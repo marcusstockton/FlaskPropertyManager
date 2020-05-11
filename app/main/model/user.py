@@ -4,6 +4,7 @@ import jwt
 from app.main.model.blacklist import BlacklistToken
 from ..config import key
 
+
 class User(db.Model):
 	""" User Model for storing user related details """
 	__tablename__ = "user"
@@ -67,7 +68,6 @@ class User(db.Model):
 			return 'Signature expired. Please log in again.'
 		except jwt.InvalidTokenError:
 			return 'Invalid token. Please log in again.'
-
 
 	def __repr__(self):
 		return "<User '{}'>".format(self.username)
