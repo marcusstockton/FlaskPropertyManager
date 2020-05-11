@@ -13,15 +13,12 @@ def save_new_user(data):
             email=data['email'],
             username=data['username'],
             password=data['password'],
-			first_name = data['firstname'],
-			last_name = data['lastname'],
+            first_name=data['first_name'],
+            last_name=data['last_name'],
+            date_of_birth=data['date_of_birth'],
             registered_on=datetime.datetime.utcnow()
         )
         save_changes(new_user)
-        response_object = {
-            'status': 'success',
-            'message': 'Successfully registered.'
-        }
         return generate_token(new_user)
     else:
         response_object = {
