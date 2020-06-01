@@ -12,7 +12,6 @@ class Address(db.Model):
 	town = db.Column(db.String(100), nullable=True)
 	city = db.Column(db.String(100), nullable=True)
 	property_id = db.Column(db.Integer, db.ForeignKey(Property.id))
-	property = db.relationship(Property, uselist=False, back_populates="address")
 	
 	def __repr__(self):
 		return "<Address '{} {} {} {} {} {}'>".format(self.line_1, self.line_2, self.line_3, self.post_code, self.town, self.city)

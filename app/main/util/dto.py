@@ -20,3 +20,13 @@ class AuthDto:
         'email': fields.String(required=True, description='The email address'),
         'password': fields.String(required=True, description='The user password '),
     })
+
+class PortfolioDto:
+    api = Namespace('portfolio', description='portfolio related operations')
+    portfolio = api.model('portfolio', {
+        'id': fields.String(required=True, description='id'),
+        'name': fields.String(required=True, description='portfolio name'),
+        'created_on': fields.DateTime(required=True, description='date created'),
+        'owner': fields.String(required=True, description='owner'),
+    })
+
