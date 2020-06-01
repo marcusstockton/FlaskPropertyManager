@@ -7,7 +7,6 @@ from app.main.service.auth_helper import Auth
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-
         data, status = Auth.get_logged_in_user(request)
         token = data.get('data')
 
@@ -22,7 +21,6 @@ def token_required(f):
 def admin_token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-
         data, status = Auth.get_logged_in_user(request)
         token = data.get('data')
 
