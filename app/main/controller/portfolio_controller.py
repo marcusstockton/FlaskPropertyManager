@@ -1,6 +1,8 @@
-from ..service.portfolio_service import get_all_portfolios, save_new_portfolio
-from ..util.dto import PortfolioDto
+from flask import request
 from flask_restx import Resource
+from ..service.portfolio_service import get_all_portfolios_for_user, save_new_portfolio
+from ..service.auth_helper import Auth
+from ..util.dto import PortfolioDto
 from ..util.decorator import token_required
 
 
@@ -11,12 +13,12 @@ _portfolio = PortfolioDto.portfolio
 @api.route('/')
 class PortfolioList(Resource):
 	@token_required
-	@api.doc('list_of_portfolios')
+	@api.doc('list_of_portfolios',security='apikey', params={'Authorization': {'in': 'header', 'description': 'An authorization token'}})
 	@api.marshal_list_with(_portfolio, envelope='data')
 	def get(self):
-		"""List all registered users"""
-		breakpoint() # Try and get logged in user here...
-		return get_all_portfolios()
+		"""Get all portfolio's for the logged in user"""
+		user = Auth.get_logged_in_user(request)
+		return get_all_portfolios_for_user(user[0]['data']['user_id'])
 
 	@token_required
 	@api.response(201, 'Portfolio successfully created.')

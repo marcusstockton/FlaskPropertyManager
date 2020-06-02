@@ -40,7 +40,8 @@ class User(db.Model):
 			payload = {
 				'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1, seconds=5),
 				'iat': datetime.datetime.utcnow(),
-				'sub': user_id
+				'sub': user_id,
+				'username': User.query.filter_by(id=user_id).first().username
 			}
 			return jwt.encode(
 				payload,
@@ -57,8 +58,9 @@ class User(db.Model):
 		:param auth_token:
 		:return: integer|string
 		"""
+		print("AUTH TOKEN:" + auth_token)
 		try:
-			payload = jwt.decode(auth_token, key)
+			payload = jwt.decode(auth_token, key,algorithms=['HS256'])
 			is_blacklisted_token = BlacklistToken.check_blacklist(auth_token)
 			if is_blacklisted_token:
 				return 'Token blacklisted. Please log in again.'
