@@ -2,8 +2,8 @@ from app.main import db
 from app.main.model.portfolio import Portfolio
 import uuid
 
-def get_all_portfolios():
-    return Portfolio.query.all()
+def get_all_portfolios_for_user(userId):
+    return Portfolio.query.filter_by(owner=userId).all()
 
 
 def save_new_portfolio(data):
