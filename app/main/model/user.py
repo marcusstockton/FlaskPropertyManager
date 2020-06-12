@@ -16,8 +16,8 @@ class User(db.Model):
 	public_id = db.Column(db.String(100), unique=True)
 	username = db.Column(db.String(50), unique=True)
 	password_hash = db.Column(db.String(100))
-	first_name = db.Column(db.String(100))
-	last_name = db.Column(db.String(100))
+	first_name = db.Column(db.String(100), nullable=True)
+	last_name = db.Column(db.String(100), nullable=True)
 	date_of_birth = db.Column(db.DateTime, nullable=True)
 
 	@property

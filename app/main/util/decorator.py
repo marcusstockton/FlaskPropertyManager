@@ -9,7 +9,6 @@ def token_required(f):
     def decorated(*args, **kwargs):
         data, status = Auth.get_logged_in_user(request)
         token = data.get('data')
-        print(token['email'])
         if not token:
             return data, status
 
