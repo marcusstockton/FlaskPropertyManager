@@ -13,9 +13,9 @@ def save_new_user(data):
             email=data['email'],
             username=data['username'],
             password=data['password'],
-            first_name=data['first_name'],
-            last_name=data['last_name'],
-            date_of_birth=data['date_of_birth'],
+            first_name= data['firstname'] if 'firstname' in data else None,
+            last_name= data['lastname'] if 'lastname' in data else None,
+            date_of_birth= data['date_of_birth'] if 'date_of_birth' in data else None,
             registered_on=datetime.datetime.utcnow()
         )
         save_changes(new_user)
