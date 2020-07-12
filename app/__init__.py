@@ -6,6 +6,7 @@ from flask import Blueprint
 from .main.controller.user_controller import api as user_ns
 from .main.controller.auth_controller import api as auth_ns
 from .main.controller.portfolio_controller import api as portfolio_ns
+from .main.controller.property_controller import api as property_ns
 
 blueprint = Blueprint('api', __name__)
 
@@ -27,4 +28,5 @@ api = Api(blueprint,
 
 api.add_namespace(user_ns, path='/user')
 api.add_namespace(portfolio_ns, path='/portfolio')
+api.add_namespace(property_ns, path='/property')
 api.add_namespace(auth_ns)

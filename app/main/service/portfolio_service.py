@@ -16,8 +16,8 @@ def save_new_portfolio(data):
             properties=data['properties'],
             created_on=datetime.datetime.utcnow()
         )
-        save_changes(portfolio)
-        return new_user
+        save_changes(new_portfolio)
+        return new_portfolio
     else:
         response_object = {
             'status': 'fail',
@@ -26,8 +26,6 @@ def save_new_portfolio(data):
         return response_object, 409
 
 
-# id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-# 	name = db.Column(db.String(100))
-# 	created_on = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-# 	owner = db.Column(db.Integer, db.ForeignKey(User.id, ondelete='CASCADE'))
-# 	properties = db.relationship("Property")
+def save_changes(data):
+    db.session.add(data)
+    db.session.commit()
