@@ -5,7 +5,6 @@ from ..service.auth_helper import Auth
 from ..util.dto import PortfolioDto
 from ..util.decorator import token_required
 
-
 api = PortfolioDto.api
 _portfolio = PortfolioDto.portfolio
 
@@ -13,7 +12,7 @@ _portfolio = PortfolioDto.portfolio
 @api.route('/')
 class PortfolioList(Resource):
 	@token_required
-	@api.doc('list_of_portfolios',security='apikey', params={'Authorization': {'in': 'header', 'description': 'An authorization token'}})
+	@api.doc('list_of_portfolios')
 	@api.marshal_list_with(_portfolio, envelope='data')
 	def get(self):
 		"""Get all portfolio's for the logged in user"""
@@ -28,3 +27,28 @@ class PortfolioList(Resource):
 		"""Creates a new Portfolio """
 		data = request.json
 		return save_new_portfolio(data=data)
+
+
+@api.route('/<int:id>')
+class PortfolioItem(Resource):
+	@token_required
+	@api.doc('single portfolio')
+	@api.marshal_list_with(_portfolio, envelope='data')
+	def get(self, id):
+		"""
+		Displays a portfolio's details
+		"""
+		data = request.json
+		breakpoint()
+
+	@token_required
+	@api.doc('update a portfolio')
+	@api.marshal_list_with(_portfolio, envelope='data')
+	@api.response(201, 'Portfolio updated created.')
+	@api.expect(_portfolio, validate=True)
+	def put(self, id):
+		"""
+		Edits a selected conference
+		"""
+		data = request.json
+		breakpoint()
