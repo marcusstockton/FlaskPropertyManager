@@ -7,7 +7,7 @@ from flask_script import Manager
 from app.main import create_app, db
 from app import blueprint
 
-from app.main.model import user, blacklist, portfolio, property, address
+from app.main.model import user, blacklist, portfolio, property, address, tenant
 
 app = create_app(os.getenv('PROPERTYMANAGER_ENV') or 'dev')
 app.register_blueprint(blueprint)

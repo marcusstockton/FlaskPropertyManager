@@ -70,6 +70,7 @@ class Auth:
 					'data': {
 						'user_id': user.id,
 						'email': user.email,
+						'username': user.username,
 						'admin': user.admin,
 						'registered_on': str(user.registered_on)
 					}
@@ -86,3 +87,12 @@ class Auth:
 				'message': 'Provide a valid auth token.'
 			}
 			return response_object, 401
+
+	def get_logged_in_user_object(request):
+		auth_token = request.headers.get('Authorization')
+		if auth_token:
+			resp = User.decode_auth_token(auth_token)
+			if not isinstance(resp, str):
+				user = User.query.filter_by(id=resp).first()
+				if user:
+					return user

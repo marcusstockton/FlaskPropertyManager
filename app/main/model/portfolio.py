@@ -9,7 +9,8 @@ class Portfolio(db.Model):
 	id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 	name = db.Column(db.String(100))
 	created_on = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-	owner = db.Column(db.Integer, db.ForeignKey(User.id, ondelete='CASCADE'))
+	owner_id = db.Column(db.Integer, db.ForeignKey(User.id, ondelete='CASCADE'))
+	owner = db.relationship("User")
 	properties = db.relationship("Property")
 
 	def __repr__(self):

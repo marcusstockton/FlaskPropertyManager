@@ -6,7 +6,7 @@ class Address(db.Model):
 	__tablename__ = "address"
 	id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 	line_1 = db.Column(db.String(100))
-	line_2 = db.Column(db.String(100))
+	line_2 = db.Column(db.String(100), nullable=True)
 	line_3 = db.Column(db.String(100), nullable=True)
 	post_code = db.Column(db.String(100))
 	town = db.Column(db.String(100), nullable=True)
