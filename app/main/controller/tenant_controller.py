@@ -2,7 +2,7 @@ from flask import request
 from flask_restx import Resource
 from ..service.auth_helper import Auth
 from ..util.decorator import token_required
-from ..util.dto import TenantDto
+from ..util.dto.tenant_dto import TenantDto
 from ..service.tenant_service import get_all_tenants_for_property, save_new_tenant
 
 api = TenantDto.api

@@ -14,3 +14,4 @@ class Property(db.Model):
 	monthly_rental_price = db.Column(db.Float(precision='10, 2'), nullable=True)
 	created_on = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 	address = db.relationship("Address", foreign_keys=[address_id])
+	tenants = db.relationship("Tenant")

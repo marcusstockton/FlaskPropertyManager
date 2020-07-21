@@ -3,7 +3,7 @@ import datetime
 
 from app.main import db
 from app.main.model.user import User
-
+import pdb
 
 def save_new_user(data):
     user = User.query.filter_by(email=data['email']).first()
@@ -13,9 +13,9 @@ def save_new_user(data):
             email=data['email'],
             username=data['username'],
             password=data['password'],
-            first_name= data['firstname'] if 'firstname' in data else None,
-            last_name= data['lastname'] if 'lastname' in data else None,
-            date_of_birth= data['date_of_birth'] if 'date_of_birth' in data else None,
+            first_name=data['firstname'] if 'firstname' in data else None,
+            last_name=data['lastname'] if 'lastname' in data else None,
+            date_of_birth=datetime.datetime.strptime(data['date_of_birth'], '%Y-%m-%d') if 'date_of_birth' in data else None,
             registered_on=datetime.datetime.utcnow()
         )
         save_changes(new_user)

@@ -1,5 +1,5 @@
 from app.main import db
-from app.main.model.tenant import Tenant
+from app.main.model.tenant import Tenant, TenantNote
 from app.main.model.property import Property
 from datetime import datetime as dt
 
@@ -30,13 +30,16 @@ def save_new_tenant(portfolioId, propertyId, data):
         tenancy_start_date = dt.strptime(data['tenancy_start_date'], '%Y-%m-%d'),
         tenancy_end_date = dt.strptime(data['tenancy_end_date'], '%Y-%m-%d') 
             if 'tenancy_end_date' in data 
-            else dt.strptime(str(dt.min.date()), '%Y-%m-%d'),
+            else None,
     )
     if 'note' in data:
-        # We've got a note to add in...?
-        pass
-    
+        new_note = TenantNote(
+            note = data['note']
+        )
+        
+    new_tenant.notes.append(new_note)
     property.tenants.append(new_tenant)
+    
     save_changes(property)
     response_object = {
         'status': 'success',
