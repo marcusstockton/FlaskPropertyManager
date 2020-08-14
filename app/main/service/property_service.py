@@ -3,9 +3,6 @@ from app.main.model.property import Property
 from app.main.model.address import Address
 from app.main.model.portfolio import Portfolio
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
-import uuid
-import json
-from collections import namedtuple
 import datetime
 
 
@@ -61,23 +58,18 @@ def save_new_property(portfolio_id, data):
                     f'Exception: {ex}',
                 }
             }
-        
+            return response_object, 500
 
 
 def get_property_by_id(portfolio_id, property_id):
 	try:
 		return Property.query.filter_by(portfolio_id=portfolio_id, id=property_id).one()
 	except MultipleResultsFound as e:
-		app.logger.info('Multiple Results Found. %s', e)
 		print(e)
 	except NoResultFound as e:
-		app.logger.info('No Results Found. %s', e)
 		print(e)
 
-	
-	
-	
 
 def save_changes(data):
-    db.session.add(data)
-    db.session.commit()
+	db.session.add(data)
+	db.session.commit()
