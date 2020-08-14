@@ -1,13 +1,13 @@
 from flask import request
 from flask_restx import Resource
 from ..service.property_service import get_all_properties_for_portfolio, save_new_property, get_property_by_id
-from ..service.auth_helper import Auth
 from ..util.dto.property_dto import PropertyDto
 from ..util.decorator import token_required
 
 api = PropertyDto.api
 _property = PropertyDto.property
 _property_create = PropertyDto.property_create
+
 
 @api.route('/')
 class PropertyList(Resource):

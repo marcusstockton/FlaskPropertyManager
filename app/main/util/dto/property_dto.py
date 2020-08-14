@@ -1,6 +1,7 @@
 from flask_restx import Namespace, fields
 from .tenant_dto import TenantDto
 
+
 class PropertyDto:
     api = Namespace('property', description='property related operations')
     

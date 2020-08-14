@@ -8,7 +8,7 @@ from ..util.decorator import token_required
 
 api = PortfolioDto.api
 _portfolio = PortfolioDto.portfolio
-import pdb
+
 
 @api.route('/')
 class PortfolioList(Resource):
@@ -49,5 +49,5 @@ class PortfolioItem(Resource):
 	def put(self, id):
 		""" Edits a selected conference """
 		data = request.json
-		pdb.set_trace()
+		import pdb; pdb.set_trace()
 		return update_portfolio(id, data)
