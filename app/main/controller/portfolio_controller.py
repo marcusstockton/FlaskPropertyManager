@@ -1,13 +1,14 @@
 from flask import request
 from flask_restx import Resource
 import json
-from ..service.portfolio_service import get_all_portfolios_for_user, save_new_portfolio, update_portfolio
+from ..service.portfolio_service import get_all_portfolios_for_user, save_new_portfolio, update_portfolio, get_portfolio_by_id
 from ..service.auth_helper import Auth
 from ..util.dto.portfolio_dto import PortfolioDto
 from ..util.decorator import token_required
 
 api = PortfolioDto.api
 _portfolio = PortfolioDto.portfolio
+_portfolio_update = PortfolioDto.portfolio_update
 
 
 @api.route('/')
@@ -35,19 +36,19 @@ class PortfolioList(Resource):
 class PortfolioItem(Resource):
 	@token_required
 	@api.doc('single portfolio')
-	@api.marshal_list_with(_portfolio, envelope='data')
+	@api.marshal_with(_portfolio, envelope='data')
 	def get(self, id):
 		""" Displays a portfolio's details """
-		data = request.json
-		breakpoint()
+		user = Auth.get_logged_in_user_object(request)
+		return get_portfolio_by_id(user.id, id)
+		
 
 	@token_required
 	@api.doc('update a portfolio')
-	@api.marshal_list_with(_portfolio, envelope='data')
-	@api.response(201, 'Portfolio updated created.')
-	@api.expect(PortfolioDto.portfolio_create, validate=True)
+	@api.marshal_with(_portfolio, envelope='data')
+	@api.response(204, 'Portfolio updated created.')
+	@api.expect(_portfolio, validate=True)
 	def put(self, id):
 		""" Edits a selected conference """
 		data = request.json
-		import pdb; pdb.set_trace()
 		return update_portfolio(id, data)
