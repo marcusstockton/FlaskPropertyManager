@@ -9,6 +9,7 @@ from ..util.decorator import token_required
 api = PortfolioDto.api
 _portfolio = PortfolioDto.portfolio
 _portfolio_update = PortfolioDto.portfolio_update
+_portfolio_update_parser = PortfolioDto.portfolio_update_parser
 
 
 @api.route('/')
@@ -46,9 +47,11 @@ class PortfolioItem(Resource):
 	@token_required
 	@api.doc('update a portfolio')
 	@api.marshal_with(_portfolio, envelope='data')
-	@api.response(204, 'Portfolio updated created.')
-	@api.expect(_portfolio, validate=True)
+	@api.response(200, 'Portfolio updated created.')
+	@api.response(500, 'Internal Server Error')
+	@api.response(404, 'Portfolio Not found')
+	@api.expect(_portfolio_update_parser, validate=True)
 	def put(self, id):
 		""" Edits a selected conference """
-		data = request.json
+		data = _portfolio_update_parser.parse_args()
 		return update_portfolio(id, data)

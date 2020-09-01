@@ -29,7 +29,7 @@ class TenantList(Resource):
 	@api.expect(_tenant_create_parser, validate=True)
 	def post(self, portfolio_id, property_id):
 		"""Creates a new Tenant """
-		data = request.form
+		data = _tenant_create_parser.parse_args()
 		profile = request.files['profile']
 		
 		return save_new_tenant(portfolio_id, property_id, data, profile)

@@ -1,5 +1,4 @@
-import werkzeug
-from flask import send_from_directory, request
+from flask import  request
 from flask_restx import Namespace, fields
 from werkzeug.datastructures import FileStorage
 from ...model.tenant import TitleEnum
@@ -10,15 +9,17 @@ from flask import current_app
 
 
 class File(fields.Raw):
-    ''' Custom field to return a file...hopefully.... '''
+    """ Custom field to return a file...hopefully.... """
     def format(self, value):
         with open(os.path.join(current_app.config['UPLOAD_FOLDER'], value), "rb") as imageFile:
             str = base64.b64encode(imageFile.read())
             return json.dumps(str.decode()).replace("'", '"')[1:-1]
 
+
 class CurrentTenants(fields.Raw):
     def format(self, value):
         return value.upper()
+
 
 class FileLocationToUrl(fields.Raw):
     def format(self, value):

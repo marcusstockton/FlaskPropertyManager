@@ -1,31 +1,15 @@
-import flask
-import unittest
 import datetime
-from unittest.mock import MagicMock, patch, PropertyMock
+from unittest.mock import patch
 from app.main import db
 from app.test.base import BaseTestCase
 from app.main.model.portfolio import Portfolio
+from app.main.model.property import Property
 from app.main.service.auth_helper import Auth
 from app.main.model.user import User
+from app.main.model.address import Address
 import json
-
+from app.test.helpers import mock_get_logged_in_user_success, mock_logged_in_user
 from manage import app
-
-
-def mock_get_logged_in_user_success():
-    mock_response_object = dict(status='success', data=dict(user_id=1, email='test@test.com', admin=0,
-                                                            registered_on=datetime.datetime.now()))
-    return mock_response_object, 200
-
-
-def mock_user_logged_in():
-    return dict(status='success', data=dict(user_id=1, email='test@test.com', admin=0,
-                                            registered_on=datetime.datetime.now()))
-
-
-def mock_logged_in_user():
-    return User(id=1, email="test@test.com", first_name="Foo",
-                last_name="Bar", username="test@test.com", admin=0)
 
 
 class TestPortfolioBlueprint(BaseTestCase):
@@ -51,7 +35,6 @@ class TestPortfolioBlueprint(BaseTestCase):
             data = response.get_json()
             self.assertEqual('Test 1', data.get('data').get('name'))
             self.assertEqual('1', data.get('data').get('id'))
-        #import pdb; pdb.set_trace()
 
     @patch.object(Auth, 'get_logged_in_user', return_value=mock_get_logged_in_user_success())
     @patch.object(Auth, 'get_logged_in_user_object', return_value=mock_logged_in_user())
@@ -61,34 +44,76 @@ class TestPortfolioBlueprint(BaseTestCase):
         with app.test_client() as client:
             response = client.get('/portfolio/2')
             self.assert404(response)
-        #import pdb; pdb.set_trace()
 
     @patch.object(Auth, 'get_logged_in_user', return_value=mock_get_logged_in_user_success())
     @patch.object(Auth, 'get_logged_in_user_object', return_value=mock_logged_in_user())
     def test_update_portfolio_works_with_correct_data_and_user(self, mock_user, mock_auth):
         self.create_data()
-        dict_data = {'id': '1', 'name': 'Updated Test 1', 'created_on': '2020-08-21T11:43:06.006284'}
+        dict_data = {'id': '1', 'name': 'Updated Test 1'}
         with app.test_client() as client:
-            response = client.put('/portfolio/1', data=json.dumps(dict_data), headers={'Content-Type': 'application/json'},)
+            response = client.put('/portfolio/1', data=json.dumps(dict_data),
+                                  headers={'Content-Type': 'application/json'},)
             self.assertIsNot(400, response.status_code)
-            self.assertEqual(response.status_code, 204)
-            
-            response = client.get('/portfolio/1')
+            self.assertEqual(response.status_code, 200)
             data = json.loads(response.get_data(as_text=True))
 
             self.assertEqual('Updated Test 1', data.get('data').get('name'))
-            
+
+    @patch.object(Auth, 'get_logged_in_user', return_value=mock_get_logged_in_user_success())
+    @patch.object(Auth, 'get_logged_in_user_object', return_value=mock_logged_in_user())
+    def test_update_portfolio_fails_if_incorrect_data_used(self, mock_user, mock_auth):
+        self.create_data()
+        dict_data = {'id': '2', 'name': 'Updated Test 1'}
+        with app.test_client() as client:
+            response = client.put('/portfolio/1', data=json.dumps(dict_data),
+                                  headers={'Content-Type': 'application/json'},)
+            self.assertEqual(response.status_code, 500)
+
+    @patch.object(Auth, 'get_logged_in_user', return_value=mock_get_logged_in_user_success())
+    @patch.object(Auth, 'get_logged_in_user_object', return_value=mock_logged_in_user())
+    def test_get_portfolio_returns_correct_property_count_with_correct_data_and_user(self, mock_user, mock_auth):
+        self.create_data()
+        # get portfolio to append a property or two to it
+        portfolio = db.session.query(Portfolio).filter(Portfolio.id == 1).one()
+        property1 = Property(
+            id=1,
+            portfolio_id=1,
+            address_id=1,
+            owner_id=1,
+            purchase_price=32000,
+            purchase_date=datetime.datetime(2020, 5, 17),
+            monthly_rental_price=670,
+            created_on=datetime.datetime.now(),
+            address=Address(
+                id=1,
+                line_1="Test Line 1",
+                line_2="Test Line 2",
+                post_code="EX11EX",
+                city="Exeter"
+            ),
+        )
+        portfolio.properties.append(property1)
+        db.session.commit()
+
+        # Do the test:
+        with app.test_client() as client:
+            response = client.get('/portfolio/1')
+            self.assertIsNot(400, response.status_code)
+            self.assertEqual(response.status_code, 200)
+            data = json.loads(response.get_data(as_text=True))
+
+            self.assertEqual(1, data.get('data').get('property_count'))
 
     @staticmethod
     def create_data():
         date = datetime.datetime.now()
-        date -= datetime.timedelta(6 * 30) # date 6 months ago.
-        user_1 = User(email="test@test.com", first_name="Foo", registered_on=date,
-                last_name="Bar", username="test@test.com", admin=0)
+        date -= datetime.timedelta(6 * 30)  # date 6 months ago.
+        user_1 = User(email="test@test.com", first_name="Foo", registered_on=date, last_name="Bar",
+                      username="test@test.com", admin=0)
         db.session.add(user_1)
 
-        user_2 = User(email="test2@test.com", first_name="Fizz", registered_on=date,
-                last_name="Buzz", username="test1@test.com", admin=0)
+        user_2 = User(email="test2@test.com", first_name="Fizz", registered_on=date, last_name="Buzz",
+                      username="test1@test.com", admin=0)
         db.session.add(user_2)
 
         portfolio1 = Portfolio(
