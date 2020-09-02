@@ -1,4 +1,5 @@
 from app.main import db
+from flask import current_app
 from app.main.model.portfolio import Portfolio
 from typing import List, Dict
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
@@ -7,6 +8,7 @@ from sqlalchemy import update
 from sqlalchemy.orm import lazyload
 import datetime
 from flask_restx import abort
+
 
 def get_all_portfolios_for_user(user_id: int) -> List[Portfolio]:
     return Portfolio.query.filter_by(owner_id=user_id).options(lazyload(Portfolio.owner),
@@ -19,9 +21,11 @@ def get_portfolio_by_id(user_id: int, portfolio_id: int) -> Portfolio:
             .options(lazyload(Portfolio.owner),
                      lazyload(Portfolio.properties)).one()
     except NoResultFound as e:
-        return abort(404, "Portfolio not found")
+        current_app.logger.error("Portfolio not found for userid %s and portfolio_id %s", user_id, portfolio_id)
+        abort(404, "Portfolio not found")
     except MultipleResultsFound as e:
-        return abort(500, "Multiple Portfolio's found")
+        current_app.logger.error("Multiple portfolio's not found for userid %s and portfolio_id %s", user_id, portfolio_id)
+        abort(500, "Multiple Portfolio's found")
 
 
 def save_new_portfolio(data, user) -> Dict[str, str]:
@@ -35,13 +39,13 @@ def save_new_portfolio(data, user) -> Dict[str, str]:
         save_changes(new_portfolio)
         return new_portfolio
     else:
-        return abort(409, "Portfolio already exists.")
+        abort(409, "Portfolio already exists.")
 
 
 def update_portfolio(portfolio_id: int, data: dict):
     portfolio_query = db.session.query(Portfolio).filter(Portfolio.id == portfolio_id)
     if not portfolio_query:
-        return abort(404, "Portfolio not found.")
+        abort(404, "Portfolio not found.")
 
     try:
         stmt = update(Portfolio).where(Portfolio.id == portfolio_id).values(data)
@@ -50,9 +54,10 @@ def update_portfolio(portfolio_id: int, data: dict):
         return Portfolio(**data)
 
     except IntegrityError as e:
-        return abort(500, e)
+        abort(500, e.args)
+
     except Exception as e:
-        return abort(500, e)
+        abort(500, e)
 
 
 def save_changes(data) -> None:

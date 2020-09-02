@@ -1,4 +1,5 @@
 from app.main import db
+from flask import current_app
 from app.main.model.tenant import Tenant, TenantNote
 from app.main.model.property import Property
 from flask import current_app
@@ -52,7 +53,6 @@ def save_new_tenant(portfolioId, propertyId, data, profile):
         return response_object, 404
 
     # check if tenant already exists?
-    import pdb; pdb.set_trace()
     if Tenant.query.filter_by(property_id=propertyId)\
             .filter(portfolio__id=portfolioId)\
             .filter(first_name=data['first_name'])\

@@ -7,12 +7,12 @@ from ._helpers import ObjectCount
 class PortfolioDto:
     api = Namespace('portfolio', description='portfolio related operations')
 
-    portfolio = api.model('Portfolio', {
+    portfolio_details = api.model('Portfolio', {
         'id': fields.String(required=True, description='id'),
         'name': fields.String(required=True, description='portfolio name'),
         'created_on': fields.DateTime(required=True, description='date created', attribute="created_on", format='rfc822'),
         'owner': fields.Nested(UserDto.user, description='owner', attribute='owner'),
-        'properties': fields.List(fields.Nested(PropertyDto.property),required=False, description='properties'),
+        #'properties': fields.List(fields.Nested(PropertyDto.property),required=False, description='properties'),
         'property_count': ObjectCount(attribute='properties')
     })
 

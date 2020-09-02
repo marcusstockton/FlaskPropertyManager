@@ -7,7 +7,7 @@ from ..util.dto.portfolio_dto import PortfolioDto
 from ..util.decorator import token_required
 
 api = PortfolioDto.api
-_portfolio = PortfolioDto.portfolio
+_portfolio_details = PortfolioDto.portfolio_details
 _portfolio_update = PortfolioDto.portfolio_update
 _portfolio_update_parser = PortfolioDto.portfolio_update_parser
 
@@ -16,7 +16,7 @@ _portfolio_update_parser = PortfolioDto.portfolio_update_parser
 class PortfolioList(Resource):
 	@token_required
 	@api.doc('list_of_portfolios')
-	@api.marshal_list_with(_portfolio, envelope='data')
+	@api.marshal_list_with(_portfolio_details, envelope='data')
 	def get(self):
 		"""Get all portfolio's for the logged in user"""
 		user = Auth.get_logged_in_user_object(request)
@@ -37,7 +37,7 @@ class PortfolioList(Resource):
 class PortfolioItem(Resource):
 	@token_required
 	@api.doc('single portfolio')
-	@api.marshal_with(_portfolio, envelope='data')
+	@api.marshal_with(_portfolio_details, envelope='data')
 	def get(self, id):
 		""" Displays a portfolio's details """
 		user = Auth.get_logged_in_user_object(request)
@@ -46,7 +46,7 @@ class PortfolioItem(Resource):
 
 	@token_required
 	@api.doc('update a portfolio')
-	@api.marshal_with(_portfolio, envelope='data')
+	@api.marshal_with(_portfolio_details, envelope='data')
 	@api.response(200, 'Portfolio updated created.')
 	@api.response(500, 'Internal Server Error')
 	@api.response(404, 'Portfolio Not found')

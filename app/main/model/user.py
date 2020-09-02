@@ -19,6 +19,7 @@ class User(db.Model):
 	first_name = db.Column(db.String(100), nullable=True)
 	last_name = db.Column(db.String(100), nullable=True)
 	date_of_birth = db.Column(db.DateTime, nullable=True)
+	roles = db.relationship('Role', secondary='user_roles', backref=db.backref('user', lazy='dynamic'))
 
 	@property
 	def password(self):
@@ -72,3 +73,16 @@ class User(db.Model):
 
 	def __repr__(self):
 		return "<User '{}'>".format(self.username)
+
+
+class Role(db.Model):
+        __tablename__ = 'roles'
+        id = db.Column(db.Integer(), primary_key=True)
+        name = db.Column(db.String(50), unique=True)
+
+# Define the UserRoles association table
+class UserRoles(db.Model):
+	__tablename__ = 'user_roles'
+	id = db.Column(db.Integer(), primary_key=True)
+	user_id = db.Column(db.Integer(), db.ForeignKey('user.id', ondelete='CASCADE'))
+	role_id = db.Column(db.Integer(), db.ForeignKey('roles.id', ondelete='CASCADE'))

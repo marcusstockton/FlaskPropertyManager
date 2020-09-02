@@ -26,3 +26,7 @@ db.session.commit()
 
 test@test.com
 test
+
+
+Idea's
+Add error logging to a mongodb database
