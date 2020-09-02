@@ -6,13 +6,13 @@ from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 import datetime
 
 
-def get_all_properties_for_portfolio(portfolioId):
-    return Property.query.filter_by(portfolio_id=portfolioId).all()
+def get_all_properties_for_portfolio(portfolio_id):
+    return Property.query.filter_by(portfolio_id=portfolio_id).all()
 
 
 def save_new_property(portfolio_id, data):
     portfolio = Portfolio.query.filter_by(id=portfolio_id).first()
-    
+
     if portfolio is None:
         response_object = {
             'status': 'fail',
@@ -23,17 +23,17 @@ def save_new_property(portfolio_id, data):
     if data['address']:
         # create address
         new_address = Address(
-            line_1 = data['address']['line_1'],
-            line_2 = data['address'].get('line_2', None),
-            line_3 = data['address'].get('line_3', None),
-            post_code = data['address']['post_code'],
-            town = data['address'].get('town', None),
-            city = data['address'].get('city', None)
+            line_1=data['address']['line_1'],
+            line_2=data['address'].get('line_2', None),
+            line_3=data['address'].get('line_3', None),
+            post_code=data['address']['post_code'],
+            town=data['address'].get('town', None),
+            city=data['address'].get('city', None)
         )
         new_property = Property(
             portfolio_id=portfolio_id,
             purchase_price=data['purchase_price'],
-            purchase_date= datetime.datetime.strptime(data['purchase_date'], '%Y-%m-%d'),
+            purchase_date=datetime.datetime.strptime(data['purchase_date'], '%Y-%m-%d'),
             monthly_rental_price=data['monthly_rental_price'],
             created_on=datetime.datetime.utcnow()
         )
@@ -62,14 +62,14 @@ def save_new_property(portfolio_id, data):
 
 
 def get_property_by_id(portfolio_id, property_id):
-	try:
-		return Property.query.filter_by(portfolio_id=portfolio_id, id=property_id).one()
-	except MultipleResultsFound as e:
-		print(e)
-	except NoResultFound as e:
-		print(e)
+    try:
+        return Property.query.filter_by(portfolio_id=portfolio_id, id=property_id).one()
+    except MultipleResultsFound as e:
+        print(e)
+    except NoResultFound as e:
+        print(e)
 
 
 def save_changes(data):
-	db.session.add(data)
-	db.session.commit()
+    db.session.add(data)
+    db.session.commit()
