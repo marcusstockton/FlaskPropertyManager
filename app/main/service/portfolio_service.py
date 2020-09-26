@@ -46,18 +46,13 @@ def update_portfolio(portfolio_id: int, data: dict):
     portfolio_query = db.session.query(Portfolio).filter(Portfolio.id == portfolio_id)
     if not portfolio_query:
         abort(404, "Portfolio not found.")
-
     try:
         stmt = update(Portfolio).where(Portfolio.id == portfolio_id).values(data)
         db.session.execute(stmt)
         db.session.commit()
         return Portfolio(**data)
-
     except IntegrityError as e:
-        abort(500, e.args)
-
-    except Exception as e:
-        abort(500, e)
+        raise e
 
 
 def save_changes(data) -> None:

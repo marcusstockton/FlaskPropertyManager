@@ -13,6 +13,7 @@ class UserLogin(Resource):
     """ User Login Resource """
     @api.doc('user login')
     @api.expect(user_auth, validate=True)
+    @api.response(401, 'Invalid username and/or password')
     def post(self):
         # get the post data
         post_data = request.json

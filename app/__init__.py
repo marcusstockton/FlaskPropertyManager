@@ -2,6 +2,7 @@
 
 from flask_restx import Api
 from flask import Blueprint
+from sqlalchemy.exc import IntegrityError
 
 from .main.controller.user_controller import api as user_ns
 from .main.controller.auth_controller import api as auth_ns
@@ -32,3 +33,17 @@ api.add_namespace(portfolio_ns, path='/portfolio')
 api.add_namespace(property_ns, path='/portfolio/<int:portfolio_id>/property')
 api.add_namespace(tenant_ns, path='/portfolio/<int:portfolio_id>/property/<int:property_id>')
 api.add_namespace(auth_ns)
+
+
+# Global Error Handlers:
+@api.errorhandler(IntegrityError)
+def integrety_exception_handler(error: IntegrityError):
+    """Default error handler"""
+    return {'message': error.args}, 500
+    #return {'message': str(error)}, getattr(error, 'code', 500)
+
+
+@api.errorhandler(Exception)
+def generic_exception_handler(error: Exception):
+    """Default error handler"""
+    return {'message': str(error)}, getattr(error, 'code', 500)

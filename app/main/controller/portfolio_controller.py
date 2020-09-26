@@ -1,3 +1,5 @@
+from sqlite3 import IntegrityError
+
 from flask import request
 from flask_restx import Resource
 import json
@@ -42,7 +44,6 @@ class PortfolioItem(Resource):
 		""" Displays a portfolio's details """
 		user = Auth.get_logged_in_user_object(request)
 		return get_portfolio_by_id(user.id, id)
-		
 
 	@token_required
 	@api.doc('update a portfolio')
@@ -55,3 +56,5 @@ class PortfolioItem(Resource):
 		""" Edits a selected conference """
 		data = _portfolio_update_parser.parse_args()
 		return update_portfolio(id, data)
+
+

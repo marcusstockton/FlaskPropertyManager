@@ -15,5 +15,5 @@ class TestUserService(BaseTestCase):
 
         # get the user id that was created, and check role
         new_user = user_service.get_a_user(response['user_id'])
-        self.assertEqual(len(new_user.roles) == 1)
+        self.assertEqual(len(new_user.roles), 1)
         self.assertEqual(new_user.roles[0].name, 'Owner')
