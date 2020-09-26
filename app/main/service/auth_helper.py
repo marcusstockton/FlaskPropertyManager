@@ -3,7 +3,6 @@ from ..service.blacklist_service import save_token
 
 
 class Auth:
-
 	@staticmethod
 	def login_user(data):
 		try:
@@ -21,7 +20,7 @@ class Auth:
 			else:
 				response_object = {
 					'status': 'fail',
-					'message': 'email or password does not match.'
+					'message': 'Email or password does not match.'
 				}
 				return response_object, 401
 
