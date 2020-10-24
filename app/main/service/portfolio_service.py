@@ -1,13 +1,15 @@
-from app.main import db
-from flask import current_app
-from app.main.model.portfolio import Portfolio
-from typing import List, Dict
-from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy import update
-from sqlalchemy.orm import lazyload
 import datetime
+from typing import List, Dict
+
+from flask import current_app
 from flask_restx import abort
+from sqlalchemy import update
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import lazyload
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
+
+from app.main import db
+from app.main.model.portfolio import Portfolio
 
 
 def get_all_portfolios_for_user(user_id: int) -> List[Portfolio]:
@@ -28,12 +30,12 @@ def get_portfolio_by_id(user_id: int, portfolio_id: int) -> Portfolio:
         abort(500, "Multiple Portfolio's found")
 
 
-def save_new_portfolio(data, user) -> Dict[str, str]:
-    portfolio = Portfolio.query.filter_by(name=data['name']).first()
+def save_new_portfolio(data, user_id) -> Dict[str, str]:
+    portfolio = Portfolio.query.filter_by(name=data['name']).filter_by(owner_id=user_id).first()
     if not portfolio:
         new_portfolio = Portfolio(
             name=data['name'],
-            owner_id=user.id,
+            owner_id=user_id,
             created_on=datetime.datetime.utcnow()
         )
         save_changes(new_portfolio)
