@@ -1,6 +1,7 @@
-from .. import db
 import datetime
+
 from .user import User
+from .. import db
 
 
 class Portfolio(db.Model):
@@ -11,7 +12,7 @@ class Portfolio(db.Model):
 	created_on = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 	owner_id = db.Column(db.Integer, db.ForeignKey(User.id, ondelete='CASCADE'))
 	owner = db.relationship("User")
-	properties = db.relationship("Property")
+	properties = db.relationship("Property", cascade="all, delete")
 
 	def __repr__(self):
-		return "<Portfolio '{}'>".format(self.name)
+		return "<Portfolio 'Id:{}, Name:{}'>".format(self.id, self.name)
