@@ -1,5 +1,5 @@
 from .. import db
-from .property import Property
+
 
 class Address(db.Model):
 	""" Address Model for storing addresses """
@@ -11,7 +11,9 @@ class Address(db.Model):
 	post_code = db.Column(db.String(100))
 	town = db.Column(db.String(100), nullable=True)
 	city = db.Column(db.String(100), nullable=True)
-	property_id = db.Column(db.Integer, db.ForeignKey(Property.id))
-	
+	property_id = db.Column(db.Integer, db.ForeignKey("property.id"))
+	property = db.relationship("Property", back_populates="address", foreign_keys=[property_id])
+
 	def __repr__(self):
-		return "<Address '{} {} {} {} {} {}'>".format(self.line_1, self.line_2, self.line_3, self.post_code, self.town, self.city)
+		return "<Address 'Id:{} Address:{} {} {} {} {} {} PropertyId:{}'>"\
+			.format(self.id, self.line_1, self.line_2, self.line_3, self.post_code, self.town, self.city, self.property_id)
