@@ -47,9 +47,9 @@ class User(db.Model):
 
     def encode_auth_token(self, user_id):
         """
-		Generates the Auth Token
-		:return: string
-		"""
+        Generates the Auth Token
+        :return: string
+        """
         try:
             payload = {
                 'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1, seconds=5),
@@ -68,10 +68,10 @@ class User(db.Model):
     @staticmethod
     def decode_auth_token(auth_token):
         """
-		Decodes the auth token
-		:param auth_token:
-		:return: integer|string
-		"""
+        Decodes the auth token
+        :param auth_token:
+        :return: integer|string
+        """
         try:
             payload = jwt.decode(auth_token, key, algorithms=['HS256'])
             is_blacklisted_token = BlacklistToken.check_blacklist(auth_token)
@@ -92,11 +92,12 @@ class Role(db.Model):
     __tablename__ = 'roles'
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(50), unique=True)
+
     def __repr__(self):
         return "<Role 'Id: {} {}'>".format(self.id, self.name)
 
 
-# Define the UserRoles association table
+# Define the UserRoles association tabletest_registered_user_login
 class UserRoles(db.Model):
     __tablename__ = 'user_roles'
     id = db.Column(db.Integer(), primary_key=True)

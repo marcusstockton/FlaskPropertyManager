@@ -1,7 +1,6 @@
 from flask_restx import Namespace, fields
 
 from ._helpers import ObjectCount, SumOfProperties
-from .user_dto import UserDto
 
 
 class PortfolioDto:
@@ -11,7 +10,7 @@ class PortfolioDto:
         'id': fields.String(required=True, description='id'),
         'name': fields.String(required=True, description='portfolio name'),
         'created_on': fields.DateTime(required=True, description='date created', attribute="created_on", format='rfc822'),
-        'owner': fields.Nested(UserDto.user, description='owner', attribute='owner'),
+        # 'owner': fields.Nested(UserDto.user, description='owner', attribute='owner'),
         'property_count': ObjectCount(attribute='properties'),
         'total_income': SumOfProperties(attribute='properties')
     })

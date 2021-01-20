@@ -1,13 +1,15 @@
 import uuid
 from datetime import datetime
-from app.main import db
+
 from flask import current_app
+
+from app.main import db
 from app.main.model.user import User, Role
 
 
 def save_new_user(data):
     user = User.query.filter_by(email=data['email']).first()
-    owner_role = Role.query.filter_by(name='Owner').first() # All users created are owners...for now
+    owner_role = Role.query.filter_by(name='Owner').first()  # All users created are owners...for now
     if not user:
         new_user = User(
             public_id=str(uuid.uuid4()),
@@ -49,7 +51,7 @@ def generate_token(user):
             'message': 'Successfully registered.',
             'user_id': user.public_id,
             'user_name': user.username,
-            'Authorization': auth_token.decode()
+            'Authorization': auth_token
         }
         current_app.logger.info('auth_token created successfully')
         return response_object, 201

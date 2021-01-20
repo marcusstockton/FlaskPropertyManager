@@ -1,19 +1,24 @@
-from flask import  request
-from flask_restx import Namespace, fields
-from werkzeug.datastructures import FileStorage
-from ...model.tenant import TitleEnum
+import base64
 import json
 import os
-import base64
+
 from flask import current_app
+from flask import request
+from flask_restx import Namespace, fields
+from werkzeug.datastructures import FileStorage
+
+from ...model.tenant import TitleEnum
 
 
 class File(fields.Raw):
     """ Custom field to return a file...hopefully.... """
     def format(self, value):
-        with open(os.path.join(current_app.config['UPLOAD_FOLDER'], value), "rb") as imageFile:
-            str = base64.b64encode(imageFile.read())
-            return json.dumps(str.decode()).replace("'", '"')[1:-1]
+        if value.startswith("http"):
+            return value
+        else:
+            with open(os.path.join(current_app.config['UPLOAD_FOLDER'], value), "rb") as imageFile:
+                str = base64.b64encode(imageFile.read())
+                return json.dumps(str.decode()).replace("'", '"')[1:-1]
 
 
 class CurrentTenants(fields.Raw):

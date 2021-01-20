@@ -38,8 +38,10 @@ def seed_data(db):
         registered_on=datetime.now(),
         public_id=str(uuid.uuid4()),
         date_of_birth=fake.date_of_birth(),
+        password="test"
     )
     owner_user1.roles = [owner_role, ]
+
     admin_user = user.User(
         email="marcus_stockton@hotmail.co.uk",
         username="AdminUser",
@@ -47,9 +49,11 @@ def seed_data(db):
         last_name="Stockton",
         registered_on=datetime.now(),
         public_id=str(uuid.uuid4()),
-        date_of_birth=fake.date_of_birth()
+        date_of_birth=fake.date_of_birth(),
+        password="test"
     )
     admin_user.roles = [admin_role, ]
+
     db.session.add_all([owner_user1, admin_user])
     db.session.commit()
 
@@ -60,7 +64,7 @@ def seed_data(db):
             property.Property(
                 address=address.Address(
                     line_1=fake.building_number(),
-                    line_2=fake.street_address(),
+                    line_2=fake.street_name(),
                     line_3="",
                     post_code=fake.postcode(),
                     town="",
@@ -76,6 +80,7 @@ def seed_data(db):
                         date_of_birth=fake.date_of_birth(),
                         job_title=fake.job(),
                         tenancy_start_date=fake.date_this_decade(),
+                        profile_pic=fake.image_url(500,400)
                     ),
                     tenant.Tenant(
                         title=tenant.TitleEnum.Miss,
@@ -87,6 +92,7 @@ def seed_data(db):
                         job_title=fake.job(),
                         tenancy_start_date=fakeTenancyStartDate1,
                         tenancy_end_date=fake.date_between_dates(fakeTenancyStartDate1),
+                        profile_pic=fake.image_url(500,400)
                     ),
                     tenant.Tenant(
                         title=tenant.TitleEnum.Mr,
@@ -98,6 +104,7 @@ def seed_data(db):
                         job_title=fake.job(),
                         tenancy_start_date=fakeTenancyStartDate2,
                         tenancy_end_date=fake.date_between_dates(fakeTenancyStartDate2),
+                        profile_pic=fake.image_url(500,400),
                         notes=[
                             tenant.TenantNote(
                                 created_date=datetime.now(),
@@ -151,6 +158,7 @@ def seed_data(db):
                         job_title=fake.job(),
                         tenancy_start_date=fakeTenancyStartDate3,
                         tenancy_end_date=fake.date_between_dates(fakeTenancyStartDate3),
+                        profile_pic=fake.image_url(400,400)
                     ),
                     tenant.Tenant(
                         title=tenant.TitleEnum.Mr,
@@ -162,6 +170,7 @@ def seed_data(db):
                         job_title=fake.job(),
                         tenancy_start_date=fakeTenancyStartDate4,
                         tenancy_end_date=fake.date_between_dates(fakeTenancyStartDate4),
+                        profile_pic=fake.image_url(400, 400),
                         notes=[
                             tenant.TenantNote(
                                 created_date=datetime.now(),
@@ -208,6 +217,7 @@ def seed_data(db):
                         date_of_birth=fake.date_of_birth(),
                         job_title=fake.job(),
                         tenancy_start_date=fake.date_this_decade(),
+                        profile_pic=fake.image_url(400,400)
                     ),
                     tenant.Tenant(
                         title=tenant.TitleEnum.Miss,
@@ -219,6 +229,7 @@ def seed_data(db):
                         job_title=fake.job(),
                         tenancy_start_date=fakeTenancyStartDate5,
                         tenancy_end_date=fake.date_between_dates(fakeTenancyStartDate5),
+                        profile_pic=fake.image_url(400,400)
                     ),
                     tenant.Tenant(
                         title=tenant.TitleEnum.Mr,
@@ -230,6 +241,7 @@ def seed_data(db):
                         job_title=fake.job(),
                         tenancy_start_date=fakeTenancyStartDate6,
                         tenancy_end_date=fake.date_between_dates(fakeTenancyStartDate6),
+                        profile_pic=fake.image_url(400, 400),
                         notes=[
                             tenant.TenantNote(
                                 created_date=datetime.now(),
@@ -270,7 +282,7 @@ def seed_data(db):
                         date_of_birth=fake.date_of_birth(),
                         job_title=fake.job(),
                         tenancy_start_date=fake.date_this_decade(),
-                        profile_pic='tenants/5/ed-warp-art-bfg-space-marines-dark-angels-capitains-05.jpg',
+                        profile_pic=fake.image_url(400,400)
                     ),
                     tenant.Tenant(
                         title=tenant.TitleEnum.Miss,
@@ -282,6 +294,7 @@ def seed_data(db):
                         job_title=fake.job(),
                         tenancy_start_date=fakeTenancyStartDate7,
                         tenancy_end_date=fake.date_between_dates(fakeTenancyStartDate7),
+                        profile_pic=fake.image_url(400,400)
                     ),
                     tenant.Tenant(
                         title=tenant.TitleEnum.Mr,
@@ -293,6 +306,7 @@ def seed_data(db):
                         job_title=fake.job(),
                         tenancy_start_date=fakeTenancyStartDate8,
                         tenancy_end_date=fake.date_between_dates(fakeTenancyStartDate8),
+                        profile_pic=fake.image_url(400, 400),
                         notes=[
                             tenant.TenantNote(
                                 created_date=datetime.now(),
@@ -340,6 +354,7 @@ def seed_data(db):
                         date_of_birth=fake.date_of_birth(),
                         job_title=fake.job(),
                         tenancy_start_date=fake.date_this_decade(),
+                        profile_pic=fake.image_url(400, 400),
                         notes=[
                             tenant.TenantNote(
                                 created_date=datetime.now(),
@@ -357,6 +372,7 @@ def seed_data(db):
                         job_title=fake.job(),
                         tenancy_start_date=fakeTenancyStartDate9,
                         tenancy_end_date=fake.date_between_dates(fakeTenancyStartDate9),
+                        profile_pic=fake.image_url(400, 400),
                         notes=[
                             tenant.TenantNote(
                                 created_date=datetime.now(),
@@ -390,6 +406,7 @@ def seed_data(db):
                         job_title=fake.job(),
                         tenancy_start_date=fakeTenancyStartDate10,
                         tenancy_end_date=fake.date_between_dates(fakeTenancyStartDate10),
+                        profile_pic=fake.image_url(400, 400),
                         notes=[
                             tenant.TenantNote(
                                 created_date=datetime.now(),
@@ -407,6 +424,7 @@ def seed_data(db):
                         job_title=fake.job(),
                         tenancy_start_date=fakeTenancyStartDate11,
                         tenancy_end_date=fake.date_between_dates(fakeTenancyStartDate11),
+                        profile_pic=fake.image_url(400, 400),
                         notes=[
                             tenant.TenantNote(
                                 created_date=datetime.now(),
