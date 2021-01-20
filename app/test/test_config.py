@@ -4,8 +4,8 @@ import unittest
 from flask import current_app
 from flask_testing import TestCase
 
-from manage import app
 from app.main.config import basedir
+from manage import app
 
 
 class TestDevelopmentConfig(TestCase):
@@ -18,7 +18,7 @@ class TestDevelopmentConfig(TestCase):
         self.assertTrue(app.config['DEBUG'] is True)
         self.assertFalse(current_app is None)
         self.assertTrue(
-            app.config['SQLALCHEMY_DATABASE_URI'] == 'sqlite:///' + os.path.join(basedir, 'flask_PropertyManager_main.db')
+            app.config['SQLALCHEMY_DATABASE_URI'] == 'sqlite:///' + os.path.join(basedir, 'flask_PropertyManager_main.db?check_same_thread=False')
         )
 
 

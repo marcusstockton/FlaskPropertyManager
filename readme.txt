@@ -18,7 +18,7 @@ sudo python manage.py run
 
 Example insert of property against Portfolio in shell:
 port = Portfolio.query.first()
-new_property = Property(portfolio_id=1, purchase_price=234561, purchase_date=datetime.datetime(2020,3,12))
+new_property = Property(portfolio_id=1, purchase_price=234561, purchase_date= datetime.datetime(2020,3,12))
 port.properties.append(new_property)
 db.session.commit()
 

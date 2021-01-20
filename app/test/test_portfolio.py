@@ -1,13 +1,14 @@
 import datetime
+import json
 from unittest.mock import patch
+
 from app.main import db
-from app.test.base import BaseTestCase
+from app.main.model.address import Address
 from app.main.model.portfolio import Portfolio
 from app.main.model.property import Property
-from app.main.service.auth_helper import Auth
 from app.main.model.user import User
-from app.main.model.address import Address
-import json
+from app.main.service.auth_helper import Auth
+from app.test.base import BaseTestCase
 from app.test.helpers import mock_get_logged_in_user_success, mock_logged_in_user
 from manage import app
 
@@ -78,7 +79,6 @@ class TestPortfolioBlueprint(BaseTestCase):
         property1 = Property(
             id=1,
             portfolio_id=1,
-            address_id=1,
             owner_id=1,
             purchase_price=32000,
             purchase_date=datetime.datetime(2020, 5, 17),
