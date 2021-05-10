@@ -1,9 +1,9 @@
 from flask import request
 from flask_restx import Resource
 
+from ..service.tenant_service import get_all_tenants_for_property, save_new_tenant, get_tenant_by_id, delete_tenant
 from ..util.decorator import token_required
 from ..util.dto.tenant_dto import TenantDto
-from ..service.tenant_service import get_all_tenants_for_property, save_new_tenant
 
 api = TenantDto.api
 _tenant = TenantDto.tenant
@@ -33,3 +33,20 @@ class TenantList(Resource):
 		profile = request.files['profile']
 		
 		return save_new_tenant(portfolio_id, property_id, data, profile)
+
+
+@api.route('/<int:tenant_id>')
+class TenantItem(Resource):
+	@token_required
+	@api.doc('tenant details')
+	@api.marshal_with(_tenant)
+	def get(self, portfolio_id, property_id, tenant_id):
+		tenant = get_tenant_by_id(portfolio_id, property_id, tenant_id)
+		return tenant
+
+	@token_required
+	@api.doc('tenant delete')
+	@api.marshal_with(_tenant)
+	def delete(self, portfolio_id, property_id, tenant_id):
+		""" Gets the property by id. """
+		return delete_tenant(portfolio_id, property_id, tenant_id)

@@ -34,8 +34,8 @@ class PropertyDto:
         'purchase_price': fields.Float(required=True, description='purchase price'),
         'purchase_date': fields.DateTime(required=True, description='purchase date'),
         'monthly_rental_price': fields.Float(required=True, description='monthly rental price'),
-        'address':fields.Nested(AddressDto.address,required=True, description='address'),
-        'tenants':fields.List(fields.Nested(TenantDto.tenant),required=False, description='tenants'),
+        'address': fields.Nested(AddressDto.address, required=True, description='address'),
+        'tenants': fields.List(fields.Nested(TenantDto.tenant), required=False, description='tenants'),
     })
 
     property_create = api.model('Property', {
