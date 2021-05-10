@@ -1,3 +1,4 @@
+
 scaffolded out in line with:
 https://www.freecodecamp.org/news/structuring-a-flask-restplus-web-service-for-production-builds-c2ec676de563/
 
@@ -14,6 +15,8 @@ sudo python manage.py test
 Running:
 sudo python manage.py run
 
+Seeding:
+sudo python manage.py seed
 
 
 Example insert of property against Portfolio in shell:
@@ -24,7 +27,7 @@ db.session.commit()
 
 
 
-test@test.com | dave@test.com
+test@test.com | marcus_stockton@hotmail.co.uk
 test
 
 

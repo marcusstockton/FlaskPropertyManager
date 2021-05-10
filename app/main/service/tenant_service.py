@@ -1,17 +1,22 @@
-from app.main import db
-from flask import current_app
-from app.main.model.tenant import Tenant, TenantNote
-from app.main.model.property import Property
-from flask import current_app
-from datetime import datetime as dt
-from werkzeug.utils import secure_filename
 import os
+from datetime import datetime as dt
 
-def get_all_tenants_for_property(portfolio_id, propertyId):
-    return Tenant.query.filter_by(property_id=propertyId).all()
+from flask import current_app
+from werkzeug.utils import secure_filename
 
-def update_tenant(propertyId, data, profile):
-    tenant = Tenant.query.filter_by(id=data['id']).update(data)
+from app.main import db
+from app.main.model.property import Property
+from app.main.model.tenant import Tenant, TenantNote
+
+
+def get_all_tenants_for_property(portfolio_id, property_id):
+    return Tenant.query.filter_by(portfolio_id=portfolio_id)\
+                        .filter(property_id=property_id).all()
+
+
+def update_tenant(property_id, data, profile):
+    tenant = Tenant.query.filter_by(id=data['id'])\
+                        .filter(property_id=property_id).update(data)
     save_changes(tenant)
     response_object = {
         'status': 'success',
@@ -23,21 +28,22 @@ def update_tenant(propertyId, data, profile):
     return response_object, 204 
     
 
-def delete_tenant(propertyId, tenant_id):
-    tenant = Tenant.query.filter_by(property_id=propertyId).filter(id=tenant_id)
+def delete_tenant(property_id, tenant_id):
+    tenant = Tenant.query.filter_by(property_id=property_id).filter(id=tenant_id)
     if tenant is not None:
-        Tenant.query.filter_by(property_id=propertyId).filter(id=tenant_id).delete()
+        Tenant.query.filter_by(property_id=property_id).filter(id=tenant_id).delete()
         save_changes(tenant)
         response_object = {
             'status': 'success',
             'message': 'Successfully deleted tenant.',
-            'data': { }
+            'data': {}
         }
         return response_object, 201
     return 'Not found', 404
 
-def save_new_tenant(portfolioId, propertyId, data, profile):
-    property = Property.query.filter_by(id=propertyId).first()
+
+def save_new_tenant(portfolio_id, property_id, data, profile):
+    property = Property.query.filter_by(id=property_id).first()
     if property is None:
         response_object = {
             'status': 'fail',
@@ -45,7 +51,7 @@ def save_new_tenant(portfolioId, propertyId, data, profile):
         }
         return response_object, 409
     
-    if property.portfolio_id != portfolioId:
+    if property.portfolio_id != portfolio_id:
         response_object = {
             'status': 'fail',
             'message': 'Property does not exist against this portfolio',
@@ -53,8 +59,8 @@ def save_new_tenant(portfolioId, propertyId, data, profile):
         return response_object, 404
 
     # check if tenant already exists?
-    if Tenant.query.filter_by(property_id=propertyId)\
-            .filter(portfolio__id=portfolioId)\
+    if Tenant.query.filter_by(property_id=property_id)\
+            .filter(portfolio__id=portfolio_id)\
             .filter(first_name=data['first_name'])\
             .filter(date_of_birth=data['first_name'])\
             .filter(last_name=data['last_name']).scalar():
@@ -68,8 +74,6 @@ def save_new_tenant(portfolioId, propertyId, data, profile):
         }
         return response_object, 409
 
-    new_tenant_new = Tenant(**data)  # Fudge a dict into obj, just for shits & giggles for now.
-    
     new_tenant = Tenant(
         title=data['title'],
         first_name=data['first_name'],
@@ -101,6 +105,10 @@ def save_new_tenant(portfolioId, propertyId, data, profile):
         }
     }
     return response_object, 201
+
+
+def get_tenant_by_id(portfolio_id, property_id, tenant_id):
+    return Tenant.query.filter_by(property_id=property_id).filter_by(id=tenant_id).first()
 
 
 def __add_profile_to_tenant(new_tenant, profile):
