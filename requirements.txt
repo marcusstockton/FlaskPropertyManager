@@ -4,7 +4,7 @@ Flask-RESTx==0.3.0
 Flask-SQLAlchemy==2.5.1
 sqlalchemy_utils==0.36.8
 Flask-Testing==0.8.1
-Pillow==8.2.0
+Pillow==8.3.2
 PyJWT==2.0.1
 python-dotenv==0.17.0
 SQLAlchemy~=1.3.20
