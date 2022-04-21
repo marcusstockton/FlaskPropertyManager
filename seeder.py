@@ -1,6 +1,6 @@
 import random
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from faker import Faker
 from flask import current_app
@@ -12,20 +12,20 @@ def seed_data(db):
     """Load initial data into database."""
     fake = Faker('en-GB')
 
-    fakeTenancyStartDate1 = fake.date_this_decade()
-    fakeTenancyStartDate2 = fake.date_this_decade()
-    fakeTenancyStartDate3 = fake.date_this_decade()
-    fakeTenancyStartDate4 = fake.date_this_decade()
-    fakeTenancyStartDate5 = fake.date_this_decade()
-    fakeTenancyStartDate6 = fake.date_this_decade()
-    fakeTenancyStartDate7 = fake.date_this_decade()
-    fakeTenancyStartDate8 = fake.date_this_decade()
-    fakeTenancyStartDate9 = fake.date_this_decade()
-    fakeTenancyStartDate10 = fake.date_this_decade()
-    fakeTenancyStartDate11 = fake.date_this_decade()
+    fake_tenancy_start_date_1 = fake.date_this_decade()
+    fake_tenancy_start_date_2 = fake.date_this_decade()
+    fake_tenancy_start_date_3 = fake.date_this_decade()
+    fake_tenancy_start_date_4 = fake.date_this_decade()
+    fake_tenancy_start_date_5 = fake.date_this_decade()
+    fake_tenancy_start_date_6 = fake.date_this_decade()
+    fake_tenancy_start_date_7 = fake.date_this_decade()
+    fake_tenancy_start_date_8 = fake.date_this_decade()
+    fake_tenancy_start_date_9 = fake.date_this_decade()
+    fake_tenancy_start_date_10 = fake.date_this_decade()
+    fake_tenancy_start_date_11 = fake.date_this_decade()
 
-    db.session.remove()  # blatt the db
-    db.drop_all()  # blatt the db
+    db.session.remove()  # blat the db
+    db.drop_all()  # blat the db
     db.create_all()  # create all the tables
     admin_role = user.Role(name="Admin")
     owner_role = user.Role(name="Owner")
@@ -80,7 +80,7 @@ def seed_data(db):
                         date_of_birth=fake.date_of_birth(),
                         job_title=fake.job(),
                         tenancy_start_date=fake.date_this_decade(),
-                        profile_pic=fake.image_url(500,400)
+                        profile_pic=fake.image_url(500, 400)
                     ),
                     tenant.Tenant(
                         title=tenant.TitleEnum.Miss,
@@ -90,9 +90,9 @@ def seed_data(db):
                         phone_number=fake.phone_number(),
                         date_of_birth=fake.date_of_birth(),
                         job_title=fake.job(),
-                        tenancy_start_date=fakeTenancyStartDate1,
-                        tenancy_end_date=fake.date_between_dates(fakeTenancyStartDate1),
-                        profile_pic=fake.image_url(500,400)
+                        tenancy_start_date=fake_tenancy_start_date_1,
+                        tenancy_end_date=fake.date_between_dates(fake_tenancy_start_date_1),
+                        profile_pic=fake.image_url(500, 400)
                     ),
                     tenant.Tenant(
                         title=tenant.TitleEnum.Mr,
@@ -102,20 +102,20 @@ def seed_data(db):
                         phone_number=fake.phone_number(),
                         date_of_birth=fake.date_of_birth(),
                         job_title=fake.job(),
-                        tenancy_start_date=fakeTenancyStartDate2,
-                        tenancy_end_date=fake.date_between_dates(fakeTenancyStartDate2),
-                        profile_pic=fake.image_url(500,400),
+                        tenancy_start_date=fake_tenancy_start_date_2,
+                        tenancy_end_date=fake.date_between_dates(fake_tenancy_start_date_2),
+                        profile_pic=fake.image_url(500, 400),
                         notes=[
                             tenant.TenantNote(
-                                created_date=datetime.now(),
+                                created_date=datetime.now() - timedelta(minutes=5),
                                 note=fake.sentence(nb_words=random.randrange(15, 45, 1)),
                             ),
                             tenant.TenantNote(
-                                created_date=datetime.now(),
+                                created_date=datetime.now() - timedelta(minutes=15),
                                 note=fake.sentence(nb_words=random.randrange(15, 45, 1)),
                             ),
                             tenant.TenantNote(
-                                created_date=datetime.now(),
+                                created_date=datetime.now() - timedelta(minutes=25),
                                 note=fake.sentence(nb_words=random.randrange(15, 45, 1)),
                                 tenant_id=1
                             )
@@ -156,9 +156,9 @@ def seed_data(db):
                         phone_number=fake.phone_number(),
                         date_of_birth=fake.date_of_birth(),
                         job_title=fake.job(),
-                        tenancy_start_date=fakeTenancyStartDate3,
-                        tenancy_end_date=fake.date_between_dates(fakeTenancyStartDate3),
-                        profile_pic=fake.image_url(400,400)
+                        tenancy_start_date=fake_tenancy_start_date_3,
+                        tenancy_end_date=fake.date_between_dates(fake_tenancy_start_date_3),
+                        profile_pic=fake.image_url(400, 400)
                     ),
                     tenant.Tenant(
                         title=tenant.TitleEnum.Mr,
@@ -168,20 +168,20 @@ def seed_data(db):
                         phone_number=fake.phone_number(),
                         date_of_birth=fake.date_of_birth(),
                         job_title=fake.job(),
-                        tenancy_start_date=fakeTenancyStartDate4,
-                        tenancy_end_date=fake.date_between_dates(fakeTenancyStartDate4),
+                        tenancy_start_date=fake_tenancy_start_date_4,
+                        tenancy_end_date=fake.date_between_dates(fake_tenancy_start_date_4),
                         profile_pic=fake.image_url(400, 400),
                         notes=[
                             tenant.TenantNote(
-                                created_date=datetime.now(),
+                                created_date=datetime.now() - timedelta(minutes=55),
                                 note=fake.sentence(nb_words=random.randrange(15, 45, 1)),
                             ),
                             tenant.TenantNote(
-                                created_date=datetime.now(),
+                                created_date=datetime.now() - timedelta(minutes=115),
                                 note=fake.sentence(nb_words=random.randrange(15, 45, 1)),
                             ),
                             tenant.TenantNote(
-                                created_date=datetime.now(),
+                                created_date=datetime.now() - timedelta(minutes=235),
                                 note=fake.sentence(nb_words=random.randrange(15, 45, 1)),
                             )
                         ]
@@ -217,7 +217,7 @@ def seed_data(db):
                         date_of_birth=fake.date_of_birth(),
                         job_title=fake.job(),
                         tenancy_start_date=fake.date_this_decade(),
-                        profile_pic=fake.image_url(400,400)
+                        profile_pic=fake.image_url(400, 400)
                     ),
                     tenant.Tenant(
                         title=tenant.TitleEnum.Miss,
@@ -227,9 +227,9 @@ def seed_data(db):
                         phone_number=fake.phone_number(),
                         date_of_birth=fake.date_of_birth(),
                         job_title=fake.job(),
-                        tenancy_start_date=fakeTenancyStartDate5,
-                        tenancy_end_date=fake.date_between_dates(fakeTenancyStartDate5),
-                        profile_pic=fake.image_url(400,400)
+                        tenancy_start_date=fake_tenancy_start_date_5,
+                        tenancy_end_date=fake.date_between_dates(fake_tenancy_start_date_5),
+                        profile_pic=fake.image_url(400, 400)
                     ),
                     tenant.Tenant(
                         title=tenant.TitleEnum.Mr,
@@ -239,20 +239,20 @@ def seed_data(db):
                         phone_number=fake.phone_number(),
                         date_of_birth=fake.date_of_birth(),
                         job_title=fake.job(),
-                        tenancy_start_date=fakeTenancyStartDate6,
-                        tenancy_end_date=fake.date_between_dates(fakeTenancyStartDate6),
+                        tenancy_start_date=fake_tenancy_start_date_6,
+                        tenancy_end_date=fake.date_between_dates(fake_tenancy_start_date_6),
                         profile_pic=fake.image_url(400, 400),
                         notes=[
                             tenant.TenantNote(
-                                created_date=datetime.now(),
+                                created_date=datetime.now() - timedelta(minutes=455),
                                 note=fake.sentence(nb_words=random.randrange(15, 45, 1)),
                             ),
                             tenant.TenantNote(
-                                created_date=datetime.now(),
+                                created_date=datetime.now() - timedelta(minutes=675),
                                 note=fake.sentence(nb_words=random.randrange(15, 45, 1)),
                             ),
                             tenant.TenantNote(
-                                created_date=datetime.now(),
+                                created_date=datetime.now() - timedelta(minutes=755),
                                 note=fake.sentence(nb_words=random.randrange(15, 45, 1)),
                             )
                         ]
@@ -282,7 +282,7 @@ def seed_data(db):
                         date_of_birth=fake.date_of_birth(),
                         job_title=fake.job(),
                         tenancy_start_date=fake.date_this_decade(),
-                        profile_pic=fake.image_url(400,400)
+                        profile_pic=fake.image_url(400, 400)
                     ),
                     tenant.Tenant(
                         title=tenant.TitleEnum.Miss,
@@ -292,9 +292,9 @@ def seed_data(db):
                         phone_number=fake.phone_number(),
                         date_of_birth=fake.date_of_birth(),
                         job_title=fake.job(),
-                        tenancy_start_date=fakeTenancyStartDate7,
-                        tenancy_end_date=fake.date_between_dates(fakeTenancyStartDate7),
-                        profile_pic=fake.image_url(400,400)
+                        tenancy_start_date=fake_tenancy_start_date_7,
+                        tenancy_end_date=fake.date_between_dates(fake_tenancy_start_date_7),
+                        profile_pic=fake.image_url(400, 400)
                     ),
                     tenant.Tenant(
                         title=tenant.TitleEnum.Mr,
@@ -304,20 +304,20 @@ def seed_data(db):
                         phone_number=fake.phone_number(),
                         date_of_birth=fake.date_of_birth(),
                         job_title=fake.job(),
-                        tenancy_start_date=fakeTenancyStartDate8,
-                        tenancy_end_date=fake.date_between_dates(fakeTenancyStartDate8),
+                        tenancy_start_date=fake_tenancy_start_date_8,
+                        tenancy_end_date=fake.date_between_dates(fake_tenancy_start_date_8),
                         profile_pic=fake.image_url(400, 400),
                         notes=[
                             tenant.TenantNote(
-                                created_date=datetime.now(),
+                                created_date=datetime.now() - timedelta(minutes=35),
                                 note=fake.sentence(nb_words=random.randrange(15, 45, 1)),
                             ),
                             tenant.TenantNote(
-                                created_date=datetime.now(),
+                                created_date=datetime.now() - timedelta(minutes=25),
                                 note=fake.sentence(nb_words=random.randrange(15, 45, 1)),
                             ),
                             tenant.TenantNote(
-                                created_date=datetime.now(),
+                                created_date=datetime.now() - timedelta(minutes=55),
                                 note=fake.sentence(nb_words=random.randrange(15, 45, 1)),
                             )
                         ]
@@ -357,7 +357,11 @@ def seed_data(db):
                         profile_pic=fake.image_url(400, 400),
                         notes=[
                             tenant.TenantNote(
-                                created_date=datetime.now(),
+                                created_date=datetime.now() - timedelta(minutes=25),
+                                note=fake.sentence(nb_words=random.randrange(15, 45, 1)),
+                            ),
+                            tenant.TenantNote(
+                                created_date=datetime.now() - timedelta(hours=123),
                                 note=fake.sentence(nb_words=random.randrange(15, 45, 1)),
                             )
                         ]
@@ -370,12 +374,16 @@ def seed_data(db):
                         phone_number=fake.phone_number(),
                         date_of_birth=fake.date_of_birth(),
                         job_title=fake.job(),
-                        tenancy_start_date=fakeTenancyStartDate9,
-                        tenancy_end_date=fake.date_between_dates(fakeTenancyStartDate9),
+                        tenancy_start_date=fake_tenancy_start_date_9,
+                        tenancy_end_date=fake.date_between_dates(fake_tenancy_start_date_9),
                         profile_pic=fake.image_url(400, 400),
                         notes=[
                             tenant.TenantNote(
-                                created_date=datetime.now(),
+                                created_date=datetime.now() - timedelta(minutes=52),
+                                note=fake.sentence(nb_words=random.randrange(15, 45, 1)),
+                            ),
+                            tenant.TenantNote(
+                                created_date=datetime.now() - timedelta(hours=52),
                                 note=fake.sentence(nb_words=random.randrange(15, 45, 1)),
                             )
                         ]
@@ -404,12 +412,16 @@ def seed_data(db):
                         phone_number=fake.phone_number(),
                         date_of_birth=fake.date_of_birth(),
                         job_title=fake.job(),
-                        tenancy_start_date=fakeTenancyStartDate10,
-                        tenancy_end_date=fake.date_between_dates(fakeTenancyStartDate10),
+                        tenancy_start_date=fake_tenancy_start_date_10,
+                        tenancy_end_date=fake.date_between_dates(fake_tenancy_start_date_10),
                         profile_pic=fake.image_url(400, 400),
                         notes=[
                             tenant.TenantNote(
-                                created_date=datetime.now(),
+                                created_date=datetime.now() - timedelta(minutes=43),
+                                note=fake.sentence(nb_words=random.randrange(15, 45, 1)),
+                            ),
+                            tenant.TenantNote(
+                                created_date=datetime.now() - timedelta(hours=42),
                                 note=fake.sentence(nb_words=random.randrange(15, 45, 1)),
                             )
                         ]
@@ -422,12 +434,12 @@ def seed_data(db):
                         phone_number=fake.phone_number(),
                         date_of_birth=fake.date_of_birth(),
                         job_title=fake.job(),
-                        tenancy_start_date=fakeTenancyStartDate11,
-                        tenancy_end_date=fake.date_between_dates(fakeTenancyStartDate11),
+                        tenancy_start_date=fake_tenancy_start_date_11,
+                        tenancy_end_date=fake.date_between_dates(fake_tenancy_start_date_11),
                         profile_pic=fake.image_url(400, 400),
                         notes=[
                             tenant.TenantNote(
-                                created_date=datetime.now(),
+                                created_date=datetime.now() - timedelta(minutes=132),
                                 note=fake.sentence(nb_words=random.randrange(15, 45, 1)),
                             )
                         ]

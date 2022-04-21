@@ -93,7 +93,6 @@ def save_new_tenant(portfolio_id, property_id, data, profile):
     
     save_changes(property)
 
-    profile_dir = ''
     if profile is not None:
         __add_profile_to_tenant(new_tenant, profile)
 

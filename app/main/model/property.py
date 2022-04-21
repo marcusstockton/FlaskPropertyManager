@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 
 from .portfolio import Portfolio
 from .user import User
@@ -14,7 +14,8 @@ class Property(db.Model):
     purchase_price = db.Column(db.Float(precision='10, 2'), nullable=True)
     purchase_date = db.Column(db.DateTime, nullable=True)
     monthly_rental_price = db.Column(db.Float(precision='10, 2'), nullable=True)
-    created_on = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    created_date = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_date = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     address = db.relationship("Address",  back_populates="property",uselist=False, cascade="all, delete")
     tenants = db.relationship("Tenant", cascade="all, delete")
     owner = db.relationship("User")

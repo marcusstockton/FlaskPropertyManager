@@ -28,8 +28,7 @@ class CurrentTenants(fields.Raw):
 
 class FileLocationToUrl(fields.Raw):
     def format(self, value):
-        return request.host + '/Uploads/' + value
-
+        return value
 
 
 class TenantDto:

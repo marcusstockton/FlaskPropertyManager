@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import enum
 
 from sqlalchemy_utils import EmailType
@@ -34,6 +34,8 @@ class Tenant(db.Model):
 	tenancy_end_date = db.Column(db.Date, nullable=True)
 	profile_pic = db.Column(db.String(255), nullable=True)
 	notes = db.relationship("TenantNote")
+	created_date = db.Column(db.DateTime, default=datetime.utcnow)
+	updated_date = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  
 
 	def __repr__(self):
 		return "<Tenant 'Id:{} Title:{} FirstName:{} LastName{}'>".format(self.id, self.title, self.first_name, self.last_name)
@@ -44,7 +46,8 @@ class TenantNote(db.Model):
 	__tablename__ = "tenantNote"
 	id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 	tenant_id = db.Column(db.Integer, db.ForeignKey(Tenant.id))
-	created_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+	created_date = db.Column(db.DateTime, default=datetime.utcnow)
+	updated_date = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  
 	note = db.Column(db.String(2000))
 
 	def __repr__(self):

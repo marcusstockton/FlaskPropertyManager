@@ -1,4 +1,5 @@
 from .. import db
+from datetime import datetime
 
 
 class Address(db.Model):
@@ -11,6 +12,8 @@ class Address(db.Model):
 	post_code = db.Column(db.String(100))
 	town = db.Column(db.String(100), nullable=True)
 	city = db.Column(db.String(100), nullable=True)
+	created_date = db.Column(db.DateTime, default=datetime.utcnow)
+	updated_date = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  
 	property_id = db.Column(db.Integer, db.ForeignKey("property.id"))
 	property = db.relationship("Property", back_populates="address", foreign_keys=[property_id])
 
