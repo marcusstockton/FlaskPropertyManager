@@ -1,6 +1,6 @@
 import datetime
 import re
-
+from datetime import datetime, timedelta
 import jwt
 
 from app.main.model.blacklist import BlacklistToken
@@ -22,6 +22,8 @@ class User(db.Model):
     first_name = db.Column(db.String(100), nullable=True)
     last_name = db.Column(db.String(100), nullable=True)
     date_of_birth = db.Column(db.DateTime, nullable=True)
+    created_date = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_date = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  
     roles = db.relationship('Role', secondary='user_roles', backref=db.backref('user', lazy='dynamic'))
 
     @property
@@ -52,8 +54,8 @@ class User(db.Model):
         """
         try:
             payload = {
-                'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1, seconds=5),
-                'iat': datetime.datetime.utcnow(),
+                'exp': datetime.utcnow() + timedelta(days=1, seconds=5),
+                'iat': datetime.utcnow(),
                 'sub': user_id,
                 'username': User.query.filter_by(id=user_id).first().username
             }
