@@ -1,17 +1,21 @@
+from email.mime import image
 import os
 from datetime import datetime as dt
+from app.main.model import tenant
 
 from flask import current_app
 from werkzeug.utils import secure_filename
+from http import HTTPStatus
 
 from app.main import db
 from app.main.model.property import Property
-from app.main.model.tenant import Tenant, TenantNote
+from app.main.model.tenant import Tenant, TenantNote, TenantProfile
 
 
-def get_all_tenants_for_property(portfolio_id, property_id):
-    return Tenant.query.filter_by(portfolio_id=portfolio_id)\
-                        .filter(property_id=property_id).all()
+def get_all_tenants_for_property(property_id):
+    tenants = Tenant.query.filter_by(property_id=property_id).all()
+
+    return tenants
 
 
 def update_tenant(property_id, data, profile):
@@ -25,7 +29,7 @@ def update_tenant(property_id, data, profile):
             'id': tenant.id
         }
     }
-    return response_object, 204 
+    return response_object, HTTPStatus.NO_CONTENT
     
 
 def delete_tenant(property_id, tenant_id):
@@ -38,8 +42,8 @@ def delete_tenant(property_id, tenant_id):
             'message': 'Successfully deleted tenant.',
             'data': {}
         }
-        return response_object, 201
-    return 'Not found', 404
+        return response_object, HTTPStatus.NO_CONTENT
+    return 'Not found', HTTPStatus.NOT_FOUND
 
 
 def save_new_tenant(portfolio_id, property_id, data, profile):
@@ -49,14 +53,14 @@ def save_new_tenant(portfolio_id, property_id, data, profile):
             'status': 'fail',
             'message': 'No property found',
         }
-        return response_object, 409
+        return response_object, HTTPStatus.BAD_REQUEST
     
     if property.portfolio_id != portfolio_id:
         response_object = {
             'status': 'fail',
             'message': 'Property does not exist against this portfolio',
         }
-        return response_object, 404
+        return response_object, HTTPStatus.NOT_FOUND
 
     # check if tenant already exists?
     if Tenant.query.filter_by(property_id=property_id)\
@@ -72,7 +76,7 @@ def save_new_tenant(portfolio_id, property_id, data, profile):
                 'last_name': data['last_name']
             }
         }
-        return response_object, 409
+        return response_object, HTTPStatus.BAD_REQUEST
 
     new_tenant = Tenant(
         title=data['title'],
@@ -93,9 +97,6 @@ def save_new_tenant(portfolio_id, property_id, data, profile):
     
     save_changes(property)
 
-    if profile is not None:
-        __add_profile_to_tenant(new_tenant, profile)
-
     response_object = {
         'status': 'success',
         'message': 'Successfully created tenant.',
@@ -103,23 +104,39 @@ def save_new_tenant(portfolio_id, property_id, data, profile):
             'id': new_tenant.id
         }
     }
-    return response_object, 201
+    return response_object, HTTPStatus.CREATED
 
 
 def get_tenant_by_id(portfolio_id, property_id, tenant_id):
-    return Tenant.query.filter_by(property_id=property_id).filter_by(id=tenant_id).first()
+    tenant = Tenant.query.filter_by(property_id=property_id).filter_by(id=tenant_id).first()
+    if tenant.property.portfolio_id != portfolio_id:
+        response_object = {
+            'status': 'fail',
+            'message': 'Issue with property portfolio supplied.',
+            'data': {
+                'portfolio_id': portfolio_id,
+                'property_id': property_id
+            }
+        }
+        return response_object, HTTPStatus.BAD_REQUEST
+    return tenant
 
 
-def __add_profile_to_tenant(new_tenant, profile):
+def add_profile_to_tenant(tenant_id, image_str):
     # Save image off
-    img_name = secure_filename(profile.filename)
-    tenant_id_folder = os.path.join('tenants', str(new_tenant.id))
-    profile_dir = os.path.join(current_app.config['UPLOAD_FOLDER'], tenant_id_folder)
-    if not os.path.exists(profile_dir):
-        os.makedirs(profile_dir)
-    profile.save(os.path.join(profile_dir, img_name))
-    new_tenant.profile_pic = os.path.join(tenant_id_folder, img_name)
-    save_changes(new_tenant)
+    tenant_profile = tenant.TenantProfile(
+        tenant_id = tenant_id,
+        image = image_str
+    )
+    save_changes(tenant_profile)
+    response_object = {
+        'status': 'success',
+        'message': 'Successfully uploaded the tenant image.',
+        'data': {
+            'id': tenant_profile.id
+        }
+    }
+    return response_object, HTTPStatus.CREATED
 
 
 def save_changes(data):

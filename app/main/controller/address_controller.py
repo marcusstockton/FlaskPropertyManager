@@ -15,6 +15,7 @@ class AddressSearchList(Resource):
     @token_required
     @api.doc('search for address by postcode')
     def get(self, search):
+        """Calls off to hereapi to get location details"""
         # Go get data...
         _apiKey = os.getenv('HERE_Maps_API_Key')
         _ukLatLong = "55.3781,3.4360"

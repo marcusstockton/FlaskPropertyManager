@@ -36,6 +36,20 @@ class PropertyDto:
         'monthly_rental_price': fields.Float(required=True, description='monthly rental price'),
         'address': fields.Nested(AddressDto.address, required=True, description='address'),
         'tenants': fields.List(fields.Nested(TenantDto.tenant), required=False, description='tenants'),
+        'created_date': fields.DateTime(required=False, description='date created'),
+        'updated_date': fields.DateTime(required=False, description='date last updated'),
+    })
+
+    property_list = api.model('Property', {
+        'id': fields.String(required=True, description='id'),
+        'portfolio_id': fields.String(required=True, description='portfolio id'),
+        'address_id': fields.String(required=True, description='address id'),
+        'purchase_price': fields.Float(required=True, description='purchase price'),
+        'purchase_date': fields.DateTime(required=True, description='purchase date'),
+        'monthly_rental_price': fields.Float(required=True, description='monthly rental price'),
+        'address': fields.Nested(AddressDto.address, required=True, description='address'),
+        'created_date': fields.DateTime(required=False, description='date created'),
+        'updated_date': fields.DateTime(required=False, description='date last updated'),
     })
 
     property_create = api.model('Property', {

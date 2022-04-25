@@ -2,6 +2,8 @@ import datetime
 
 from flask import current_app
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
+from sqlalchemy.orm import lazyload
+from http import HTTPStatus
 
 from app.main import db
 from app.main.model.address import Address
@@ -11,7 +13,7 @@ from app.main.model.property import Property
 
 def get_all_properties_for_portfolio(portfolio_id):
     current_app.logger.info("Getting all properties for portfolio_id %s", portfolio_id)
-    return Property.query.filter_by(portfolio_id=portfolio_id).all()
+    return Property.query.options(lazyload(Property.tenants)).filter_by(portfolio_id=portfolio_id).all()
 
 
 def save_new_property(portfolio_id, data):
@@ -23,7 +25,7 @@ def save_new_property(portfolio_id, data):
             'message': 'No portfolio found',
         }
         current_app.logger.error("No portfolio found portfolio_id %s", portfolio_id)
-        return response_object, 409
+        return response_object, HTTPStatus.NOT_FOUND
 
     if data['address']:
         # create address
@@ -41,7 +43,7 @@ def save_new_property(portfolio_id, data):
             purchase_price=data['purchase_price'],
             purchase_date=datetime.datetime.strptime(data['purchase_date'], '%Y-%m-%d'),
             monthly_rental_price=data['monthly_rental_price'],
-            created_on=datetime.datetime.utcnow()
+            created_date=datetime.datetime.utcnow()
         )
         current_app.logger.info("Created property")
 
@@ -56,7 +58,7 @@ def save_new_property(portfolio_id, data):
                     'id': new_property.id
                 }
             }
-            return response_object, 201
+            return response_object, HTTPStatus.CREATED
         except Exception as ex:
             current_app.logger.error("Unable to save new Property %s", ex)
             response_object = {
@@ -66,7 +68,7 @@ def save_new_property(portfolio_id, data):
                     f'Exception: {ex}',
                 }
             }
-            return response_object, 500
+            return response_object, HTTPStatus.INTERNAL_SERVER_ERROR
 
 
 def get_property_by_id(portfolio_id, property_id):

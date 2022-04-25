@@ -23,7 +23,7 @@ class PortfolioList(Resource):
 	@api.doc('list_of_portfolios')
 	@api.marshal_list_with(_portfolio_details, envelope='data')
 	def get(self):
-		"""Get all portfolio's for the logged in user"""
+		"""Get all portfolio's for the logged-in user"""
 		user = Auth.get_logged_in_user_object(request)
 		return get_all_portfolios_for_user(user.id)
 
@@ -57,7 +57,7 @@ class PortfolioItem(Resource):
 	@api.response(404, 'Portfolio Not found')
 	@api.expect(_portfolio_update_parser, validate=True)
 	def put(self, id):
-		""" Edits a selected conference """
+		""" Edits a portfolio """
 		data = _portfolio_update_parser.parse_args()
 		return update_portfolio(id, data)
 

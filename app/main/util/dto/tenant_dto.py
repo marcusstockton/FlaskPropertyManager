@@ -1,24 +1,17 @@
-import base64
 import json
-import os
+import base64
 
 from flask import current_app
 from flask import request
 from flask_restx import Namespace, fields
-from werkzeug.datastructures import FileStorage
 
 from ...model.tenant import TitleEnum
 
-
-class File(fields.Raw):
-    """ Custom field to return a file...hopefully.... """
+class Base64Decoder(fields.Raw):
     def format(self, value):
-        if value.startswith("http"):
-            return value
-        else:
-            with open(os.path.join(current_app.config['UPLOAD_FOLDER'], value), "rb") as imageFile:
-                str = base64.b64encode(imageFile.read())
-                return json.dumps(str.decode()).replace("'", '"')[1:-1]
+        data_bytes = base64.b64encode(value)
+        data = data_bytes.decode("utf-8")
+        return data
 
 
 class CurrentTenants(fields.Raw):
@@ -36,8 +29,16 @@ class TenantDto:
 
     tenant_notes = api.model('TenantNote', {
         'id': fields.String(required=True, description='id'),
-        'created_date': fields.DateTime(required=True, description='date created'),
+        'created_date': fields.DateTime(required=False, description='date created'),
+        'updated_date': fields.DateTime(required=False, description='date last updated'),
         'note': fields.String(required=True, description='note'),
+    })
+
+    tenant_profile = api.model('TenantProfile', {
+        'id': fields.String(required=True, description='id'),
+        'created_date': fields.DateTime(required=False, description='date created'),
+        'updated_date': fields.DateTime(required=False, description='date last updated'),
+        'image_base_64': Base64Decoder(attribute="image"),
     })
 
     tenant_notes_create = api.model('TenantNote', {
@@ -54,13 +55,13 @@ class TenantDto:
         'job_title': fields.String(required=True, description='job title'),
         'tenancy_start_date': fields.DateTime(required=True, description='tenancy start date'),
         'tenancy_end_date': fields.DateTime(required=True, description='tenancy end date'),
-        'profile': File(required=False, attribute='profile_pic'),
-        'profile_url': FileLocationToUrl(required=False, attribute='profile_pic'),
+        'profile_pic': fields.List(fields.Nested(tenant_profile), required=False, description='tenant profile pic'),
         'notes': fields.List(fields.Nested(tenant_notes), required=False, description='tenant notes'),
+        'created_date': fields.DateTime(required=False, description='date created'),
+        'updated_date': fields.DateTime(required=False, description='date last updated'),
     })
     
     tenant_create_parser = api.parser()
-    tenant_create_parser.add_argument('profile', location='files', type=FileStorage, required=False, help="Upload an image of the tenant")
     tenant_create_parser.add_argument("title", location='form', type='string', required=False, choices=([title.name for title in TitleEnum]))
     tenant_create_parser.add_argument("first_name", location='form', type='string', required=True)
     tenant_create_parser.add_argument("last_name", location='form', type='string', required=True)

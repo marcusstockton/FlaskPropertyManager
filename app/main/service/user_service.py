@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 
 from flask import current_app
-
+from http import HTTPStatus
 from app.main import db
 from app.main.model.user import User, Role
 
@@ -29,7 +29,7 @@ def save_new_user(data):
             'status': 'fail',
             'message': 'User already exists. Please Log in.',
         }
-        return response_object, 409
+        return response_object, HTTPStatus.BAD_REQUEST
 
 
 def get_all_users():
@@ -54,14 +54,14 @@ def generate_token(user):
             'Authorization': auth_token
         }
         current_app.logger.info('auth_token created successfully')
-        return response_object, 201
+        return response_object, HTTPStatus.CREATED
     except Exception as e:
         response_object = {
             'status': 'fail',
             'message': 'Some error occurred. Please try again.'
         }
         current_app.logger.error(e)
-        return response_object, 401
+        return response_object, HTTPStatus.INTERNAL_SERVER_ERROR
 
 
 def save_changes(data):

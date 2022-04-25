@@ -83,7 +83,7 @@ class TestPortfolioBlueprint(BaseTestCase):
             purchase_price=32000,
             purchase_date=datetime.datetime(2020, 5, 17),
             monthly_rental_price=670,
-            created_on=datetime.datetime.now(),
+            created_date=datetime.datetime.now(),
             address=Address(
                 id=1,
                 line_1="Test Line 1",
@@ -119,7 +119,7 @@ class TestPortfolioBlueprint(BaseTestCase):
         portfolio1 = Portfolio(
             id=1,
             name='Test 1',
-            created_on=datetime.datetime.now(),
+            created_date=datetime.datetime.now(),
             owner=user_1,
             properties=[],
         )
@@ -128,7 +128,7 @@ class TestPortfolioBlueprint(BaseTestCase):
         portfolio2 = Portfolio(
             id=2,
             name='Test 2',
-            created_on=datetime.datetime.now(),
+            created_date=datetime.datetime.now(),
             owner=user_2,
             properties=[],
         )

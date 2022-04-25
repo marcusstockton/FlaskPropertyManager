@@ -11,5 +11,7 @@ class UserDto:
         'first_name': fields.String(required=False, description='user first name'),
         'last_name': fields.String(required=False, description='user last name'),
         'date_of_birth': fields.Date(required=False, description='user date of birth'),
+        'created_date': fields.DateTime(required=False, description='date created'),
+        'updated_date': fields.DateTime(required=False, description='date last updated'),
         'public_id': fields.String(description='user Identifier')
     })
