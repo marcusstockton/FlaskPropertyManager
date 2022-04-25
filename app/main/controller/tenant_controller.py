@@ -1,7 +1,8 @@
 from flask import request
 from flask_restx import Resource
+import base64
 
-from ..service.tenant_service import get_all_tenants_for_property, save_new_tenant, get_tenant_by_id, delete_tenant
+from ..service.tenant_service import get_all_tenants_for_property, save_new_tenant, get_tenant_by_id, delete_tenant, add_profile_to_tenant
 from ..util.decorator import token_required
 from ..util.dto.tenant_dto import TenantDto
 
@@ -41,12 +42,27 @@ class TenantItem(Resource):
 	@api.doc('tenant details')
 	@api.marshal_with(_tenant)
 	def get(self, portfolio_id, property_id, tenant_id):
+		""" Gets a tenant by Id """
 		tenant = get_tenant_by_id(portfolio_id, property_id, tenant_id)
 		return tenant
+
+	@token_required
+	@api.doc('Add an image of the tenant')
+	def add_profile_pic(self, tenant_id):
+		""" Adds a tenant profile pic. """
+		file = request.files['file']
+		if file:
+			# Save image as base64 string
+			image_string = base64.b64encode(file.read())
+			return add_profile_to_tenant(tenant_id, image_string)
+
+		
 
 	@token_required
 	@api.doc('tenant delete')
 	@api.marshal_with(_tenant)
 	def delete(self, portfolio_id, property_id, tenant_id):
-		""" Gets the property by id. """
+		""" Deletes a tenant. """
 		return delete_tenant(portfolio_id, property_id, tenant_id)
+
+

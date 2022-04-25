@@ -7,7 +7,7 @@ Useful commands:
 
 Migrations:
 may need to: export FLASK_APP=manage.py from the root:
-flask db migrate -m '<Migration Message>'
+flask db migrate -m "<Migration Message>"
 flask db upgrade
 
 
@@ -37,3 +37,4 @@ test
 Idea's
 Add error logging to a mongodb database
 Update seeder to generate many more records - for loops?
+Add Pydantic - https://pypi.org/project/Flask-Pydantic/

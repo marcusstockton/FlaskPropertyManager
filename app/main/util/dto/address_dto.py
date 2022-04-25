@@ -12,6 +12,8 @@ class AddressDto:
         'town': fields.String(required=True, description='address town'),
         'city': fields.String(required=True, description='address city'),
         'property_id': fields.String(required=True, description='address property_id'),
+        'created_date': fields.DateTime(required=False, description='date created'),
+        'updated_date': fields.DateTime(required=False, description='date last updated'),
     })
 
     address_create = api.model('Address', {

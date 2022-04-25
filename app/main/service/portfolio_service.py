@@ -7,6 +7,7 @@ from sqlalchemy import update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import lazyload
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
+from http import HTTPStatus
 
 from app.main import db
 from app.main.model.portfolio import Portfolio
@@ -24,10 +25,10 @@ def get_portfolio_by_id(user_id: int, portfolio_id: int) -> Portfolio:
                      lazyload(Portfolio.properties)).one()
     except NoResultFound as e:
         current_app.logger.error("Portfolio not found for userid %s and portfolio_id %s", user_id, portfolio_id)
-        abort(404, "Portfolio not found")
+        abort(HTTPStatus.NOT_FOUND, "Portfolio not found")
     except MultipleResultsFound as e:
         current_app.logger.error("Multiple portfolio's not found for userid %s and portfolio_id %s", user_id, portfolio_id)
-        abort(500, "Multiple Portfolio's found")
+        abort(HTTPStatus.BAD_REQUEST, "Multiple Portfolio's found")
 
 
 def save_new_portfolio(data, user_id) -> Dict[str, str]:
@@ -36,25 +37,25 @@ def save_new_portfolio(data, user_id) -> Dict[str, str]:
         new_portfolio = Portfolio(
             name=data['name'],
             owner_id=user_id,
-            created_on=datetime.datetime.utcnow()
+            created_date=datetime.datetime.utcnow()
         )
         save_changes(new_portfolio)
         return new_portfolio
     else:
-        abort(409, "Portfolio already exists.")
+        abort(HTTPStatus.BAD_REQUEST, "Portfolio already exists.")
 
 
 def update_portfolio(portfolio_id: int, data: dict):
-    portfolio_query = db.session.query(Portfolio).filter(Portfolio.id == portfolio_id)
+    portfolio_query = Portfolio.query.filter_by(id=portfolio_id).one()
     if not portfolio_query:
-        abort(404, "Portfolio not found.")
+        abort(HTTPStatus.BAD_REQUEST, "Portfolio not found.")
     try:
         stmt = update(Portfolio).where(Portfolio.id == portfolio_id).values(data)
         db.session.execute(stmt)
         db.session.commit()
         return Portfolio(**data)
     except IntegrityError as e:
-        raise e
+        abort(HTTPStatus.INTERNAL_SERVER_ERROR, e.orig)
 
 
 def save_changes(data) -> None:

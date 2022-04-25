@@ -2,6 +2,7 @@ from datetime import datetime
 import enum
 
 from sqlalchemy_utils import EmailType
+from sqlalchemy import LargeBinary
 
 from .property import Property
 from .. import db
@@ -32,7 +33,7 @@ class Tenant(db.Model):
 	job_title = db.Column(db.String(100))
 	tenancy_start_date = db.Column(db.Date, nullable=False)
 	tenancy_end_date = db.Column(db.Date, nullable=True)
-	profile_pic = db.Column(db.String(255), nullable=True)
+	profile_pic = db.relationship("TenantProfile", back_populates="tenant", uselist=False)
 	notes = db.relationship("TenantNote")
 	created_date = db.Column(db.DateTime, default=datetime.utcnow)
 	updated_date = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  
@@ -52,3 +53,13 @@ class TenantNote(db.Model):
 
 	def __repr__(self):
 		return "<Tenant Note 'Id:{} Note:{}'>".format(self.id, self.note)
+
+class TenantProfile(db.Model):
+	"""Tenant profile pic stored as base64 str"""
+	__tablename__ = "tenant-profile"
+	id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+	tenant_id = db.Column(db.Integer, db.ForeignKey(Tenant.id))
+	created_date = db.Column(db.DateTime, default=datetime.utcnow)
+	updated_date = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  
+	image = db.Column(LargeBinary)
+	tenant = db.relationship("Tenant", back_populates="profile_pic")
