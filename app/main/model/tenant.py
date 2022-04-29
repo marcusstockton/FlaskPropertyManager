@@ -54,6 +54,7 @@ class TenantNote(db.Model):
 	def __repr__(self):
 		return "<Tenant Note 'Id:{} Note:{}'>".format(self.id, self.note)
 
+
 class TenantProfile(db.Model):
 	"""Tenant profile pic stored as base64 str"""
 	__tablename__ = "tenant-profile"
@@ -63,3 +64,6 @@ class TenantProfile(db.Model):
 	updated_date = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  
 	image = db.Column(LargeBinary)
 	tenant = db.relationship("Tenant", back_populates="profile_pic")
+
+	def __repr__(self):
+		return "<Tenant Profile 'Id:{} tenant:{}'>".format(self.id, self.tenant.first_name + ' ' + self.tenant.last_name)

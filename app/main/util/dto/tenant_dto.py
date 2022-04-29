@@ -27,6 +27,12 @@ class FileLocationToUrl(fields.Raw):
 class TenantDto:
     api = Namespace('tenant', description='tenant related operations')
 
+    colors_api_model = api.schema_model('Titles', {
+        'enum':
+            ['black', 'white', 'red', 'green', 'blue'],
+        'type': 'string'
+    })
+
     tenant_notes = api.model('TenantNote', {
         'id': fields.String(required=True, description='id'),
         'created_date': fields.DateTime(required=False, description='date created'),
@@ -49,6 +55,7 @@ class TenantDto:
         'id': fields.String(required=True, description='id'),
         'title': fields.String(required=False, description='title', enum=[x.name for x in TitleEnum], attribute='title.name'),
         'phone_number': fields.String(required=False, description='phone number'),
+        'email_address': fields.String(required=False, description='email_address'),
         'first_name': fields.String(required=True, description='first name', attribute='first_name'),
         'last_name': fields.String(required=True, description='last name'),
         'date_of_birth': fields.DateTime(required=True, description='date of birth'),
@@ -60,12 +67,40 @@ class TenantDto:
         'created_date': fields.DateTime(required=False, description='date created'),
         'updated_date': fields.DateTime(required=False, description='date last updated'),
     })
+
+    tenant_list = api.model('Tenant', {
+        'id': fields.String(required=True, description='id'),
+        'title': fields.String(required=False, description='title', enum=[x.name for x in TitleEnum], attribute='title.name'),
+        'phone_number': fields.String(required=False, description='phone number'),
+        'first_name': fields.String(required=True, description='first name', attribute='first_name'),
+        'last_name': fields.String(required=True, description='last name'),
+        'date_of_birth': fields.DateTime(required=True, description='date of birth'),
+        'job_title': fields.String(required=True, description='job title'),
+        'tenancy_start_date': fields.DateTime(required=True, description='tenancy start date'),
+        'tenancy_end_date': fields.DateTime(required=True, description='tenancy end date'),
+        'created_date': fields.DateTime(required=False, description='date created'),
+        'updated_date': fields.DateTime(required=False, description='date last updated'),
+    })
     
+    tenant_create = api.model('Tenant', {
+        'title': fields.String(required=False, description='title', enum=[x.name for x in TitleEnum], attribute='title.name'),
+        'phone_number': fields.String(required=False, description='phone number'),
+        'email_address': fields.String(required=True, description='email_address'),
+        'first_name': fields.String(required=True, description='first name'),
+        'last_name': fields.String(required=True, description='last name'),
+        'date_of_birth': fields.DateTime(required=True, description='date of birth'),
+        'job_title': fields.String(required=True, description='job title'),
+        'tenancy_start_date': fields.DateTime(required=True, description='tenancy start date'),
+        'tenancy_end_date': fields.DateTime(required=False, description='tenancy end date'),
+    })
+
     tenant_create_parser = api.parser()
-    tenant_create_parser.add_argument("title", location='form', type='string', required=False, choices=([title.name for title in TitleEnum]))
-    tenant_create_parser.add_argument("first_name", location='form', type='string', required=True)
-    tenant_create_parser.add_argument("last_name", location='form', type='string', required=True)
-    tenant_create_parser.add_argument("date_of_birth", location='form', type="date", required=False, help="yyyy-mm-dd")
-    tenant_create_parser.add_argument("job_title", location='form', type='string', required=False)
-    tenant_create_parser.add_argument("tenancy_start_date", location='form', type='date', required=True, help="yyyy-mm-dd")
-    tenant_create_parser.add_argument("tenancy_end_date", location='form', type='date', required=False, help="yyyy-mm-dd")
+    tenant_create_parser.add_argument("title", type='string', required=False)
+    tenant_create_parser.add_argument("first_name", type='string', required=True)
+    tenant_create_parser.add_argument("last_name", type='string', required=True)
+    tenant_create_parser.add_argument("phone_number", type='string', required=False)
+    tenant_create_parser.add_argument("email_address", type='string', required=True)
+    tenant_create_parser.add_argument("date_of_birth", type="date", required=False, help="yyyy-mm-dd")
+    tenant_create_parser.add_argument("job_title", type='string', required=False)
+    tenant_create_parser.add_argument("tenancy_start_date", type='date', required=True, help="yyyy-mm-dd")
+    tenant_create_parser.add_argument("tenancy_end_date", type='date', required=False, help="yyyy-mm-dd")

@@ -16,9 +16,9 @@ class PortfolioDto:
         'total_income': SumOfProperties(attribute='properties'),
     })
 
-    portfolio_create = api.model('Portfolio', {
-        'name': fields.String(required=True, description='portfolio name'),
-    })
+    # portfolio_create = api.model('Portfolio', {
+    #     'name': fields.String(required=True, description='portfolio name'),
+    # })
 
     portfolio_update = api.model('Portfolio', {
         'id': fields.String(required=True, description='id'),
