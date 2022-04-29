@@ -1,24 +1,19 @@
-from email.mime import image
-import os
 from datetime import datetime as dt
-from app.main.model import tenant
 
 from flask import current_app
-from werkzeug.utils import secure_filename
 from http import HTTPStatus
 
 from app.main import db
 from app.main.model.property import Property
-from app.main.model.tenant import Tenant, TenantNote, TenantProfile
+from app.main.model.tenant import Tenant, TenantNote, TenantProfile, TitleEnum
 
 
 def get_all_tenants_for_property(property_id):
     tenants = Tenant.query.filter_by(property_id=property_id).all()
-
     return tenants
 
 
-def update_tenant(property_id, data, profile):
+def update_tenant(property_id, data):
     tenant = Tenant.query.filter_by(id=data['id'])\
                         .filter(property_id=property_id).update(data)
     save_changes(tenant)
@@ -46,7 +41,7 @@ def delete_tenant(property_id, tenant_id):
     return 'Not found', HTTPStatus.NOT_FOUND
 
 
-def save_new_tenant(portfolio_id, property_id, data, profile):
+def save_new_tenant(portfolio_id, property_id, data):
     property = Property.query.filter_by(id=property_id).first()
     if property is None:
         response_object = {
@@ -66,20 +61,23 @@ def save_new_tenant(portfolio_id, property_id, data, profile):
     if Tenant.query.filter_by(property_id=property_id)\
             .filter(portfolio__id=portfolio_id)\
             .filter(first_name=data['first_name'])\
-            .filter(date_of_birth=data['first_name'])\
+            .filter(date_of_birth=data['date_of_birth'])\
             .filter(last_name=data['last_name']).scalar():
         response_object = {
             'status': 'fail',
             'message': 'Tenant already exists at this property',
             'data': {
                 'first_name': data['first_name'],
-                'last_name': data['last_name']
+                'last_name': data['last_name'],
+                'property_id': property_id
             }
         }
         return response_object, HTTPStatus.BAD_REQUEST
 
+    import pdb; pdb.set_trace() # Check title correctly parses
+    title = TitleEnum(data['title'])
     new_tenant = Tenant(
-        title=data['title'],
+        title=title,
         first_name=data['first_name'],
         last_name=data['last_name'],
         date_of_birth=dt.strptime(data['date_of_birth'], '%Y-%m-%d'),
@@ -108,6 +106,8 @@ def save_new_tenant(portfolio_id, property_id, data, profile):
 
 
 def get_tenant_by_id(portfolio_id, property_id, tenant_id):
+    # TODO: Needs work!
+    import pdb; pdb.set_trace()
     tenant = Tenant.query.filter_by(property_id=property_id).filter_by(id=tenant_id).first()
     if tenant.property.portfolio_id != portfolio_id:
         response_object = {
@@ -124,7 +124,7 @@ def get_tenant_by_id(portfolio_id, property_id, tenant_id):
 
 def add_profile_to_tenant(tenant_id, image_str):
     # Save image off
-    tenant_profile = tenant.TenantProfile(
+    tenant_profile = TenantProfile(
         tenant_id = tenant_id,
         image = image_str
     )

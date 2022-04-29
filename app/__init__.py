@@ -33,7 +33,7 @@ api.add_namespace(user_ns, path='/user')
 api.add_namespace(portfolio_ns, path='/portfolio')
 api.add_namespace(property_ns, path='/portfolio/<int:portfolio_id>/property')
 api.add_namespace(address_ns, path='/address')
-api.add_namespace(tenant_ns, path='/portfolio/<int:portfolio_id>/property/<int:property_id>')
+api.add_namespace(tenant_ns, path='/portfolio/<int:portfolio_id>/property/<int:property_id>/tenants')
 api.add_namespace(auth_ns)
 
 

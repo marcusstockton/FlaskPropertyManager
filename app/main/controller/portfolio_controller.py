@@ -14,7 +14,7 @@ _portfolio_details = PortfolioDto.portfolio_details
 _portfolio_update = PortfolioDto.portfolio_update
 _portfolio_update_parser = PortfolioDto.portfolio_update_parser
 _portfolio_create_parser = PortfolioDto.portfolio_create_parser
-_portfolio_create = PortfolioDto.portfolio_create
+# _portfolio_create = PortfolioDto.portfolio_create
 
 
 @api.route('/')
@@ -31,10 +31,10 @@ class PortfolioList(Resource):
 	@api.response(201, 'Portfolio successfully created.')
 	@api.doc('create a new portfolio')
 	@api.marshal_with(_portfolio_details, envelope='data')
-	@api.expect(_portfolio_create, envelope='data')
+	@api.expect(_portfolio_create_parser, validate=True)
 	def post(self):
 		"""Creates a new Portfolio """
-		data = json.loads(request.data)
+		data = _portfolio_create_parser.parse_args()
 		user = Auth.get_logged_in_user_object(request)
 		return save_new_portfolio(data=data, user_id=user.id)
 

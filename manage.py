@@ -14,7 +14,7 @@ migrate = Migrate(app, db)
 
 @app.cli.command()
 def run():
-    app.run(port=8089)
+    app.run(debug=True)
 
 
 @app.cli.command()
