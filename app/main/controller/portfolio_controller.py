@@ -1,5 +1,3 @@
-import json
-
 from flask import request
 from flask_restx import Resource
 
@@ -21,7 +19,7 @@ _portfolio_create_parser = PortfolioDto.portfolio_create_parser
 class PortfolioList(Resource):
 	@token_required
 	@api.doc('list_of_portfolios')
-	@api.marshal_list_with(_portfolio_details, envelope='data')
+	@api.marshal_list_with(_portfolio_details)
 	def get(self):
 		"""Get all portfolio's for the logged-in user"""
 		user = Auth.get_logged_in_user_object(request)
@@ -30,7 +28,7 @@ class PortfolioList(Resource):
 	@token_required
 	@api.response(201, 'Portfolio successfully created.')
 	@api.doc('create a new portfolio')
-	@api.marshal_with(_portfolio_details, envelope='data')
+	@api.marshal_with(_portfolio_details)
 	@api.expect(_portfolio_create_parser, validate=True)
 	def post(self):
 		"""Creates a new Portfolio """
@@ -43,7 +41,7 @@ class PortfolioList(Resource):
 class PortfolioItem(Resource):
 	@token_required
 	@api.doc('single portfolio')
-	@api.marshal_with(_portfolio_details, envelope='data')
+	@api.marshal_with(_portfolio_details)
 	def get(self, id):
 		""" Displays a portfolio's details """
 		user = Auth.get_logged_in_user_object(request)
@@ -51,7 +49,7 @@ class PortfolioItem(Resource):
 
 	@token_required
 	@api.doc('update a portfolio')
-	@api.marshal_with(_portfolio_details, envelope='data')
+	@api.marshal_with(_portfolio_details)
 	@api.response(200, 'Portfolio updated created.')
 	@api.response(500, 'Internal Server Error')
 	@api.response(404, 'Portfolio Not found')

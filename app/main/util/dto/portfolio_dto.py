@@ -31,4 +31,4 @@ class PortfolioDto:
     #                                      type=lambda x: datetime.strptime(x, '%Y-%m-%dT%H:%M:%S.%f'), required=False)
 
     portfolio_create_parser = api.parser()
-    portfolio_create_parser.add_argument('name', location='json', type=str, required=True, help="Name of portfolio")
+    portfolio_create_parser.add_argument('name', location='json', type=str, required=True, nullable=False, help="Name of Portfolio")

@@ -2,12 +2,11 @@ import datetime
 from typing import List, Dict
 
 from flask import current_app
-from flask_restx import abort
 from sqlalchemy import update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import lazyload
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
-from http import HTTPStatus
+from werkzeug.exceptions import NotFound, BadRequest, InternalServerError
 
 from app.main import db
 from app.main.model.portfolio import Portfolio
@@ -25,10 +24,10 @@ def get_portfolio_by_id(user_id: int, portfolio_id: int) -> Portfolio:
                      lazyload(Portfolio.properties)).one()
     except NoResultFound as e:
         current_app.logger.error("Portfolio not found for userid %s and portfolio_id %s", user_id, portfolio_id)
-        abort(HTTPStatus.NOT_FOUND, "Portfolio not found")
+        raise NotFound("Portfolio not found for userid %s and portfolio_id %s", user_id, portfolio_id)
     except MultipleResultsFound as e:
         current_app.logger.error("Multiple portfolio's not found for userid %s and portfolio_id %s", user_id, portfolio_id)
-        abort(HTTPStatus.BAD_REQUEST, "Multiple Portfolio's found")
+        raise BadRequest("Multiple portfolio's not found for userid %s and portfolio_id %s", user_id, portfolio_id)
 
 
 def save_new_portfolio(data, user_id) -> Dict[str, str]:
@@ -42,20 +41,20 @@ def save_new_portfolio(data, user_id) -> Dict[str, str]:
         save_changes(new_portfolio)
         return new_portfolio
     else:
-        abort(HTTPStatus.BAD_REQUEST, "Portfolio already exists.")
+        raise BadRequest("Portfolio already exists.")
 
 
 def update_portfolio(portfolio_id: int, data: dict):
     portfolio_query = Portfolio.query.filter_by(id=portfolio_id).one()
     if not portfolio_query:
-        abort(HTTPStatus.BAD_REQUEST, "Portfolio not found.")
+        raise NotFound("Portfolio not found.")
     try:
         stmt = update(Portfolio).where(Portfolio.id == portfolio_id).values(data)
         db.session.execute(stmt)
         db.session.commit()
         return Portfolio(**data)
     except IntegrityError as e:
-        abort(HTTPStatus.INTERNAL_SERVER_ERROR, e.orig)
+        raise InternalServerError(e.orig)
 
 
 def save_changes(data) -> None:

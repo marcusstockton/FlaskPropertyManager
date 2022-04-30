@@ -1,11 +1,9 @@
-import json
 import base64
 
-from flask import current_app
-from flask import request
 from flask_restx import Namespace, fields
 
 from ...model.tenant import TitleEnum
+
 
 class Base64Decoder(fields.Raw):
     def format(self, value):
@@ -88,19 +86,19 @@ class TenantDto:
         'email_address': fields.String(required=True, description='email_address'),
         'first_name': fields.String(required=True, description='first name'),
         'last_name': fields.String(required=True, description='last name'),
+        'date_of_birth': fields.Date(required=True, description='date of birth'),
+        'job_title': fields.String(required=True, description='job title'),
+        'tenancy_start_date': fields.Date(required=True, description='tenancy start date'),
+        'tenancy_end_date': fields.Date(required=False, description='tenancy end date'),
+    })
+    tenant_update = api.model('Tenant', {
+        'id': fields.String(required=True, description='id'),
+        'title': fields.String(required=False, description='title', enum=[x.name for x in TitleEnum], attribute='title.name'),
+        'phone_number': fields.String(required=False, description='phone number'),
+        'first_name': fields.String(required=True, description='first name', attribute='first_name'),
+        'last_name': fields.String(required=True, description='last name'),
         'date_of_birth': fields.DateTime(required=True, description='date of birth'),
         'job_title': fields.String(required=True, description='job title'),
         'tenancy_start_date': fields.DateTime(required=True, description='tenancy start date'),
-        'tenancy_end_date': fields.DateTime(required=False, description='tenancy end date'),
+        'tenancy_end_date': fields.DateTime(required=True, description='tenancy end date'),
     })
-
-    tenant_create_parser = api.parser()
-    tenant_create_parser.add_argument("title", type='string', required=False)
-    tenant_create_parser.add_argument("first_name", type='string', required=True)
-    tenant_create_parser.add_argument("last_name", type='string', required=True)
-    tenant_create_parser.add_argument("phone_number", type='string', required=False)
-    tenant_create_parser.add_argument("email_address", type='string', required=True)
-    tenant_create_parser.add_argument("date_of_birth", type="date", required=False, help="yyyy-mm-dd")
-    tenant_create_parser.add_argument("job_title", type='string', required=False)
-    tenant_create_parser.add_argument("tenancy_start_date", type='date', required=True, help="yyyy-mm-dd")
-    tenant_create_parser.add_argument("tenancy_end_date", type='date', required=False, help="yyyy-mm-dd")

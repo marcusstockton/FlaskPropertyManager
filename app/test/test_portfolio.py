@@ -34,8 +34,8 @@ class TestPortfolioBlueprint(BaseTestCase):
         with app.test_client() as client:
             response = client.get('/portfolio/1')
             data = response.get_json()
-            self.assertEqual('Test 1', data.get('data').get('name'))
-            self.assertEqual('1', data.get('data').get('id'))
+            self.assertEqual('Test 1', data.get('name'))
+            self.assertEqual('1', data.get('id'))
 
     @patch.object(Auth, 'get_logged_in_user', return_value=mock_get_logged_in_user_success())
     @patch.object(Auth, 'get_logged_in_user_object', return_value=mock_logged_in_user())
@@ -44,7 +44,7 @@ class TestPortfolioBlueprint(BaseTestCase):
 
         with app.test_client() as client:
             response = client.get('/portfolio/2')
-            self.assert404(response)
+            self.assert500(response)
 
     @patch.object(Auth, 'get_logged_in_user', return_value=mock_get_logged_in_user_success())
     @patch.object(Auth, 'get_logged_in_user_object', return_value=mock_logged_in_user())
@@ -58,7 +58,7 @@ class TestPortfolioBlueprint(BaseTestCase):
             self.assertEqual(response.status_code, 200)
             data = json.loads(response.get_data(as_text=True))
 
-            self.assertEqual('Updated Test 1', data.get('data').get('name'))
+            self.assertEqual('Updated Test 1', data.get('name'))
 
     @patch.object(Auth, 'get_logged_in_user', return_value=mock_get_logged_in_user_success())
     @patch.object(Auth, 'get_logged_in_user_object', return_value=mock_logged_in_user())
@@ -102,7 +102,7 @@ class TestPortfolioBlueprint(BaseTestCase):
             self.assertEqual(response.status_code, 200)
             data = json.loads(response.get_data(as_text=True))
 
-            self.assertEqual(1, data.get('data').get('property_count'))
+            self.assertEqual(1, data.get('property_count'))
 
     @staticmethod
     def create_data():
