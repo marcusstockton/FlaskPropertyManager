@@ -21,7 +21,6 @@ class TestPortfolioBlueprint(BaseTestCase):
 
         with app.test_client() as client:
             response = client.get('/portfolio/')
-            self.assertIsNot(401, response.status_code)
             self.assert200(response)
             data = json.loads(response.get_data(as_text=True))
             self.assertEqual(1, len(data))
@@ -54,8 +53,7 @@ class TestPortfolioBlueprint(BaseTestCase):
         with app.test_client() as client:
             response = client.put('/portfolio/1', data=json.dumps(dict_data),
                                   headers={'Content-Type': 'application/json'},)
-            self.assertIsNot(400, response.status_code)
-            self.assertEqual(response.status_code, 200)
+            self.assert200(response)
             data = json.loads(response.get_data(as_text=True))
 
             self.assertEqual('Updated Test 1', data.get('name'))
@@ -98,11 +96,34 @@ class TestPortfolioBlueprint(BaseTestCase):
         # Do the test:
         with app.test_client() as client:
             response = client.get('/portfolio/1')
-            self.assertIsNot(400, response.status_code)
-            self.assertEqual(response.status_code, 200)
+            self.assert200(response)
             data = json.loads(response.get_data(as_text=True))
 
             self.assertEqual(1, data.get('property_count'))
+
+    @patch.object(Auth, 'get_logged_in_user', return_value=mock_get_logged_in_user_success())
+    @patch.object(Auth, 'get_logged_in_user_object', return_value=mock_logged_in_user())
+    def test_create_portfolio_with_xss_input_is_sanitized(self, mock_user, mock_auth):
+        new_portfolio = {'name': '<script>alert();</script>'}
+        # Do the test:
+        with app.test_client() as client:
+            response = client.post('/portfolio/', data=json.dumps(new_portfolio)
+                                   , headers={'Content-Type': 'application/json'},)
+            self.assert200(response)
+            data = json.loads(response.get_data(as_text=True))
+            self.assertEqual('&lt;script&gt;alert();&lt;/script&gt;', data.get('name'))
+
+    @patch.object(Auth, 'get_logged_in_user', return_value=mock_get_logged_in_user_success())
+    @patch.object(Auth, 'get_logged_in_user_object', return_value=mock_logged_in_user())
+    def test_create_portfolio_with_normal_input_is_saved_correctly(self, mock_user, mock_auth):
+        new_portfolio = {'name': 'Testing Portfolio Name'}
+        # Do the test:
+        with app.test_client() as client:
+            response = client.post('/portfolio/', data=json.dumps(new_portfolio)
+                                   , headers={'Content-Type': 'application/json'},)
+            self.assert200(response)
+            data = json.loads(response.get_data(as_text=True))
+            self.assertEqual('Testing Portfolio Name', data.get('name'))
 
     @staticmethod
     def create_data():

@@ -1,5 +1,6 @@
-import unittest
 import json
+import unittest
+
 from app.test.base import BaseTestCase
 
 
@@ -43,7 +44,7 @@ class TestAuthBlueprint(BaseTestCase):
 			login_response = login_user(self)
 			data = json.loads(login_response.data.decode())
 			self.assertTrue(data['Authorization'])
-			self.assertEqual(login_response.status_code, 200)
+			self.assert200(login_response)
 
 	def test_valid_logout(self):
 		""" Test for logout before token expires """
