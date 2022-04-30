@@ -1,7 +1,9 @@
 from datetime import datetime as dt
-
-from flask import current_app
 from http import HTTPStatus
+from sqlite3 import IntegrityError
+
+from sqlalchemy import update
+from werkzeug.exceptions import NotFound, BadRequest
 
 from app.main import db
 from app.main.model.property import Property
@@ -13,77 +15,72 @@ def get_all_tenants_for_property(property_id):
     return tenants
 
 
-def update_tenant(property_id, data):
-    tenant = Tenant.query.filter_by(id=data['id'])\
-                        .filter(property_id=property_id).update(data)
-    save_changes(tenant)
-    response_object = {
-        'status': 'success',
-        'message': 'Successfully updated tenant.',
-        'data': {
-            'id': tenant.id
-        }
-    }
-    return response_object, HTTPStatus.NO_CONTENT
+def update_tenant(property_id, tenant_id, data):
+    if int(data['id']) != tenant_id:
+        raise BadRequest()
+
+    tenant = Tenant.query.filter_by(id=data['id']).filter(Tenant.property_id==property_id).first()
+    
+    if tenant is not None:
+        data['date_of_birth'] = dt.strptime(data['date_of_birth'], '%Y-%m-%d').date()
+        data['tenancy_start_date']=dt.strptime(data['tenancy_start_date'], '%Y-%m-%d').date()
+        data['tenancy_end_date']=dt.strptime(data['tenancy_end_date'], '%Y-%m-%d').date()
+        try:
+            stmt = update(Tenant).where(Tenant.id == tenant_id).values(data)
+            db.session.execute(stmt)
+            db.session.commit()
+            response_object = {
+                'status': 'success',
+                'message': 'Successfully updated tenant.',
+                'data': {
+                    'id': tenant_id
+                }
+            }
+            return response_object, HTTPStatus.NO_CONTENT
+        except IntegrityError as e:
+            raise IntegrityError(e)
+
     
 
 def delete_tenant(property_id, tenant_id):
-    tenant = Tenant.query.filter_by(property_id=property_id).filter(id=tenant_id)
-    if tenant is not None:
-        Tenant.query.filter_by(property_id=property_id).filter(id=tenant_id).delete()
-        save_changes(tenant)
-        response_object = {
-            'status': 'success',
-            'message': 'Successfully deleted tenant.',
-            'data': {}
-        }
-        return response_object, HTTPStatus.NO_CONTENT
-    return 'Not found', HTTPStatus.NOT_FOUND
+    tenant = Tenant.query.filter_by(property_id=property_id, id=tenant_id)
+    if tenant.scalar() is None:
+        raise NotFound()
+    tenant.delete()
+    db.session.commit()
+    response_object = {
+        'status': 'success',
+        'message': 'Successfully deleted tenant.',
+        'data': {}
+    }
+    return response_object, HTTPStatus.NO_CONTENT
 
 
 def save_new_tenant(portfolio_id, property_id, data):
     property = Property.query.filter_by(id=property_id).first()
     if property is None:
-        response_object = {
-            'status': 'fail',
-            'message': 'No property found',
-        }
-        return response_object, HTTPStatus.BAD_REQUEST
+        raise NotFound()
     
     if property.portfolio_id != portfolio_id:
-        response_object = {
-            'status': 'fail',
-            'message': 'Property does not exist against this portfolio',
-        }
-        return response_object, HTTPStatus.NOT_FOUND
+        raise NotFound('Property does not exist against this portfolio')
 
     # check if tenant already exists?
-    if Tenant.query.filter_by(property_id=property_id)\
-            .filter(portfolio__id=portfolio_id)\
-            .filter(first_name=data['first_name'])\
-            .filter(date_of_birth=data['date_of_birth'])\
-            .filter(last_name=data['last_name']).scalar():
-        response_object = {
-            'status': 'fail',
-            'message': 'Tenant already exists at this property',
-            'data': {
-                'first_name': data['first_name'],
-                'last_name': data['last_name'],
-                'property_id': property_id
-            }
-        }
-        return response_object, HTTPStatus.BAD_REQUEST
-
-    import pdb; pdb.set_trace() # Check title correctly parses
-    title = TitleEnum(data['title'])
+    existingTenant = Tenant.query.filter(Tenant.property_id==property_id, 
+        Tenant.first_name==data['first_name'], 
+        Tenant.last_name==data['last_name'],
+        Tenant.date_of_birth==data['date_of_birth']).scalar()
+    if existingTenant is not None:
+        raise BadRequest('Tenant already exists at this property')
+        
+    title = TitleEnum[data['title']]
     new_tenant = Tenant(
         title=title,
-        first_name=data['first_name'],
-        last_name=data['last_name'],
+        first_name=data.get('first_name'),
+        last_name=data.get('last_name'),
         date_of_birth=dt.strptime(data['date_of_birth'], '%Y-%m-%d'),
-        job_title=data['job_title'],
+        job_title=data.get('job_title'),
         tenancy_start_date=dt.strptime(data['tenancy_start_date'], '%Y-%m-%d'),
-        tenancy_end_date=dt.strptime(data['tenancy_end_date'], '%Y-%m-%d')
+        tenancy_end_date=data.get('tenancy_end_date')
     )
     if 'note' in data:
         new_note = TenantNote(
@@ -106,19 +103,13 @@ def save_new_tenant(portfolio_id, property_id, data):
 
 
 def get_tenant_by_id(portfolio_id, property_id, tenant_id):
-    # TODO: Needs work!
-    import pdb; pdb.set_trace()
-    tenant = Tenant.query.filter_by(property_id=property_id).filter_by(id=tenant_id).first()
+    tenant = Tenant.query.filter(Tenant.property_id==property_id, Tenant.id==tenant_id).first()
+    if tenant is None:
+        raise NotFound("Tenant not found with id")
+        # return "Tenant not found with id", HTTPStatus.NOT_FOUND
     if tenant.property.portfolio_id != portfolio_id:
-        response_object = {
-            'status': 'fail',
-            'message': 'Issue with property portfolio supplied.',
-            'data': {
-                'portfolio_id': portfolio_id,
-                'property_id': property_id
-            }
-        }
-        return response_object, HTTPStatus.BAD_REQUEST
+        raise BadRequest('Issue with property portfolio supplied.')
+        
     return tenant
 
 

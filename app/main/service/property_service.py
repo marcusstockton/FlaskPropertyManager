@@ -1,9 +1,10 @@
 import datetime
+from http import HTTPStatus
 
 from flask import current_app
-from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 from sqlalchemy.orm import lazyload
-from http import HTTPStatus
+from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
+from werkzeug.exceptions import NotFound, InternalServerError
 
 from app.main import db
 from app.main.model.address import Address
@@ -20,12 +21,8 @@ def save_new_property(portfolio_id, data):
     portfolio = Portfolio.query.filter_by(id=portfolio_id).first()
 
     if portfolio is None:
-        response_object = {
-            'status': 'fail',
-            'message': 'No portfolio found',
-        }
         current_app.logger.error("No portfolio found portfolio_id %s", portfolio_id)
-        return response_object, HTTPStatus.NOT_FOUND
+        raise NotFound('No portfolio found')
 
     if data['address']:
         # create address
@@ -60,15 +57,8 @@ def save_new_property(portfolio_id, data):
             }
             return response_object, HTTPStatus.CREATED
         except Exception as ex:
-            current_app.logger.error("Unable to save new Property %s", ex)
-            response_object = {
-                'status': 'failure',
-                'message': 'Error saving property.',
-                'data': {
-                    f'Exception: {ex}',
-                }
-            }
-            return response_object, HTTPStatus.INTERNAL_SERVER_ERROR
+            raise InternalServerError("Unable to save new Property %s", ex)
+            
 
 
 def get_property_by_id(portfolio_id, property_id):

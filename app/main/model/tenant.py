@@ -1,8 +1,8 @@
-from datetime import datetime
 import enum
+from datetime import datetime
 
-from sqlalchemy_utils import EmailType
 from sqlalchemy import LargeBinary
+from sqlalchemy_utils import EmailType
 
 from .property import Property
 from .. import db
@@ -16,6 +16,13 @@ class TitleEnum(enum.Enum):
 	Lord = 5
 	Sir = 6
 	Dr = 7
+
+	@classmethod
+	def has_key(cls, name):
+		return name in cls.__members__ # solution above 1
+	@classmethod
+	def list(cls):
+		return list(map(lambda c: c.value, cls))
 
 
 class Tenant(db.Model):
