@@ -1,3 +1,4 @@
+from flask import current_app as app
 from flask import request
 from flask_restx import Resource
 
@@ -23,6 +24,7 @@ class PortfolioList(Resource):
 	def get(self):
 		"""Get all portfolio's for the logged-in user"""
 		user = Auth.get_logged_in_user_object(request)
+		app.logger.info(f"Getting all portfolios' for {user.username}")
 		return get_all_portfolios_for_user(user.id)
 
 	@token_required
@@ -34,6 +36,7 @@ class PortfolioList(Resource):
 		"""Creates a new Portfolio """
 		data = _portfolio_create_parser.parse_args()
 		user = Auth.get_logged_in_user_object(request)
+		app.logger.info(f"Creating a new portfolio for {user.username}")
 		return save_new_portfolio(data=data, user_id=user.id)
 
 
@@ -45,6 +48,7 @@ class PortfolioItem(Resource):
 	def get(self, id):
 		""" Displays a portfolio's details """
 		user = Auth.get_logged_in_user_object(request)
+		app.logger.info(f"Finding Portfolio by Id {id} for {user.username}")
 		return get_portfolio_by_id(user.id, id)
 
 	@token_required
