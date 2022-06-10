@@ -1,5 +1,6 @@
 import base64
 
+from flask import current_app as app
 from flask import request
 from flask_restx import Resource
 from werkzeug.datastructures import FileStorage
@@ -25,6 +26,7 @@ class TenantList(Resource):
 	@api.marshal_list_with(_tenant_list)
 	def get(self, portfolio_id, property_id):
 		"""Get all tenants for the property"""
+		app.logger.info(f"Getting all tenants for propertyId {property_id}")
 		return get_all_tenants_for_property(property_id)
 
 
@@ -40,6 +42,7 @@ class TenantList(Resource):
 		"""Creates a new Tenant """
 		#import pdb; pdb.set_trace()
 		data = request.json
+		app.logger.info(f"Adding new tenant {data.email_address} to {property_id}")
 		return save_new_tenant(portfolio_id, property_id, data)
 
 @api.route('/<int:tenant_id>')
@@ -49,6 +52,7 @@ class TenantItem(Resource):
 	# @api.marshal_with(_tenant)
 	def get(self, portfolio_id, property_id, tenant_id):
 		""" Gets a tenant by Id """
+		app.logger.info(f"Finding tenant by id {tenant_id}")
 		return get_tenant_by_id(portfolio_id, property_id, tenant_id)
 		
 
@@ -57,6 +61,7 @@ class TenantItem(Resource):
 	# @api.marshal_with(_tenant)
 	def delete(self, portfolio_id, property_id, tenant_id):
 		""" Deletes a tenant. """
+		app.logger.info(f"Deleting tenant id {tenant_id} for property {property_id}")
 		return delete_tenant(property_id, tenant_id)
 
 	@token_required
@@ -65,6 +70,7 @@ class TenantItem(Resource):
 	def put(self, portfolio_id, property_id, tenant_id):
 		"""Update a tenant details"""
 		data = request.json
+		app.logger.info(f"Updating tenant id {tenant_id} for property {property_id}")
 		return update_tenant(property_id,tenant_id, data)
 
 
@@ -77,9 +83,10 @@ class TenantImage(Resource):
 		""" Adds a tenant profile pic. """
 		args = upload_parser.parse_args()
 		file = args['image']
-		import pdb;pdb.set_trace()
 		if file:
 			# Save image as base64 string
 			# verify user has permission to do this...?
+			import pdb;pdb.set_trace()
+			app.logger.info(f"Adding a tenant profile image {file.name} for tenant id {tenant_id}")
 			image_string = base64.b64encode(file.read())
 			return add_profile_to_tenant(tenant_id, image_string)

@@ -30,7 +30,7 @@ class Tenant(db.Model):
 	__tablename__ = "tenant"
 	id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 	property_id = db.Column(db.Integer, db.ForeignKey(Property.id))
-	property = db.relationship("Property", foreign_keys=[property_id])
+	property = db.relationship("Property", back_populates="tenants")
 	phone_number = db.Column(db.String(20))
 	email_address = db.Column(EmailType)
 	title = db.Column(db.Enum(TitleEnum))

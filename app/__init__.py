@@ -61,7 +61,6 @@ def internal_server_error_exception_handler(error: InternalServerError):
     """Default Not Found error handler"""
     return {'message': str(error)}, getattr(error, 'code', HTTPStatus.BAD_REQUEST)
     
-
 @api.errorhandler(Exception)
 def generic_exception_handler(error: Exception):
     """Default error handler"""

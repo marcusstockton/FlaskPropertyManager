@@ -2,9 +2,9 @@ import os
 import unittest
 
 from flask_migrate import Migrate
-from app.main import create_app, db
+
 from app import blueprint
-from app.main.model import user, blacklist, portfolio, property, address, tenant
+from app.main import create_app, db
 
 app = create_app(os.getenv('PROPERTYMANAGER_ENV') or 'dev')
 app.register_blueprint(blueprint)
@@ -14,6 +14,7 @@ migrate = Migrate(app, db)
 
 @app.cli.command()
 def run():
+    app.logger.info("run called")
     app.run(debug=True)
 
 
@@ -34,4 +35,5 @@ def seed():
 
 
 if __name__ == '__main__':
+    app.logger.info("__main__ called")
     app.run(debug=True)

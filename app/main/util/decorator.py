@@ -1,4 +1,6 @@
 from functools import wraps
+from http import HTTPStatus
+
 from flask import request
 
 from app.main.service.auth_helper import Auth
@@ -32,7 +34,7 @@ def admin_token_required(f):
                 'status': 'fail',
                 'message': 'admin token required'
             }
-            return response_object, 401
+            return response_object, HTTPStatus.UNAUTHORIZED
 
         return f(*args, **kwargs)
 

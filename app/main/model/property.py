@@ -1,4 +1,5 @@
 from datetime import datetime
+
 from sqlalchemy import LargeBinary
 
 from .portfolio import Portfolio
@@ -18,7 +19,7 @@ class Property(db.Model):
     created_date = db.Column(db.DateTime, default=datetime.utcnow)
     updated_date = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     address = db.relationship("Address",  back_populates="property",uselist=False, cascade="all, delete")
-    tenants = db.relationship("Tenant", cascade="all, delete")
+    tenants = db.relationship("Tenant", back_populates="property", cascade="all, delete")
     owner = db.relationship("User")
     property_pics = db.relationship("PropertyImages", back_populates="property", lazy=True)
 

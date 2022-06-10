@@ -29,7 +29,6 @@ class PropertyList(Resource):
 	@api.expect(_property_create, validate=True)
 	def post(self, portfolio_id):
 		"""Creates a new Property """
-		import pdb;pdb.set_trace()
 		data = request.json
 		return save_new_property(portfolio_id, data=data)
 	

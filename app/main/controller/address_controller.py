@@ -1,6 +1,7 @@
 import os
 
 import requests
+from flask import current_app
 from flask import make_response
 from flask_restx import Resource
 
@@ -20,8 +21,14 @@ class AddressSearchList(Resource):
         _apiKey = os.getenv('HERE_Maps_API_Key')
         _ukLatLong = "55.3781,3.4360"
         _countryCode = "GBP"
+        
         url = f"https://autosuggest.search.hereapi.com/v1/autosuggest?at={_ukLatLong}&countryCode={_countryCode}" \
               f"&limit=50&lang=en&q={search}&apiKey={_apiKey}"
-        r = requests.get(url=url)
-        data = r.json()
-        return make_response(data, 200)
+        current_app.logger.debug(f"{AddressSearchList.__name__} calling {url}")
+        try:
+            r = requests.get(url=url)
+            data = r.json()
+            return make_response(data, r.status_code)
+        except requests.HTTPError as err:
+            current_app.logger.error(f"{AddressSearchList.__name__} call failed {err}")
+            return make_response(err, r.status_code)
