@@ -13,7 +13,6 @@ _portfolio_details = PortfolioDto.portfolio_details
 _portfolio_update = PortfolioDto.portfolio_update
 _portfolio_update_parser = PortfolioDto.portfolio_update_parser
 _portfolio_create_parser = PortfolioDto.portfolio_create_parser
-# _portfolio_create = PortfolioDto.portfolio_create
 
 
 @api.route('/')
@@ -45,11 +44,11 @@ class PortfolioItem(Resource):
 	@token_required
 	@api.doc('single portfolio')
 	@api.marshal_with(_portfolio_details)
-	def get(self, id):
+	def get(self, portfolio_id):
 		""" Displays a portfolio's details """
 		user = Auth.get_logged_in_user_object(request)
-		app.logger.info(f"Finding Portfolio by Id {id} for {user.username}")
-		return get_portfolio_by_id(user.id, id)
+		app.logger.info(f"Finding Portfolio by Id {portfolio_id} for {user.username}")
+		return get_portfolio_by_id(user.id, portfolio_id)
 
 	@token_required
 	@api.doc('update a portfolio')
@@ -58,9 +57,7 @@ class PortfolioItem(Resource):
 	@api.response(500, 'Internal Server Error')
 	@api.response(404, 'Portfolio Not found')
 	@api.expect(_portfolio_update_parser, validate=True)
-	def put(self, id):
+	def put(self, portfolio_id):
 		""" Edits a portfolio """
 		data = _portfolio_update_parser.parse_args()
-		return update_portfolio(id, data)
-
-
+		return update_portfolio(portfolio_id, data)

@@ -14,6 +14,7 @@ _property_create = PropertyDto.property_create
 upload_parser = api.parser()
 upload_parser.add_argument('images', location='files', type=FileStorage, required=True, action="append")
 
+
 @api.route('/')
 class PropertyList(Resource):
 	@token_required
@@ -31,7 +32,7 @@ class PropertyList(Resource):
 		"""Creates a new Property """
 		data = request.json
 		return save_new_property(portfolio_id, data=data)
-	
+
 
 @api.route('/<int:property_id>')
 class PropertyItem(Resource):
@@ -41,19 +42,19 @@ class PropertyItem(Resource):
 	def get(self, portfolio_id, property_id):
 		""" Gets the property by id. """
 		return get_property_by_id(portfolio_id, property_id)
-		
+
 	@token_required
 	@api.doc('update property')
-	@api.marshal_list_with(_property)	
+	@api.marshal_list_with(_property)
 	def put(self, portfolio_id, property_id):
-		"""Updates the property""" 
+		"""Updates the property"""
 		data = request.json
 		pass
 
 
 @api.route('/<int:property_id>/images')
 class PropertyImage(Resource):
-	#@token_required
+	@token_required
 	@api.doc('add images of property')
 	@api.expect(upload_parser)
 	@api.marshal_list_with(_property)
@@ -61,7 +62,7 @@ class PropertyImage(Resource):
 		""" Add images of property. """
 		images = request.files
 		if images:
-			#do stuff
+			# do stuff
 			pass
 
 		pass

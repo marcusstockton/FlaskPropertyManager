@@ -16,7 +16,6 @@ naming_convention = {
     "pk": "pk_%(table_name)s"
 }
 
-
 db = SQLAlchemy(metadata=MetaData(naming_convention=naming_convention))
 flask_bcrypt = Bcrypt()
 
@@ -30,7 +29,7 @@ def create_app(config_name):
     app.config.from_object(config_by_name[config_name])
     app.config['ERROR_404_HELP'] = False
     db.init_app(app)
-    
+
     flask_bcrypt.init_app(app)
 
     return app

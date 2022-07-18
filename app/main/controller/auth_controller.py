@@ -11,6 +11,7 @@ user_auth = AuthDto.user_auth
 @api.route('/login')
 class UserLogin(Resource):
     """ User Login Resource """
+
     @api.doc('user login')
     @api.expect(user_auth, validate=True)
     @api.response(401, 'Invalid username and/or password')
@@ -23,6 +24,7 @@ class UserLogin(Resource):
 @api.route('/logout')
 class LogoutAPI(Resource):
     """ Logout Resource """
+
     @api.doc('logout a user')
     def post(self):
         # get auth token

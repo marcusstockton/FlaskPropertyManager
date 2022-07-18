@@ -21,7 +21,7 @@ class AddressSearchList(Resource):
         _apiKey = os.getenv('HERE_Maps_API_Key')
         _ukLatLong = "55.3781,3.4360"
         _countryCode = "GBP"
-        
+
         url = f"https://autosuggest.search.hereapi.com/v1/autosuggest?at={_ukLatLong}&countryCode={_countryCode}" \
               f"&limit=50&lang=en&q={search}&apiKey={_apiKey}"
         current_app.logger.debug(f"{AddressSearchList.__name__} calling {url}")

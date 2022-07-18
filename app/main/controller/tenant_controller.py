@@ -19,6 +19,7 @@ _tenant_update = TenantDto.tenant_update
 upload_parser = api.parser()
 upload_parser.add_argument('image', location='files', type=FileStorage, required=True)
 
+
 @api.route('/')
 class TenantList(Resource):
 	@token_required
@@ -29,9 +30,8 @@ class TenantList(Resource):
 		app.logger.info(f"Getting all tenants for propertyId {property_id}")
 		return get_all_tenants_for_property(property_id)
 
-
 	@token_required
-	# @api.response(201, 'Tenant successfully created.')
+	@api.response(201, 'Tenant successfully created.')
 	@api.doc('create a new tenant against a property', responses={
 		201: 'Tenant successfully created.',
 		404: 'Property does not exist against this portfolio',
@@ -40,25 +40,24 @@ class TenantList(Resource):
 	@api.expect(_tenant_create, validate=True)
 	def post(self, portfolio_id, property_id):
 		"""Creates a new Tenant """
-		#import pdb; pdb.set_trace()
 		data = request.json
 		app.logger.info(f"Adding new tenant {data.email_address} to {property_id}")
 		return save_new_tenant(portfolio_id, property_id, data)
+
 
 @api.route('/<int:tenant_id>')
 class TenantItem(Resource):
 	@token_required
 	@api.doc('tenant details')
-	# @api.marshal_with(_tenant)
+	@api.marshal_with(_tenant)
 	def get(self, portfolio_id, property_id, tenant_id):
 		""" Gets a tenant by Id """
 		app.logger.info(f"Finding tenant by id {tenant_id}")
 		return get_tenant_by_id(portfolio_id, property_id, tenant_id)
-		
 
 	@token_required
 	@api.doc('tenant delete')
-	# @api.marshal_with(_tenant)
+	@api.marshal_with(_tenant)
 	def delete(self, portfolio_id, property_id, tenant_id):
 		""" Deletes a tenant. """
 		app.logger.info(f"Deleting tenant id {tenant_id} for property {property_id}")
@@ -71,12 +70,12 @@ class TenantItem(Resource):
 		"""Update a tenant details"""
 		data = request.json
 		app.logger.info(f"Updating tenant id {tenant_id} for property {property_id}")
-		return update_tenant(property_id,tenant_id, data)
+		return update_tenant(property_id, tenant_id, data)
 
 
 @api.route('/<int:tenant_id>/images')
 class TenantImage(Resource):
-	#@token_required
+	@token_required
 	@api.doc('Add an image of the tenant')
 	@api.expect(upload_parser)
 	def post(self, portfolio_id, property_id, tenant_id):
@@ -86,7 +85,6 @@ class TenantImage(Resource):
 		if file:
 			# Save image as base64 string
 			# verify user has permission to do this...?
-			import pdb;pdb.set_trace()
 			app.logger.info(f"Adding a tenant profile image {file.name} for tenant id {tenant_id}")
 			image_string = base64.b64encode(file.read())
 			return add_profile_to_tenant(tenant_id, image_string)

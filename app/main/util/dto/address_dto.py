@@ -1,5 +1,6 @@
 from flask_restx import Namespace, fields
 
+
 class AddressDto:
     api = Namespace('address', description='address related operations')
 
