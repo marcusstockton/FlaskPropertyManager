@@ -9,10 +9,9 @@ from ..util.dto.user_dto import UserDto
 api = UserDto.api
 _user = UserDto.user
 
-
 @api.route('/')
 class UserList(Resource):
-    # @token_required
+    @token_required
     @api.doc('list_of_registered_users')
     @api.marshal_list_with(_user)
     def get(self):

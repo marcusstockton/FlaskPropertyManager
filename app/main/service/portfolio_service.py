@@ -25,11 +25,13 @@ def get_portfolio_by_id(user_id: int, portfolio_id: int) -> Portfolio:
             .options(lazyload(Portfolio.owner),
                      lazyload(Portfolio.properties)).one()
     except NoResultFound as e:
-        current_app.logger.error(f"Portfolio not found for userid: {user_id} and portfolio_id {portfolio_id}. Error {e}")
-        raise NotFound("Portfolio not found for userid %s and portfolio_id %s", user_id, portfolio_id)
+        error_message = f"Portfolio not found for userid: {user_id} and portfolio_id {portfolio_id}. Error {e}"
+        current_app.logger.error(error_message)
+        raise NotFound(error_message)
     except MultipleResultsFound as e:
-        current_app.logger.error("Multiple portfolio's not found for userid %s and portfolio_id %s", user_id, portfolio_id)
-        raise BadRequest("Multiple portfolio's found for userid %s and portfolio_id %s. Error %s", user_id, portfolio_id, e)
+        error = "Multiple portfolio's not found for userid %s and portfolio_id %s", user_id, portfolio_id
+        current_app.logger.error(error)
+        raise BadRequest(error, e)
 
 
 def save_new_portfolio(data, user_id) -> Dict[str, str]:
