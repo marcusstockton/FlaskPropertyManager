@@ -4,12 +4,12 @@ from http import HTTPStatus
 from flask import current_app
 from sqlalchemy.orm import lazyload
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
-from werkzeug.exceptions import NotFound, InternalServerError
+from werkzeug.exceptions import NotFound, InternalServerError, BadRequest
 
 from app.main import db
 from app.main.model.address import Address
 from app.main.model.portfolio import Portfolio
-from app.main.model.property import Property
+from app.main.model.property import Property, PropertyImages
 
 
 def get_all_properties_for_portfolio(portfolio_id):
@@ -63,7 +63,8 @@ def save_new_property(portfolio_id, data):
 def get_property_by_id(portfolio_id, property_id):
     try:
         current_app.logger.info("Getting properties with portfolio_id %s property_id %s", portfolio_id, property_id)
-        return Property.query.filter_by(portfolio_id=portfolio_id, id=property_id).one()
+        propertyObj = Property.query.filter_by(portfolio_id=portfolio_id, id=property_id).one()
+        return propertyObj
     except MultipleResultsFound as e:
         current_app.logger.error("Multiple properties found... portfolio_id %s property_id %s", portfolio_id,
                                  property_id)
@@ -71,6 +72,21 @@ def get_property_by_id(portfolio_id, property_id):
     except NoResultFound as e:
         current_app.logger.error("No properties found with portfolio_id %s property_id %s", portfolio_id, property_id)
         print(e)
+
+
+def add_images_to_property(portfolio_id, property_id, images):
+    property_obj = Property.query.filter_by(portfolio_id=portfolio_id, id=property_id).one()
+    if property_obj is None:
+        raise NotFound(f"No property found with id {property_id}")
+    if images is None:
+        raise BadRequest("No images were passed in")
+    new_images = []
+    for image in images:
+        new_images.append(PropertyImages(property_id=property_id, property=property_obj, image=image))
+
+    db.session.add_all(new_images)
+    db.session.commit()
+    return property_obj, HTTPStatus.CREATED
 
 
 def save_changes(data):

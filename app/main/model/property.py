@@ -18,13 +18,15 @@ class Property(db.Model):
     monthly_rental_price = db.Column(db.Float(precision='10, 2'), nullable=True)
     created_date = db.Column(db.DateTime, default=datetime.utcnow)
     updated_date = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    address = db.relationship("Address",  back_populates="property",uselist=False, cascade="all, delete")
+    address = db.relationship("Address", back_populates="property", uselist=False, cascade="all, delete")
     tenants = db.relationship("Tenant", back_populates="property", cascade="all, delete")
     owner = db.relationship("User")
     property_pics = db.relationship("PropertyImages", back_populates="property", lazy=True)
 
     def __repr__(self):
-        return "<Property 'Id:{} PortfolioId:{} Owner:{} Address: {}'>".format(self.id, self.portfolio_id, self.owner, self.address)
+        return "<Property 'Id:{} PortfolioId:{} Owner:{} Address: {}'>".format(self.id, self.portfolio_id, self.owner,
+                                                                               self.address)
+
 
 class PropertyImages(db.Model):
     """Property Images model for storing property images"""
