@@ -39,6 +39,10 @@ def get_a_user(public_id):
     current_app.logger.info('Calling get a user')
     return User.query.filter_by(public_id=public_id).first()
 
+def get_a_user_by_username(username):
+    current_app.logger.info('Calling get a user')
+    return User.query.filter_by(username=username).first()
+
 
 def generate_token(user):
     try:
