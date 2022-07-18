@@ -45,7 +45,7 @@ def save_new_portfolio(data, user_id) -> Dict[str, str]:
             created_date=datetime.datetime.utcnow()
         )
         save_changes(new_portfolio)
-        current_app.logger.info(f"Portfolio {sanitised_name} sucessfully added.")
+        current_app.logger.info(f"Portfolio {sanitised_name} successfully added.")
         return new_portfolio
     else:
         raise BadRequest("Portfolio already exists.")
@@ -59,7 +59,7 @@ def update_portfolio(portfolio_id: int, data: dict):
         stmt = update(Portfolio).where(Portfolio.id == portfolio_id).values(data)
         db.session.execute(stmt)
         db.session.commit()
-        return Portfolio(**data)
+        return portfolio_query
     except IntegrityError as e:
         raise InternalServerError(e.orig)
 

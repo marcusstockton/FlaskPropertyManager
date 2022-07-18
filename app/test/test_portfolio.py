@@ -52,7 +52,7 @@ class TestPortfolioBlueprint(BaseTestCase):
         dict_data = {'id': '1', 'name': 'Updated Test 1'}
         with app.test_client() as client:
             response = client.put('/portfolio/1', data=json.dumps(dict_data),
-                                  headers={'Content-Type': 'application/json'},)
+                                  headers={'Content-Type': 'application/json'}, )
             self.assert200(response)
             data = json.loads(response.get_data(as_text=True))
 
@@ -65,7 +65,7 @@ class TestPortfolioBlueprint(BaseTestCase):
         dict_data = {'id': '2', 'name': 'Updated Test 1'}
         with app.test_client() as client:
             response = client.put('/portfolio/1', data=json.dumps(dict_data),
-                                  headers={'Content-Type': 'application/json'},)
+                                  headers={'Content-Type': 'application/json'}, )
             self.assertEqual(response.status_code, 500)
 
     @patch.object(Auth, 'get_logged_in_user', return_value=mock_get_logged_in_user_success())
@@ -108,7 +108,7 @@ class TestPortfolioBlueprint(BaseTestCase):
         # Do the test:
         with app.test_client() as client:
             response = client.post('/portfolio/', data=json.dumps(new_portfolio)
-                                   , headers={'Content-Type': 'application/json'},)
+                                   , headers={'Content-Type': 'application/json'}, )
             self.assert200(response)
             data = json.loads(response.get_data(as_text=True))
             self.assertEqual('&lt;script&gt;alert();&lt;/script&gt;', data.get('name'))
@@ -120,7 +120,7 @@ class TestPortfolioBlueprint(BaseTestCase):
         # Do the test:
         with app.test_client() as client:
             response = client.post('/portfolio/', data=json.dumps(new_portfolio)
-                                   , headers={'Content-Type': 'application/json'},)
+                                   , headers={'Content-Type': 'application/json'}, )
             self.assert200(response)
             data = json.loads(response.get_data(as_text=True))
             self.assertEqual('Testing Portfolio Name', data.get('name'))
@@ -156,5 +156,3 @@ class TestPortfolioBlueprint(BaseTestCase):
         db.session.add(portfolio2)
 
         db.session.commit()
-
-

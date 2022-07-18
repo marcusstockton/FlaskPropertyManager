@@ -58,7 +58,6 @@ def save_new_property(portfolio_id, data):
             return response_object, HTTPStatus.CREATED
         except Exception as ex:
             raise InternalServerError("Unable to save new Property %s", ex)
-            
 
 
 def get_property_by_id(portfolio_id, property_id):
@@ -66,7 +65,8 @@ def get_property_by_id(portfolio_id, property_id):
         current_app.logger.info("Getting properties with portfolio_id %s property_id %s", portfolio_id, property_id)
         return Property.query.filter_by(portfolio_id=portfolio_id, id=property_id).one()
     except MultipleResultsFound as e:
-        current_app.logger.error("Multiple properties found... portfolio_id %s property_id %s", portfolio_id, property_id)
+        current_app.logger.error("Multiple properties found... portfolio_id %s property_id %s", portfolio_id,
+                                 property_id)
         print(e)
     except NoResultFound as e:
         current_app.logger.error("No properties found with portfolio_id %s property_id %s", portfolio_id, property_id)

@@ -18,7 +18,8 @@ class TestDevelopmentConfig(TestCase):
         self.assertTrue(app.config['DEBUG'] is True)
         self.assertFalse(current_app is None)
         self.assertTrue(
-            app.config['SQLALCHEMY_DATABASE_URI'] == 'sqlite:///' + os.path.join(basedir, 'flask_PropertyManager_main.db?check_same_thread=False')
+            app.config['SQLALCHEMY_DATABASE_URI'] == 'sqlite:///' +
+            os.path.join(basedir, 'flask_PropertyManager_main.db?check_same_thread=False')
         )
 
 
@@ -31,7 +32,8 @@ class TestTestingConfig(TestCase):
         self.assertFalse(app.config['SECRET_KEY'] is 'my_precious')
         self.assertTrue(app.config['DEBUG'])
         self.assertTrue(
-            app.config['SQLALCHEMY_DATABASE_URI'] == 'sqlite:///' + os.path.join(basedir, 'flask_PropertyManager_test.db')
+            app.config['SQLALCHEMY_DATABASE_URI'] == 'sqlite:///' +
+            os.path.join(basedir, 'flask_PropertyManager_test.db')
         )
 
 

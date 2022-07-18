@@ -1,8 +1,8 @@
 import os
 import unittest
 
-from flask_migrate import Migrate
 from flask_marshmallow import Marshmallow
+from flask_migrate import Migrate
 
 from app import blueprint
 from app.main import create_app, db
@@ -24,7 +24,7 @@ def run():
 def test():
     """Runs the unit tests."""
     tests = unittest.TestLoader().discover('app/test', pattern='test*.py')
-    result = unittest.TextTestRunner(verbosity=1).run(tests) # 0 (quiet), 1 (default), 2 (verbose)
+    result = unittest.TextTestRunner(verbosity=1).run(tests)  # 0 (quiet), 1 (default), 2 (verbose)
     if result.wasSuccessful():
         return 0
     return 1

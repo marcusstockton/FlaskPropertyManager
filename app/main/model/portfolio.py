@@ -8,7 +8,7 @@ class Portfolio(db.Model):
 	""" Portfolio Model for storing portfolio's """
 	__tablename__ = "portfolio"
 	id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-	name = db.Column(db.String(100))
+	name = db.Column(db.String(100), nullable=False)
 	created_date = db.Column(db.DateTime, default=datetime.utcnow)
 	updated_date = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  
 	owner_id = db.Column(db.Integer, db.ForeignKey(User.id, ondelete='CASCADE'))

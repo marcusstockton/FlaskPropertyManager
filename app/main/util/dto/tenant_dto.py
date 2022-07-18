@@ -51,7 +51,8 @@ class TenantDto:
 
     tenant = api.model('Tenant', {
         'id': fields.String(required=True, description='id'),
-        'title': fields.String(required=False, description='title', enum=[x.name for x in TitleEnum], attribute='title.name'),
+        'title': fields.String(required=False, description='title', enum=[x.name for x in TitleEnum],
+                               attribute='title.name'),
         'phone_number': fields.String(required=False, description='phone number'),
         'email_address': fields.String(required=False, description='email_address'),
         'first_name': fields.String(required=True, description='first name', attribute='first_name'),
@@ -68,7 +69,8 @@ class TenantDto:
 
     tenant_list = api.model('Tenant', {
         'id': fields.String(required=True, description='id'),
-        'title': fields.String(required=False, description='title', enum=[x.name for x in TitleEnum], attribute='title.name'),
+        'title': fields.String(required=False, description='title', enum=[x.name for x in TitleEnum],
+                               attribute='title.name'),
         'phone_number': fields.String(required=False, description='phone number'),
         'first_name': fields.String(required=True, description='first name', attribute='first_name'),
         'last_name': fields.String(required=True, description='last name'),
@@ -79,9 +81,10 @@ class TenantDto:
         'created_date': fields.DateTime(required=False, description='date created'),
         'updated_date': fields.DateTime(required=False, description='date last updated'),
     })
-    
+
     tenant_create = api.model('Tenant', {
-        'title': fields.String(required=False, description='title', enum=[x.name for x in TitleEnum], attribute='title.name'),
+        'title': fields.String(required=False, description='title', enum=[x.name for x in TitleEnum],
+                               attribute='title.name'),
         'phone_number': fields.String(required=False, description='phone number'),
         'email_address': fields.String(required=True, description='email_address'),
         'first_name': fields.String(required=True, description='first name'),
@@ -93,7 +96,8 @@ class TenantDto:
     })
     tenant_update = api.model('Tenant', {
         'id': fields.String(required=True, description='id'),
-        'title': fields.String(required=False, description='title', enum=[x.name for x in TitleEnum], attribute='title.name'),
+        'title': fields.String(required=False, description='title', enum=[x.name for x in TitleEnum],
+                               attribute='title.name'),
         'phone_number': fields.String(required=False, description='phone number'),
         'first_name': fields.String(required=True, description='first name', attribute='first_name'),
         'last_name': fields.String(required=True, description='last name'),
