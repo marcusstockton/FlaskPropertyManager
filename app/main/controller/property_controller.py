@@ -1,8 +1,12 @@
+import base64
+
 from flask import request
 from flask_restx import Resource
 from werkzeug.datastructures import FileStorage
+from werkzeug.exceptions import BadRequest
 
-from ..service.property_service import get_all_properties_for_portfolio, save_new_property, get_property_by_id
+from ..service.property_service import get_all_properties_for_portfolio, save_new_property, get_property_by_id, \
+	add_images_to_property
 from ..util.decorator import token_required
 from ..util.dto.property_dto import PropertyDto
 
@@ -60,9 +64,15 @@ class PropertyImage(Resource):
 	@api.marshal_list_with(_property)
 	def post(self, portfolio_id, property_id):
 		""" Add images of property. """
-		images = request.files
+		args = upload_parser.parse_args()
+		images = args['images']
 		if images:
 			# do stuff
-			pass
-
-		pass
+			image_strings = []
+			for image in images:
+				img = image.make_blob()
+				image_string = base64.b64encode(image.read())
+				image_strings.append(image_string)
+			if image_strings is not None:
+				return add_images_to_property(portfolio_id, property_id, image_strings)
+		return BadRequest("No images passed in")

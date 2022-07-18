@@ -25,9 +25,9 @@ authorizations = {
 }
 
 api = Api(blueprint,
-          title='FLASK RESTX API PROPERTY MANAGER WITH JWT',
+          title="Marcus's API Property Manager with JWT auth",
           version='1.0',
-          description='a boilerplate for flask restx web service',
+          description='A service to help manage properties and portfolios',
           security='Bearer Auth',
           authorizations=authorizations
           )
