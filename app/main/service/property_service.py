@@ -63,8 +63,7 @@ def save_new_property(portfolio_id, data):
 def get_property_by_id(portfolio_id, property_id):
     try:
         current_app.logger.info("Getting properties with portfolio_id %s property_id %s", portfolio_id, property_id)
-        propertyObj = Property.query.filter_by(portfolio_id=portfolio_id, id=property_id).one()
-        return propertyObj
+        return Property.query.filter_by(portfolio_id=portfolio_id, id=property_id).one()
     except MultipleResultsFound as e:
         current_app.logger.error("Multiple properties found... portfolio_id %s property_id %s", portfolio_id,
                                  property_id)
@@ -82,13 +81,18 @@ def add_images_to_property(portfolio_id, property_id, images):
         raise BadRequest("No images were passed in")
     new_images = []
     for image in images:
-        new_images.append(PropertyImages(property_id=property_id, property=property_obj, image=image))
+        new_images.append(
+            PropertyImages(property_id=property_id, property=property_obj, image=image.image, file_name=image.file_name))
 
-    db.session.add_all(new_images)
-    db.session.commit()
+    save_all_changes(new_images)
     return property_obj, HTTPStatus.CREATED
 
 
 def save_changes(data):
     db.session.add(data)
+    db.session.commit()
+
+
+def save_all_changes(data):
+    db.session.add_all(data)
     db.session.commit()

@@ -1,4 +1,5 @@
 import base64
+from collections import namedtuple
 
 from flask import request
 from flask_restx import Resource
@@ -66,13 +67,13 @@ class PropertyImage(Resource):
 		""" Add images of property. """
 		args = upload_parser.parse_args()
 		images = args['images']
+		ImageTuple = namedtuple('ImageTuple', ['file_name', 'image'])
 		if images:
-			# do stuff
 			image_strings = []
 			for image in images:
-				img = image.make_blob()
 				image_string = base64.b64encode(image.read())
-				image_strings.append(image_string)
+				img = ImageTuple(image.filename, image_string)
+				image_strings.append(img)
 			if image_strings is not None:
 				return add_images_to_property(portfolio_id, property_id, image_strings)
 		return BadRequest("No images passed in")

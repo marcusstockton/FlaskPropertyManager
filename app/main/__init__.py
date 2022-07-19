@@ -28,6 +28,7 @@ def create_app(config_name):
 
     app.config.from_object(config_by_name[config_name])
     app.config['ERROR_404_HELP'] = False
+    app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024  # 2MB limit
     db.init_app(app)
 
     flask_bcrypt.init_app(app)
