@@ -6,7 +6,7 @@ from app.main import db
 from app.main.model.address import Address
 from app.main.model.portfolio import Portfolio
 from app.main.model.property import Property
-from app.main.model.user import User
+from app.main.model.user import User, Role, UserRoles
 from app.main.service.auth_helper import Auth
 from app.test.base import BaseTestCase
 from app.test.helpers import mock_get_logged_in_user_success, mock_logged_in_user
@@ -43,7 +43,7 @@ class TestPortfolioBlueprint(BaseTestCase):
 
         with app.test_client() as client:
             response = client.get('/portfolio/2')
-            self.assert500(response)
+            self.assert404(response)
 
     @patch.object(Auth, 'get_logged_in_user', return_value=mock_get_logged_in_user_success())
     @patch.object(Auth, 'get_logged_in_user_object', return_value=mock_logged_in_user())
@@ -129,13 +129,19 @@ class TestPortfolioBlueprint(BaseTestCase):
     def create_data():
         date = datetime.datetime.now()
         date -= datetime.timedelta(6 * 30)  # date 6 months ago.
+        admin_role = db.session.query(Role).filter(Role.name == "Admin").one()
+
         user_1 = User(email="test@test.com", first_name="Foo", registered_on=date, last_name="Bar",
                       username="test@test.com", admin=0)
         db.session.add(user_1)
+        user_1_role = UserRoles(user_id=user_1.id, role_id=admin_role.id)
+        db.session.add(user_1_role)
 
         user_2 = User(email="test2@test.com", first_name="Fizz", registered_on=date, last_name="Buzz",
-                      username="test1@test.com", admin=0)
+                      username="test2@test.com", admin=0)
         db.session.add(user_2)
+        user_2_role = UserRoles(user_id=user_2.id, role_id=admin_role.id)
+        db.session.add(user_2_role)
 
         portfolio1 = Portfolio(
             id=1,

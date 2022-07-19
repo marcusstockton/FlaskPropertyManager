@@ -26,7 +26,7 @@ class UserList(Resource):
 	def post(self):
 		"""Creates a new User """
 		data = request.json
-		app.logger.info(f"Creating a new user for {data.username}")
+		app.logger.info(f"Creating a new user for {data['username']}")
 		return save_new_user(data=data)
 
 
