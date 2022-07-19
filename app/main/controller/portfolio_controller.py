@@ -39,7 +39,7 @@ class PortfolioList(Resource):
 		return save_new_portfolio(data=data, user_id=user.id)
 
 
-@api.route('/<int:id>')
+@api.route('/<int:portfolio_id>')
 class PortfolioItem(Resource):
 	@token_required
 	@api.doc('single portfolio')
