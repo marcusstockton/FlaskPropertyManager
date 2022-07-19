@@ -35,8 +35,9 @@ class PropertyImages(db.Model):
     created_date = db.Column(db.DateTime, default=datetime.utcnow)
     updated_date = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     image = db.Column(LargeBinary)
+    file_name = db.Column(db.String(200))
     property_id = db.Column(db.Integer, db.ForeignKey(Property.id), nullable=False)
     property = db.relationship("Property", back_populates="property_pics")
 
     def __repr__(self):
-        return "<Property Image 'Id:{} Property_Id:{}'>".format(self.id, self.property_id)
+        return "<Property Image 'Id:{} Property_Id:{} Filename:{}'>".format(self.id, self.property_id, self.file_name)

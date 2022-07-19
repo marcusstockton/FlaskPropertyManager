@@ -1,31 +1,28 @@
+import base64
+
 from flask_restx import Namespace, fields
 
 from .address_dto import AddressDto
 from .tenant_dto import TenantDto
 
 
+class Base64Decoder(fields.Raw):
+	def format(self, value):
+		data_bytes = base64.b64encode(value)
+		data = data_bytes.decode("utf-8")
+		return data
+
+
 class PropertyDto:
 	api = Namespace('property', description='property related operations')
 
-	# address = api.model('Address', {
-	#     'id': fields.String(required=True, description='id'),
-	#     'line_1': fields.String(required=True, description='address line_1'),
-	#     'line_2': fields.String(required=True, description='address line_2'),
-	#     'line_3': fields.String(required=True, description='address line_3'),
-	#     'post_code': fields.String(required=True, description='address post_code'),
-	#     'town': fields.String(required=True, description='address town'),
-	#     'city': fields.String(required=True, description='address city'),
-	#     'property_id': fields.String(required=True, description='address property_id'),
-	# })
-
-	# address_create = api.model('Address', {
-	#     'line_1': fields.String(required=True, description='address line_1'),
-	#     'line_2': fields.String(required=False, description='address line_2'),
-	#     'line_3': fields.String(required=False, description='address line_3'),
-	#     'post_code': fields.String(required=True, description='address post_code'),
-	#     'town': fields.String(required=False, description='address town'),
-	#     'city': fields.String(required=False, description='address city'),
-	# })
+	property_pictures = api.model('PropertyImages', {
+		'id': fields.String(required=True, description='id'),
+		'created_date': fields.DateTime(required=False, description='date created'),
+		'updated_date': fields.DateTime(required=False, description='date last updated'),
+		'file_name': fields.String(required=True, description='file name of image'),
+		'image_base_64': Base64Decoder(attribute="image"),
+	})
 
 	property = api.model('Property', {
 		'id': fields.String(required=True, description='id'),
@@ -38,6 +35,7 @@ class PropertyDto:
 		'tenants': fields.List(fields.Nested(TenantDto.tenant), required=False, description='tenants'),
 		'created_date': fields.DateTime(required=False, description='date created'),
 		'updated_date': fields.DateTime(required=False, description='date last updated'),
+		'property_pics': fields.List(fields.Nested(property_pictures), required=False, description='images')
 	})
 
 	property_list = api.model('Property', {
