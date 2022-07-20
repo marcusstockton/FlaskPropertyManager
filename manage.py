@@ -11,7 +11,7 @@ app = create_app(os.getenv('PROPERTYMANAGER_ENV') or 'dev')
 app.register_blueprint(blueprint)
 app.app_context().push()
 migrate = Migrate(app, db)
-ma = Marshmallow()
+ma = Marshmallow(app)
 
 
 @app.cli.command()
