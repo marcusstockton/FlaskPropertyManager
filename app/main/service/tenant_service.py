@@ -17,7 +17,7 @@ def get_all_tenants_for_property(property_id):
 
 def update_tenant(property_id, tenant_id, data):
     if int(data['id']) != tenant_id:
-        raise BadRequest()
+        raise BadRequest("ID's do not match.")
 
     tenant = Tenant.query.filter_by(id=data['id']).filter(Tenant.property_id == property_id).first()
 
