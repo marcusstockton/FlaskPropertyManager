@@ -40,7 +40,7 @@ class Tenant(db.Model):
 	job_title = db.Column(db.String(100))
 	tenancy_start_date = db.Column(db.Date, nullable=False)
 	tenancy_end_date = db.Column(db.Date, nullable=True)
-	profile_pic = db.relationship("TenantProfile", back_populates="tenant", uselist=False)
+	profile_pic = db.relationship("TenantProfile", back_populates="tenant", uselist=True)
 	notes = db.relationship("TenantNote")
 	created_date = db.Column(db.DateTime, default=datetime.utcnow)
 	updated_date = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  

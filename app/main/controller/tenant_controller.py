@@ -1,8 +1,9 @@
 import base64
-
+import os
+import imghdr
 from flask import current_app as app
 from flask import request
-from flask_restx import Resource
+from flask_restx import Resource, abort
 from werkzeug.datastructures import FileStorage
 
 from ..service.tenant_service import get_all_tenants_for_property, save_new_tenant, get_tenant_by_id, delete_tenant, \
@@ -17,7 +18,7 @@ _tenant_create = TenantDto.tenant_create
 _tenant_update = TenantDto.tenant_update
 
 upload_parser = api.parser()
-upload_parser.add_argument('image', location='files', type=FileStorage, required=True)
+upload_parser.add_argument('image', location='files', type=FileStorage, required=True, help='Image file cannot empty')
 
 
 @api.route('/')
@@ -48,7 +49,7 @@ class TenantList(Resource):
 @api.route('/<int:tenant_id>')
 class TenantItem(Resource):
 	@token_required
-	@api.doc('tenant details')
+	@api.doc('tenant details', responses={403: 'Not Authorized', 400: 'Bad Request', 200: 'Ok'})
 	@api.marshal_with(_tenant)
 	def get(self, portfolio_id, property_id, tenant_id):
 		""" Gets a tenant by Id """
@@ -56,7 +57,7 @@ class TenantItem(Resource):
 		return get_tenant_by_id(portfolio_id, property_id, tenant_id)
 
 	@token_required
-	@api.doc('tenant delete')
+	@api.doc('tenant delete', responses={403: 'Not Authorized', 400: 'Bad Request', 204: 'No Content'})
 	@api.marshal_with(_tenant)
 	def delete(self, portfolio_id, property_id, tenant_id):
 		""" Deletes a tenant. """
@@ -64,7 +65,7 @@ class TenantItem(Resource):
 		return delete_tenant(property_id, tenant_id)
 
 	@token_required
-	@api.doc('tenant update')
+	@api.doc('tenant update', responses={403: 'Not Authorized', 400: 'Bad Request', 204: 'Updated'})
 	@api.expect(_tenant_update, validate=True)
 	def put(self, portfolio_id, property_id, tenant_id):
 		"""Update a tenant details"""
@@ -76,15 +77,19 @@ class TenantItem(Resource):
 @api.route('/<int:tenant_id>/images')
 class TenantImage(Resource):
 	@token_required
-	@api.doc('Add an image of the tenant')
+	@api.doc('Add an image of the tenant', responses={403: 'Not Authorized', 400: 'Bad Request', 201: 'Created'})
 	@api.expect(upload_parser)
 	def post(self, portfolio_id, property_id, tenant_id):
 		""" Adds a tenant profile pic. """
 		args = upload_parser.parse_args()
 		file = args['image']
 		if file:
+			# The imghdr module determines the type of image contained in a file or byte stream.
+			if imghdr.what(file) not in app.config['UPLOAD_EXTENSIONS']:
+				abort(400, message="Invalid image type")
+
 			# Save image as base64 string
 			# verify user has permission to do this...?
-			app.logger.info(f"Adding a tenant profile image {file.name} for tenant id {tenant_id}")
+			app.logger.info(f"Adding a tenant profile image {file.filename} for tenant id {tenant_id}")
 			image_string = base64.b64encode(file.read())
 			return add_profile_to_tenant(tenant_id, image_string)
