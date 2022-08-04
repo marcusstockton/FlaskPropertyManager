@@ -1,8 +1,10 @@
 import base64
+import imghdr
 from collections import namedtuple
 
 from flask import request
-from flask_restx import Resource
+from flask import current_app as app
+from flask_restx import Resource, abort
 from werkzeug.datastructures import FileStorage
 from werkzeug.exceptions import BadRequest
 
@@ -71,6 +73,9 @@ class PropertyImage(Resource):
 		if images:
 			image_strings = []
 			for image in images:
+				# The imghdr module determines the type of image contained in a file or byte stream.
+				if imghdr.what(image) not in app.config['UPLOAD_EXTENSIONS']:
+					abort(400, message="Invalid image type")
 				image_string = base64.b64encode(image.read())
 				img = ImageTuple(image.filename, image_string)
 				image_strings.append(img)
