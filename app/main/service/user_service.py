@@ -3,7 +3,9 @@ from datetime import datetime
 from http import HTTPStatus
 
 from flask import current_app
-from werkzeug.exceptions import BadRequest, InternalServerError
+from sqlalchemy import update
+from sqlalchemy.exc import IntegrityError
+from werkzeug.exceptions import BadRequest, InternalServerError, NotFound
 
 from app.main import db
 from app.main.model.user import User, Role
@@ -11,23 +13,61 @@ from app.main.model.user import User, Role
 
 def save_new_user(data):
     user = User.query.filter_by(email=data['email']).first()
-    owner_role = Role.query.filter_by(name='Owner').first()  # All users created are owners...for now
-    if not user:
-        new_user = User(
-            public_id=str(uuid.uuid4()),
-            email=data['email'],
-            username=data['username'],
-            password=data['password'],
-            first_name=data['firstname'] if 'firstname' in data else None,
-            last_name=data['lastname'] if 'lastname' in data else None,
-            date_of_birth=datetime.strptime(data['dateofbirth'], '%Y-%m-%d') if 'dateofbirth' in data else None,
-            registered_on=datetime.utcnow()
-        )
-        new_user.roles = [owner_role, ]
-        save_changes(new_user)
-        return generate_token(new_user)
-    else:
+    if user:
         raise BadRequest('User already exists. Please Log in.')
+
+    owner_role = Role.query.filter_by(name='Owner').first()  # All users created are owners...for now
+    new_user = User(
+        public_id=str(uuid.uuid4()),
+        email=data['email'],
+        username=data['username'],
+        password=data['password'],
+        first_name=data['first_name'] if 'first_name' in data else None,
+        last_name=data['last_name'] if 'last_name' in data else None,
+        date_of_birth=datetime.strptime(data['date_of_birth'], '%Y-%m-%d') if 'date_of_birth' in data else None,
+        created_date=datetime.now(),
+        registered_on=datetime.utcnow()
+    )
+    new_user.roles = [owner_role, ]
+    save_changes(new_user)
+    return generate_token(new_user)
+
+
+def update_user(user_id, data):
+    user_query = User.query.filter_by(public_id=user_id).one()
+    if not user_query:
+        raise NotFound("User not found.")
+    try:
+        data['date_of_birth'] = datetime.strptime(data['date_of_birth'], '%Y-%m-%d').date()
+        data['updated_date'] = datetime.now()
+        stmt = update(User).where(User.id == user_query.id).values(data)
+        db.session.execute(stmt)
+        db.session.commit()
+
+        response_object = {
+            'status': 'success',
+            'message': 'Successfully updated user.',
+            'data': {
+                'id': user_id
+            }
+        }
+        return response_object, HTTPStatus.NO_CONTENT
+    except IntegrityError as e:
+        raise InternalServerError(e)
+
+
+def delete_user(user_id):
+    obj = User.query.filter_by(public_id=user_id).one()
+    try:
+        db.session.delete(obj)
+        db.session.commit()
+        response_object = {
+            'status': "success",
+            'message': f'Successfully deleted user {user_id}'
+        }
+        return response_object, HTTPStatus.NO_CONTENT
+    except IntegrityError as e:
+        raise InternalServerError(e)
 
 
 def get_all_users():

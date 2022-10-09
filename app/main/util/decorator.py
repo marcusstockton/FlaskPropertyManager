@@ -32,7 +32,7 @@ def admin_token_required(f):
         if not admin:
             response_object = {
                 'status': 'fail',
-                'message': 'admin token required'
+                'message': 'You do not have the correct permission to access this.'
             }
             return response_object, HTTPStatus.UNAUTHORIZED
 
