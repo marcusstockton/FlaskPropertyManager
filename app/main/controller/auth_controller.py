@@ -1,3 +1,4 @@
+from flask import current_app as app
 from flask import request
 from flask_restx import Resource
 
@@ -17,7 +18,9 @@ class UserLogin(Resource):
     @api.response(401, 'Invalid username and/or password')
     def post(self):
         # get the post data
+        app.logger.info(f"Received login details for  {request.json}")
         post_data = request.json
+        
         return Auth.login_user(data=post_data)
 
 
