@@ -29,7 +29,7 @@ class TenantList(Resource):
 	def get(self, portfolio_id, property_id):
 		"""Get all tenants for the property"""
 		app.logger.info(f"Getting all tenants for propertyId {property_id}")
-		return get_all_tenants_for_property(property_id)
+		return get_all_tenants_for_property(portfolio_id, property_id)
 
 	@token_required
 	@api.response(201, 'Tenant successfully created.')

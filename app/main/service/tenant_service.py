@@ -6,14 +6,21 @@ from sqlalchemy import update
 from werkzeug.exceptions import NotFound, BadRequest
 
 from app.main import db
+from app.main.model.portfolio import Portfolio
 from app.main.model.property import Property
 from app.main.model.tenant import Tenant, TenantNote, TenantProfile, TitleEnum
 
 
-def get_all_tenants_for_property(property_id):
-    tenants = Tenant.query.filter_by(property_id=property_id).all()
-    return tenants
-
+def get_all_tenants_for_property(portfolio_id, property_id):
+    portfolio = Portfolio.query.filter_by(id=portfolio_id).one()
+    if portfolio is None:
+        raise BadRequest("No Portfolio found")
+    
+    if property_id in [prop.id for prop in portfolio.properties]:
+        tenants = Tenant.query.filter_by(property_id=property_id).all()
+        return tenants
+    else:
+        raise BadRequest("Property id does't exist against this Portfolio.")
 
 def update_tenant(property_id, tenant_id, data):
     if int(data['id']) != tenant_id:
