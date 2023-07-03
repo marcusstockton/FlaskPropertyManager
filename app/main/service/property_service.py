@@ -78,14 +78,12 @@ def get_property_by_id(portfolio_id, property_id):
 
 def add_images_to_property(portfolio_id, property_id, images):
     '''Adds image(s) to property'''
-    if images is None:
-        raise BadRequest("No images were passed in")
     try:
         property_obj = Property.query.filter_by(portfolio_id=portfolio_id, id=property_id).one()
     except MultipleResultsFound as err:
-        raise BadRequest(f"Multiple Records Found. {err}") from err
+        raise BadRequest("Multiple Records Found") from err
     except NoResultFound as err:
-        raise NotFound(f'No property found with id {property_id}. {err}') from err
+        raise NotFound(f"No property found with id {property_id}") from err
 
     new_images = []
     for image in images:
