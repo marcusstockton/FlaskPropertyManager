@@ -7,6 +7,7 @@ from flask import current_app as app
 from flask_restx import Resource, abort
 from werkzeug.datastructures import FileStorage
 from werkzeug.exceptions import BadRequest
+from http import HTTPStatus
 
 from ..service.property_service import get_all_properties_for_portfolio, save_new_property, get_property_by_id, \
 	add_images_to_property
@@ -75,7 +76,7 @@ class PropertyImage(Resource):
 			for image in images:
 				# The imghdr module determines the type of image contained in a file or byte stream.
 				if imghdr.what(image) not in app.config['UPLOAD_EXTENSIONS']:
-					abort(400, message="Invalid image type")
+					abort(HTTPStatus = HTTPStatus.BAD_REQUEST, message="Invalid image type")
 				image_string = base64.b64encode(image.read())
 				img = ImageTuple(image.filename, image_string)
 				image_strings.append(img)

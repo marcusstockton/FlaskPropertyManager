@@ -4,7 +4,8 @@ from ._helpers import ObjectCount, SumOfProperties
 
 
 class PortfolioDto:
-    api = Namespace('portfolio', description='portfolio related operations')
+    '''Portfolio DTO'''
+    api = Namespace('Portfolio', description='Portfolio related operations')
 
     portfolio_details = api.model('Portfolio', {
         'id': fields.String(required=True, description='id'),
