@@ -14,7 +14,7 @@ class Base64Decoder(fields.Raw):
 
 
 class PropertyDto:
-	api = Namespace('property', description='property related operations')
+	api = Namespace('Property', description='Property related operations')
 
 	property_pictures = api.model('PropertyImages', {
 		'id': fields.String(required=True, description='id'),

@@ -24,13 +24,13 @@ class FileLocationToUrl(fields.Raw):
 
 class TenantDto:
     '''Flask-Restx Tenant related operations.'''
-    api = Namespace('tenant', description='tenant related operations')
+    api = Namespace('Tenant', description='Tenant related operations')
 
-    colors_api_model = api.schema_model('Titles', {
-        'enum':
-            ['black', 'white', 'red', 'green', 'blue'],
-        'type': 'string'
-    })
+    # colors_api_model = api.schema_model('Titles', {
+    #     'enum':
+    #         ['black', 'white', 'red', 'green', 'blue'],
+    #     'type': 'string'
+    # })
 
     tenant_notes = api.model('TenantNote', {
         'id': fields.String(required=True, description='id'),
@@ -95,6 +95,7 @@ class TenantDto:
         'tenancy_start_date': fields.Date(required=True, description='tenancy start date'),
         'tenancy_end_date': fields.Date(required=False, description='tenancy end date'),
     })
+    
     tenant_update = api.model('Tenant', {
         'id': fields.String(required=True, description='id'),
         'title': fields.String(required=False, description='title', enum=[x.name for x in TitleEnum],

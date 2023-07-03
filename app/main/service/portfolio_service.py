@@ -4,9 +4,8 @@ from typing import List, Dict
 import flask
 from flask import current_app
 from sqlalchemy import update
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, NoResultFound, MultipleResultsFound
 from sqlalchemy.orm import lazyload
-from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from werkzeug.exceptions import NotFound, BadRequest, InternalServerError
 
 from app.main import db
@@ -14,8 +13,9 @@ from app.main.model.portfolio import Portfolio
 
 
 def get_all_portfolios_for_user(user_id: int) -> List[Portfolio]:
-    return Portfolio.query.filter_by(owner_id=user_id).options(lazyload(Portfolio.owner),
+    portfolios = Portfolio.query.filter_by(owner_id=user_id).options(lazyload(Portfolio.owner),
                                                                lazyload(Portfolio.properties)).all()
+    return portfolios
 
 
 def get_portfolio_by_id(user_id: int, portfolio_id: int) -> Portfolio:
@@ -24,14 +24,15 @@ def get_portfolio_by_id(user_id: int, portfolio_id: int) -> Portfolio:
         return Portfolio.query.filter_by(owner_id=user_id).filter_by(id=portfolio_id) \
             .options(lazyload(Portfolio.owner),
                      lazyload(Portfolio.properties)).one()
-    except NoResultFound as e:
-        error_message = f"Portfolio not found for userid: {user_id} and portfolio_id {portfolio_id}. Error {e}"
+    except NoResultFound as err:
+        error_message = f"Portfolio not found for userid: {user_id} and portfolio_id {portfolio_id}. Error {err}"
         current_app.logger.error(error_message)
         raise NotFound(error_message)
-    except MultipleResultsFound as e:
+    
+    except MultipleResultsFound as err:
         error = "Multiple portfolio's not found for userid %s and portfolio_id %s", user_id, portfolio_id
         current_app.logger.error(error)
-        raise BadRequest(error, e)
+        raise BadRequest(error, err)
 
 
 def save_new_portfolio(data, user_id) -> Dict[str, str]:
@@ -60,8 +61,8 @@ def update_portfolio(portfolio_id: int, data: dict):
         db.session.execute(stmt)
         db.session.commit()
         return portfolio_query
-    except IntegrityError as e:
-        raise InternalServerError(e.orig)
+    except IntegrityError as err:
+        raise InternalServerError(err.orig)
 
 
 def save_changes(data) -> None:
