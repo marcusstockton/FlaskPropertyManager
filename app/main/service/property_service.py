@@ -3,7 +3,7 @@ from http import HTTPStatus
 
 from flask import current_app
 from sqlalchemy.orm import lazyload
-from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
+from sqlalchemy.exc import MultipleResultsFound, NoResultFound
 from werkzeug.exceptions import NotFound, InternalServerError, BadRequest
 
 from app.main import db
@@ -13,11 +13,13 @@ from app.main.model.property import Property, PropertyImages
 
 
 def get_all_properties_for_portfolio(portfolio_id):
+    '''Gets all properties for the portfolio id'''
     current_app.logger.info("Getting all properties for portfolio_id %s", portfolio_id)
     return Property.query.options(lazyload(Property.tenants)).filter_by(portfolio_id=portfolio_id).all()
 
 
 def save_new_property(portfolio_id, data):
+    '''Adds new property to portfolio'''
     portfolio = Portfolio.query.filter_by(id=portfolio_id).first()
 
     if portfolio is None:
@@ -57,23 +59,25 @@ def save_new_property(portfolio_id, data):
             }
             return response_object, HTTPStatus.CREATED
         except Exception as ex:
-            raise InternalServerError("Unable to save new Property %s", ex)
+            raise InternalServerError(f'Unable to save new Property. {ex}') from ex
 
 
 def get_property_by_id(portfolio_id, property_id):
+    '''Gets a property by its ID'''
     try:
         current_app.logger.info("Getting properties with portfolio_id %s property_id %s", portfolio_id, property_id)
         return Property.query.filter_by(portfolio_id=portfolio_id, id=property_id).one()
-    except MultipleResultsFound as e:
+    except MultipleResultsFound as err:
         current_app.logger.error("Multiple properties found... portfolio_id %s property_id %s", portfolio_id,
                                  property_id)
-        print(e)
-    except NoResultFound as e:
+        print(err)
+    except NoResultFound as err:
         current_app.logger.error("No properties found with portfolio_id %s property_id %s", portfolio_id, property_id)
-        print(e)
+        print(err)
 
 
 def add_images_to_property(portfolio_id, property_id, images):
+    '''Adds image(s) to property'''
     property_obj = Property.query.filter_by(portfolio_id=portfolio_id, id=property_id).one()
     if property_obj is None:
         raise NotFound(f"No property found with id {property_id}")
@@ -89,10 +93,12 @@ def add_images_to_property(portfolio_id, property_id, images):
 
 
 def save_changes(data):
+    '''Save Changes'''
     db.session.add(data)
     db.session.commit()
 
 
 def save_all_changes(data):
+    '''Save all Changes'''
     db.session.add_all(data)
     db.session.commit()

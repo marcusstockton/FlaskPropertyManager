@@ -23,6 +23,7 @@ class FileLocationToUrl(fields.Raw):
 
 
 class TenantDto:
+    '''Flask-Restx Tenant related operations.'''
     api = Namespace('tenant', description='tenant related operations')
 
     colors_api_model = api.schema_model('Titles', {
