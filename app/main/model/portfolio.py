@@ -10,10 +10,10 @@ class Portfolio(db.Model):
 	id = db.Column(db.Integer, primary_key=True, autoincrement=True)
 	name = db.Column(db.String(100), nullable=False)
 	created_date = db.Column(db.DateTime, default=datetime.utcnow)
-	updated_date = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  
+	updated_date = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 	owner_id = db.Column(db.Integer, db.ForeignKey(User.id, ondelete='CASCADE'))
 	owner = db.relationship("User")
 	properties = db.relationship("Property", cascade="all, delete")
 
 	def __repr__(self):
-		return "<Portfolio 'Id:{}, Name:{}'>".format(self.id, self.name)
+		return f"<Portfolio 'Id:{self.id}, Name:{self.name}'>"
