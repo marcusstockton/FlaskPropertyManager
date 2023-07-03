@@ -77,7 +77,7 @@ class PropertyImage(Resource):
 				# The imghdr module determines the type of image contained in a file or byte stream.
 				if imghdr.what(image) not in app.config['UPLOAD_EXTENSIONS']:
 					abort(HTTPStatus = HTTPStatus.BAD_REQUEST, message="Invalid image type")
-				image_string = base64.b64encode(image.read())
+				image_string = image.read()
 				img = ImageTuple(image.filename, image_string)
 				image_strings.append(img)
 			if image_strings is not None:
