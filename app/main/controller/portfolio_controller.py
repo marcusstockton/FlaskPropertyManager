@@ -4,7 +4,7 @@ from flask_restx import Resource
 
 from ..service.auth_helper import Auth
 from ..service.portfolio_service import get_all_portfolios_for_user, save_new_portfolio, update_portfolio, \
-	get_portfolio_by_id
+	get_portfolio_by_id, delete_portfolio_by_id
 from ..util.decorator import token_required
 from ..util.dto.portfolio_dto import PortfolioDto
 
@@ -61,3 +61,7 @@ class PortfolioItem(Resource):
 		""" Edits a portfolio """
 		data = _portfolio_update_parser.parse_args()
 		return update_portfolio(portfolio_id, data)
+
+	@token_required
+	def delete(self, portfolio_id):
+		return delete_portfolio_by_id(user.id, portfolio_id)
