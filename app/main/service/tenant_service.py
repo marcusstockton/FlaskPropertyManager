@@ -87,6 +87,7 @@ def save_new_tenant(portfolio_id, property_id, data):
         title=title,
         first_name=data.get('first_name'),
         last_name=data.get('last_name'),
+        phone_number=data.get('phone_number'),
         date_of_birth=dt.strptime(data['date_of_birth'], '%Y-%m-%d'),
         job_title=data.get('job_title'),
         tenancy_start_date=dt.strptime(data['tenancy_start_date'], '%Y-%m-%d'),

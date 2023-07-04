@@ -65,6 +65,16 @@ def update_portfolio(portfolio_id: int, data: dict):
         raise InternalServerError(err.orig)
 
 
+def delete_portfolio_by_id(portfolio_id):
+    portfolio = Portfolio.query.filter_by(id=portfolio_id).filter_by(id=portfolio_id) \
+            .options(lazyload(Portfolio.owner),
+                     lazyload(Portfolio.properties),
+                     lazyload(Portfolio.properties.images),
+                     lazyload(Portfolio.properties))
+    if(portfolio):
+        portfolio.delete()
+
+
 def save_changes(data) -> None:
     db.session.add(data)
     db.session.commit()
