@@ -1,3 +1,4 @@
+'''Module DocString'''
 from http import HTTPStatus
 from flask import current_app as app
 from app.main.model.user import User
@@ -8,12 +9,13 @@ class Auth:
     '''Contains Authentication functions'''
     @staticmethod
     def login_user(data):
+        '''User Auth'''
         try:
             # fetch the user data
             user = User.query.filter_by(email=data.get('email')).first()
             app.logger.info(f"User with email {data.get('email')} found...checking password...")
             if user and user.check_password(data.get('password')):
-                app.logger.info(f"User with email {data.get('email')} password confirmed. Generating token")
+                app.logger.info(f"User with email {data.get('email')} password confirmed.")
                 auth_token = user.encode_auth_token(user.id)
                 if auth_token:
                     response_object = {
@@ -64,7 +66,7 @@ class Auth:
             
     @staticmethod
     def get_logged_in_user(new_request):
-        # get the auth token
+        '''get the auth token'''
         auth_token = new_request.headers.get('Authorization')
         if auth_token:
             app.logger.info(f"Auth token received {auth_token} decoding and checking...")
@@ -96,6 +98,7 @@ class Auth:
             }
             return response_object, HTTPStatus.UNAUTHORIZED
 
+    @staticmethod
     def get_logged_in_user_object(request) -> User|None:
         auth_token = request.headers.get('Authorization')
         if auth_token:
