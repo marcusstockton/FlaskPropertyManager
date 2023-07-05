@@ -1,6 +1,6 @@
 from flask import current_app as app
 from flask import request
-from flask_restx import Resource
+from flask_restx import Resource, marshal
 
 from app.main.util.decorator import token_required, admin_token_required
 from ..service.user_service import save_new_user, get_all_users, get_a_user, update_user, delete_user
@@ -36,6 +36,7 @@ class UserList(Resource):
 @api.route('/<public_id>')
 @api.param('public_id', 'The User identifier')
 @api.response(404, 'User not found.')
+@api.response(200, 'User record returned.')
 class User(Resource):
 	@token_required
 	@api.doc('get a user')
@@ -58,6 +59,7 @@ class User(Resource):
 		return update_user(public_id, data)
 
 	@admin_token_required
+	@api.response(204, 'User Deleted.')
 	def delete(self, public_id):
 		""" Deletes a user """
 		app.logger.info(f"Deleting user with public_id {public_id}")

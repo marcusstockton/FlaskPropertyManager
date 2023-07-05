@@ -24,8 +24,7 @@ class Property(db.Model):
     property_pics = db.relationship("PropertyImages", back_populates="property", lazy=True)
 
     def __repr__(self):
-        return "<Property 'Id:{} PortfolioId:{} Owner:{} Address: {}'>".format(self.id, self.portfolio_id, self.owner,
-                                                                               self.address)
+        return f"<Property 'Id:{self.id} PortfolioId:{self.portfolio_id} Owner:{self.owner} Address: {self.address}'>"
 
 
 class PropertyImages(db.Model):
@@ -40,4 +39,4 @@ class PropertyImages(db.Model):
     property = db.relationship("Property", back_populates="property_pics")
 
     def __repr__(self):
-        return "<Property Image 'Id:{} Property_Id:{} Filename:{}'>".format(self.id, self.property_id, self.file_name)
+        return f"<Property Image 'Id:{self.id} Property_Id:{self.property_id} Filename:{self.file_name}'>"

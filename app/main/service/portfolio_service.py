@@ -65,14 +65,16 @@ def update_portfolio(portfolio_id: int, data: dict):
         raise InternalServerError(err.orig)
 
 
-def delete_portfolio_by_id(portfolio_id):
+def delete_portfolio_by_id(user, portfolio_id):
+    '''Deletes the Portfolio and related data'''
     portfolio = Portfolio.query.filter_by(id=portfolio_id).filter_by(id=portfolio_id) \
             .options(lazyload(Portfolio.owner),
                      lazyload(Portfolio.properties),
                      lazyload(Portfolio.properties.images),
                      lazyload(Portfolio.properties))
     if(portfolio):
-        portfolio.delete()
+        if portfolio.owner_id == user.id:
+            portfolio.delete()
 
 
 def save_changes(data) -> None:

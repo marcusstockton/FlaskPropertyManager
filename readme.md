@@ -1,4 +1,5 @@
 # Dev Notes
+This was just an idea for managing properties for landlords etc.
 
 ## Scaffolded out in line with:
 https://www.freecodecamp.org/news/structuring-a-flask-restplus-web-service-for-production-builds-c2ec676de563/
