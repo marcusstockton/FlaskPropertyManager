@@ -21,6 +21,7 @@ flask_bcrypt = Bcrypt()
 
 
 def create_app(config_name):
+    '''Creates the application'''
     app = Flask(__name__)
     CORS(app)
     app.logger.setLevel(logging.DEBUG)

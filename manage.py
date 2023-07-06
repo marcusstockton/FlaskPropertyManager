@@ -32,6 +32,7 @@ def test():
 
 @app.cli.command()
 def seed():
+    '''Reseeds the database with new data'''
     from seeder import seed_data
     seed_data(db)
 

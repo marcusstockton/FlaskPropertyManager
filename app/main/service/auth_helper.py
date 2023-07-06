@@ -42,6 +42,7 @@ class Auth:
 
     @staticmethod
     def logout_user(data):
+        '''Logs out the user and blacklists the token'''
         if data:
             auth_token = data.split(" ")[1]
         else:
@@ -63,7 +64,7 @@ class Auth:
                 'message': 'Provide a valid auth token.'
             }
             return response_object, HTTPStatus.FORBIDDEN
-            
+
     @staticmethod
     def get_logged_in_user(new_request):
         '''get the auth token'''
@@ -100,6 +101,7 @@ class Auth:
 
     @staticmethod
     def get_logged_in_user_object(request) -> User|None:
+        '''Returns the logged in user'''
         auth_token = request.headers.get('Authorization')
         if auth_token:
             resp = User.decode_auth_token(auth_token)

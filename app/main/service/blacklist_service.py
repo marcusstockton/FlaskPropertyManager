@@ -7,6 +7,7 @@ from app.main.model.blacklist import BlacklistToken
 
 
 def save_token(token):
+    '''Adds the token to a blacklist'''
     blacklist_token = BlacklistToken(token=token)
     try:
         # insert the token

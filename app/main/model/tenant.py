@@ -9,6 +9,7 @@ from .. import db
 
 
 class TitleEnum(enum.Enum):
+    '''Title Enum'''
     Mr = 1
     Mrs = 2
     Miss = 3
@@ -19,9 +20,11 @@ class TitleEnum(enum.Enum):
 
     @classmethod
     def has_key(cls, name):
+        '''Checks name is in enum'''
         return name in cls.__members__ # solution above 1
     @classmethod
     def list(cls):
+        '''Lists the enums'''
         return list(map(lambda c: c.value, cls))
 
 
@@ -40,13 +43,14 @@ class Tenant(db.Model):
     job_title = db.Column(db.String(100))
     tenancy_start_date = db.Column(db.Date, nullable=False)
     tenancy_end_date = db.Column(db.Date, nullable=True)
-    profile_pic = db.relationship("TenantProfile", back_populates="tenant", uselist=True)
+    profile_pic = db.relationship("TenantProfile", back_populates="tenant", uselist=False) # uselist demotes a 1:1 relationship
     notes = db.relationship("TenantNote")
     created_date = db.Column(db.DateTime, default=datetime.utcnow)
     updated_date = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def __repr__(self):
-        return f"<Tenant 'Id:{self.id} Title:{self.title} FirstName:{self.first_name} LastName{self.last_name}'>"
+        return f"""<Tenant 'Id:{self.id} Title: {self.title}
+            FirstName: {self.first_name} LastName: {self.last_name}'>"""
 
 
 class TenantNote(db.Model):
@@ -60,7 +64,7 @@ class TenantNote(db.Model):
 
     def __repr__(self):
         return f"<Tenant Note 'Id:{self.id} Note:{self.note}'>"
-    
+
 
 class TenantProfile(db.Model):
     """Tenant profile pic stored as base64 str"""
@@ -73,4 +77,5 @@ class TenantProfile(db.Model):
     tenant = db.relationship("Tenant", back_populates="profile_pic")
 
     def __repr__(self):
-        return f"<Tenant Profile 'Id:{self.id} Tenant:{self.tenant.first_name + ' ' + self.tenant.last_name}'>"
+        return f"""<Tenant Profile 'Id:{self.id} 
+            Tenant:{self.tenant.first_name + ' ' + self.tenant.last_name}'>"""
