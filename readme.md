@@ -7,7 +7,7 @@ https://www.freecodecamp.org/news/structuring-a-flask-restplus-web-service-for-p
 ## Useful commands:
 may need to:
 * Ubuntu: ``export FLASK_APP=manage.py`` from the root
-* Windows: ``set FLASK_APP=manage.py`` from the root
+* Windows: ``set FLASK_APP=manage.py`` from the root or ``set FLASK_APP=FlaskPropertyManager``
 
 ### Migrations:
     flask db migrate -m "<Migration Message>"

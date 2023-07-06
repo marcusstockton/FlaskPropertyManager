@@ -1,7 +1,6 @@
 import datetime
 from typing import List, Dict
 
-import flask
 from flask import current_app
 from sqlalchemy import update
 from sqlalchemy.exc import IntegrityError, NoResultFound, MultipleResultsFound
@@ -13,8 +12,8 @@ from app.main.model.portfolio import Portfolio
 
 
 def get_all_portfolios_for_user(user_id: int) -> List[Portfolio]:
-    portfolios = Portfolio.query.filter_by(owner_id=user_id).options(lazyload(Portfolio.owner),
-                                                               lazyload(Portfolio.properties)).all()
+    portfolios = Portfolio.query.filter_by(owner_id=user_id).options(lazyload(Portfolio.owner), # type: ignore
+                                                               lazyload(Portfolio.properties)).all() # type: ignore
     return portfolios
 
 
@@ -22,21 +21,22 @@ def get_portfolio_by_id(user_id: int, portfolio_id: int) -> Portfolio:
     try:
         current_app.logger.info(f"Getting portfolio by {portfolio_id}")
         return Portfolio.query.filter_by(owner_id=user_id).filter_by(id=portfolio_id) \
-            .options(lazyload(Portfolio.owner),
-                     lazyload(Portfolio.properties)).one()
+            .options(lazyload(Portfolio.owner), # type: ignore
+                     lazyload(Portfolio.properties)).one() # type: ignore
     except NoResultFound as err:
         error_message = f"Portfolio not found for userid: {user_id} and portfolio_id {portfolio_id}. Error {err}"
         current_app.logger.error(error_message)
         raise NotFound(error_message)
     
     except MultipleResultsFound as err:
-        error = "Multiple portfolio's not found for userid %s and portfolio_id %s", user_id, portfolio_id
+        error = f"Multiple portfolio's not found for userid {user_id} and portfolio_id {portfolio_id}"
         current_app.logger.error(error)
-        raise BadRequest(error, err)
+        raise BadRequest(error)
 
 
 def save_new_portfolio(data, user_id) -> Dict[str, str]:
-    sanitised_name = flask.escape(data["name"])
+    '''Creates a new Portfolio'''
+    sanitised_name = data["name"]
     current_app.logger.info(f"Adding portfolio {sanitised_name}")
     portfolio = Portfolio.query.filter_by(name=sanitised_name).filter_by(owner_id=user_id).first()
     if not portfolio:
@@ -53,6 +53,7 @@ def save_new_portfolio(data, user_id) -> Dict[str, str]:
 
 
 def update_portfolio(portfolio_id: int, data: dict):
+    '''Update a portfolio'''
     portfolio_query = Portfolio.query.filter_by(id=portfolio_id).one()
     if not portfolio_query:
         raise NotFound("Portfolio not found.")
@@ -62,16 +63,16 @@ def update_portfolio(portfolio_id: int, data: dict):
         db.session.commit()
         return portfolio_query
     except IntegrityError as err:
-        raise InternalServerError(err.orig)
+        raise InternalServerError(err.statement) from err
 
 
 def delete_portfolio_by_id(user, portfolio_id):
     '''Deletes the Portfolio and related data'''
     portfolio = Portfolio.query.filter_by(id=portfolio_id).filter_by(id=portfolio_id) \
-            .options(lazyload(Portfolio.owner),
-                     lazyload(Portfolio.properties),
+            .options(lazyload(Portfolio.owner), # type: ignore
+                     lazyload(Portfolio.properties),# type: ignore
                      lazyload(Portfolio.properties.images),
-                     lazyload(Portfolio.properties))
+                     lazyload(Portfolio.properties))# type: ignore
     if(portfolio):
         if portfolio.owner_id == user.id:
             portfolio.delete()
