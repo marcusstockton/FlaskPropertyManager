@@ -578,11 +578,14 @@ def seed_data(db):
 
     for x in portfolio_list:
         for pr in range(random.randint(3, 7)):
+            purchase_date=fake.date_this_century()
+            sold_date_or_null = fake.date_between_dates(purchase_date) if random.randint(1, 10) > 8 else None
             x.properties.append(
                 property.Property(
                     owner_id=owner_user2.id,
                     purchase_price=random.randrange(95000, 200000, 1075),
-                    purchase_date=fake.date_this_century(),
+                    purchase_date=purchase_date,
+                    sold_date=sold_date_or_null,
                     monthly_rental_price=random.randrange(575, 1000, 100),
                     address=address.Address(
                         line_1=fake.building_number(),
@@ -612,7 +615,7 @@ def seed_data(db):
                         date_of_birth=fake.date_of_birth(),
                         job_title=fake.job(),
                         tenancy_start_date=startDate,
-                        tenancy_end_date=  null_end_date,
+                        tenancy_end_date = null_end_date,
                         profile_pic=tenant.TenantProfile(
                             image=base_64_images[random.randint(0, 11)]
                         ),
