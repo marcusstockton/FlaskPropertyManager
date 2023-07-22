@@ -6,12 +6,14 @@ from sqlalchemy import update
 from sqlalchemy.exc import IntegrityError, NoResultFound, MultipleResultsFound
 from sqlalchemy.orm import lazyload
 from werkzeug.exceptions import NotFound, BadRequest, InternalServerError
+from bleach import clean
 
 from app.main import db
 from app.main.model.portfolio import Portfolio
 
 
 def get_all_portfolios_for_user(user_id: int) -> List[Portfolio]:
+    '''Gets all Portfolios for the logged in user'''
     portfolios = Portfolio.query.filter_by(owner_id=user_id).options(lazyload(Portfolio.owner), # type: ignore
                                                                lazyload(Portfolio.properties)).all() # type: ignore
     return portfolios
@@ -36,7 +38,7 @@ def get_portfolio_by_id(user_id: int, portfolio_id: int) -> Portfolio:
 
 def save_new_portfolio(data, user_id) -> Dict[str, str]:
     '''Creates a new Portfolio'''
-    sanitised_name = data["name"]
+    sanitised_name = clean(data["name"])
     current_app.logger.info(f"Adding portfolio {sanitised_name}")
     portfolio = Portfolio.query.filter_by(name=sanitised_name).filter_by(owner_id=user_id).first()
     if not portfolio:
