@@ -5,7 +5,7 @@ from app.test.base import BaseTestCase
 
 
 def register_user(self, auth_token):
-    '''Registers a new user. Only admin users can register new users'''
+    """Registers a new user. Only admin users can register new users"""
     headers = {
         "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json",
@@ -82,7 +82,7 @@ class TestAuthBlueprint(BaseTestCase):
 
             # valid token logout
             response = self.client.post(
-                "/auth/logout",
+                "/Auth/logout",
                 headers=dict(
                     Authorization="Bearer "
                     + json.loads(login_response.data.decode())["Authorization"]
