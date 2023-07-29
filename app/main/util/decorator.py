@@ -7,6 +7,8 @@ from app.main.service.auth_helper import Auth
 
 
 def token_required(f):
+    """Checks that the user has the correct JWT"""
+
     @wraps(f)
     def decorated(*args, **kwargs):
         data, status = Auth.get_logged_in_user(request)
@@ -20,6 +22,8 @@ def token_required(f):
 
 
 def admin_token_required(f):
+    """Checks that the user has the admin flag enabled"""
+
     @wraps(f)
     def decorated(*args, **kwargs):
         data, status = Auth.get_logged_in_user(request)
