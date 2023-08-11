@@ -13,11 +13,11 @@ class User(db.Model):
     __tablename__ = "user"
 
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(255), unique=True, nullable=False)
+    email = db.Column(db.String(255), unique=True, nullable=False, index=True)
     registered_on = db.Column(db.DateTime, nullable=False)
     admin = db.Column(db.Boolean, nullable=False, default=False)
-    public_id = db.Column(db.String(100), unique=True)
-    username = db.Column(db.String(50), unique=True)
+    public_id = db.Column(db.String(100), unique=True, index=True)
+    username = db.Column(db.String(50), unique=True, index=True)
     password_hash = db.Column(db.String(100))
     first_name = db.Column(db.String(100), nullable=True)
     last_name = db.Column(db.String(100), nullable=True)

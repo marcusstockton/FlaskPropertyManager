@@ -10,8 +10,8 @@ may need to:
 * Windows: ``set FLASK_APP=manage.py`` from the root or ``set FLASK_APP=FlaskPropertyManager``
 
 ### Migrations:
-    flask db migrate -m "<Migration Message>"
-    flask db upgrade
+    python -m flask --app manage.py db migrate -m "<Migration Message>"
+    python -m flask --app manage.py db upgrade
 
 ### Testing:
     sudo python manage.py test || flask test
