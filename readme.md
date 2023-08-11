@@ -9,9 +9,12 @@ may need to:
 * Ubuntu: ``export FLASK_APP=manage.py`` from the root
 * Windows: ``set FLASK_APP=manage.py`` from the root or ``set FLASK_APP=FlaskPropertyManager``
 
+### Help:
+    flask --app manage.py --help
+
 ### Migrations:
-    python -m flask --app manage.py db migrate -m "<Migration Message>"
-    python -m flask --app manage.py db upgrade
+    flask --app manage.py db migrate -m "<Migration Message>"
+    flask --app manage.py db upgrade
 
 ### Testing:
     sudo python manage.py test || flask test
