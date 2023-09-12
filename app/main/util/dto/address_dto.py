@@ -2,7 +2,8 @@ from flask_restx import Namespace, fields
 
 
 class AddressDto:
-    api = Namespace('address', description='address related operations')
+    '''Address DTO'''
+    api = Namespace('Address', description='Address related operations')
 
     address = api.model('Address', {
         'id': fields.String(required=True, description='id'),

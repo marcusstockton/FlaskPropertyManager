@@ -1,4 +1,5 @@
 import base64
+from datetime import date
 
 from flask_restx import Namespace, fields
 
@@ -6,30 +7,38 @@ from ...model.tenant import TitleEnum
 
 
 class Base64Decoder(fields.Raw):
+    '''Decode an image to a base 64 string'''
     def format(self, value):
         data_bytes = base64.b64encode(value)
         data = data_bytes.decode("utf-8")
         return data
 
-
-class CurrentTenants(fields.Raw):
+class CalcuateAge(fields.Raw):
+    '''Calculates the tenants age'''
     def format(self, value):
-        return value.upper()
+        today = date.today()
+        return today.year - value.year - ((today.month, today.day) < (value.month, value.day))
 
 
-class FileLocationToUrl(fields.Raw):
-    def format(self, value):
-        return value
+# class CurrentTenants(fields.Raw):
+#     def format(self, value):
+#         return value.upper()
+
+
+# class FileLocationToUrl(fields.Raw):
+#     def format(self, value):
+#         return value
 
 
 class TenantDto:
-    api = Namespace('tenant', description='tenant related operations')
+    '''Flask-Restx Tenant related operations.'''
+    api = Namespace('Tenant', description='Tenant related operations')
 
-    colors_api_model = api.schema_model('Titles', {
-        'enum':
-            ['black', 'white', 'red', 'green', 'blue'],
-        'type': 'string'
-    })
+    # colors_api_model = api.schema_model('Titles', {
+    #     'enum':
+    #         ['black', 'white', 'red', 'green', 'blue'],
+    #     'type': 'string'
+    # })
 
     tenant_notes = api.model('TenantNote', {
         'id': fields.String(required=True, description='id'),
@@ -51,28 +60,33 @@ class TenantDto:
 
     tenant = api.model('Tenant', {
         'id': fields.String(required=True, description='id'),
-        'title': fields.String(required=False, description='title', enum=[x.name for x in TitleEnum],
-                               attribute='title.name'),
+        'title': fields.String(required=False, description='Title',
+                               enum=[x.name for x in TitleEnum], attribute='title.name'),
         'phone_number': fields.String(required=False, description='phone number'),
         'email_address': fields.String(required=False, description='email_address'),
-        'first_name': fields.String(required=True, description='first name', attribute='first_name'),
+        'first_name': fields.String(required=True, description='first name', 
+                                    attribute='first_name'),
         'last_name': fields.String(required=True, description='last name'),
         'date_of_birth': fields.Date(required=True, description='date of birth'),
         'job_title': fields.String(required=True, description='job title'),
         'tenancy_start_date': fields.Date(required=True, description='tenancy start date'),
         'tenancy_end_date': fields.Date(required=True, description='tenancy end date'),
-        'profile_pic': fields.List(fields.Nested(tenant_profile), required=False, description='tenant profile pic'),
-        'notes': fields.List(fields.Nested(tenant_notes), required=False, description='tenant notes'),
+        'profile_pic': fields.List(fields.Nested(tenant_profile), 
+                                   required=False, description='tenant profile pic'),
+        'notes': fields.List(fields.Nested(tenant_notes), required=False, 
+                             description='tenant notes'),
         'created_date': fields.DateTime(required=False, description='date created'),
         'updated_date': fields.DateTime(required=False, description='date last updated'),
+        'age': CalcuateAge(attribute="date_of_birth")
     })
 
     tenant_list = api.model('Tenant', {
         'id': fields.String(required=True, description='id'),
-        'title': fields.String(required=False, description='title', enum=[x.name for x in TitleEnum],
-                               attribute='title.name'),
+        'title': fields.String(required=False, description='title', 
+                               enum=[x.name for x in TitleEnum], attribute='title.name'),
         'phone_number': fields.String(required=False, description='phone number'),
-        'first_name': fields.String(required=True, description='first name', attribute='first_name'),
+        'first_name': fields.String(required=True, description='first name', 
+                                    attribute='first_name'),
         'last_name': fields.String(required=True, description='last name'),
         'date_of_birth': fields.Date(required=True, description='date of birth'),
         'job_title': fields.String(required=True, description='job title'),
@@ -83,23 +97,27 @@ class TenantDto:
     })
 
     tenant_create = api.model('Tenant', {
-        'title': fields.String(required=False, description='title', enum=[x.name for x in TitleEnum],
-                               attribute='title.name'),
+        'title': fields.String(required=False, description='title', 
+                               enum=[x.name for x in TitleEnum], attribute='title.name'),
         'phone_number': fields.String(required=False, description='phone number'),
         'email_address': fields.String(required=True, description='email_address'),
         'first_name': fields.String(required=True, description='first name'),
         'last_name': fields.String(required=True, description='last name'),
         'date_of_birth': fields.Date(required=True, description='date of birth'),
         'job_title': fields.String(required=True, description='job title'),
-        'tenancy_start_date': fields.Date(required=True, description='tenancy start date'),
-        'tenancy_end_date': fields.Date(required=False, description='tenancy end date'),
+        'tenancy_start_date': fields.Date(required=True, 
+                                          description='tenancy start date'),
+        'tenancy_end_date': fields.Date(required=False, 
+                                        description='tenancy end date'),
     })
+
     tenant_update = api.model('Tenant', {
         'id': fields.String(required=True, description='id'),
-        'title': fields.String(required=False, description='title', enum=[x.name for x in TitleEnum],
-                               attribute='title.name'),
+        'title': fields.String(required=False, description='title', 
+                               enum=[x.name for x in TitleEnum], attribute='title.name'),
         'phone_number': fields.String(required=False, description='phone number'),
-        'first_name': fields.String(required=True, description='first name', attribute='first_name'),
+        'first_name': fields.String(required=True, 
+                                    description='first name', attribute='first_name'),
         'last_name': fields.String(required=True, description='last name'),
         'date_of_birth': fields.Date(required=True, description='date of birth'),
         'job_title': fields.String(required=True, description='job title'),

@@ -29,7 +29,7 @@ class TenantList(Resource):
 	def get(self, portfolio_id, property_id):
 		"""Get all tenants for the property"""
 		app.logger.info(f"Getting all tenants for propertyId {property_id}")
-		return get_all_tenants_for_property(property_id)
+		return get_all_tenants_for_property(portfolio_id, property_id)
 
 	@token_required
 	@api.response(201, 'Tenant successfully created.')
@@ -42,7 +42,7 @@ class TenantList(Resource):
 	def post(self, portfolio_id, property_id):
 		"""Creates a new Tenant """
 		data = request.json
-		app.logger.info(f"Adding new tenant {data.email_address} to {property_id}")
+		app.logger.info(f"Adding new tenant {data['email_address']} to {property_id}")
 		return save_new_tenant(portfolio_id, property_id, data)
 
 
@@ -91,5 +91,5 @@ class TenantImage(Resource):
 			# Save image as base64 string
 			# verify user has permission to do this...?
 			app.logger.info(f"Adding a tenant profile image {file.filename} for tenant id {tenant_id}")
-			image_string = base64.b64encode(file.read())
+			image_string = file.read()
 			return add_profile_to_tenant(tenant_id, image_string)
