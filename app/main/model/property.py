@@ -14,7 +14,8 @@ class Property(db.Model):
     portfolio_id = db.Column(db.Integer, db.ForeignKey(Portfolio.id, ondelete="cascade"))
     owner_id = db.Column(db.Integer, db.ForeignKey(User.id, ondelete="cascade"))
     purchase_price = db.Column(db.Float(precision='10, 2'), nullable=True)
-    purchase_date = db.Column(db.DateTime, nullable=True)
+    purchase_date = db.Column(db.Date, nullable=True)
+    sold_date = db.Column(db.Date, nullable=True)
     monthly_rental_price = db.Column(db.Float(precision='10, 2'), nullable=True)
     created_date = db.Column(db.DateTime, default=datetime.utcnow)
     updated_date = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -24,8 +25,7 @@ class Property(db.Model):
     property_pics = db.relationship("PropertyImages", back_populates="property", lazy=True)
 
     def __repr__(self):
-        return "<Property 'Id:{} PortfolioId:{} Owner:{} Address: {}'>".format(self.id, self.portfolio_id, self.owner,
-                                                                               self.address)
+        return f"<Property 'Id:{self.id} PortfolioId:{self.portfolio_id} Owner:{self.owner} Address: {self.address}'>"
 
 
 class PropertyImages(db.Model):
@@ -40,4 +40,4 @@ class PropertyImages(db.Model):
     property = db.relationship("Property", back_populates="property_pics")
 
     def __repr__(self):
-        return "<Property Image 'Id:{} Property_Id:{} Filename:{}'>".format(self.id, self.property_id, self.file_name)
+        return f"<Property Image 'Id:{self.id} Property_Id:{self.property_id} Filename:{self.file_name}'>"
