@@ -71,17 +71,21 @@ def delete_user(user_id):
 
 
 def get_all_users():
+    '''Returns all users'''
     current_app.logger.info('Calling get all users')
     return User.query.all()
 
 
 def get_a_user(public_id):
-    current_app.logger.info('Calling get a user')
-    return User.query.filter_by(public_id=public_id).first()
+    '''Retrieves a user via its public id'''
+    current_app.logger.info(f'Calling get a user with public_id {public_id}')
+    user = User.query.filter_by(public_id=public_id).first()
+    return user
 
 
 def get_a_user_by_username(username):
-    current_app.logger.info('Calling get a user')
+    '''Retrieves a user via its username'''
+    current_app.logger.info(f'Calling get a user with username {username}')
     return User.query.filter_by(username=username).first()
 
 

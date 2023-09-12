@@ -6,16 +6,25 @@ from sqlalchemy import update
 from werkzeug.exceptions import NotFound, BadRequest
 
 from app.main import db
+from app.main.model.portfolio import Portfolio
 from app.main.model.property import Property
 from app.main.model.tenant import Tenant, TenantNote, TenantProfile, TitleEnum
 
 
-def get_all_tenants_for_property(property_id):
-    tenants = Tenant.query.filter_by(property_id=property_id).all()
-    return tenants
+def get_all_tenants_for_property(portfolio_id, property_id):
+    """ Gets all the tenants for a property """
+    portfolio = Portfolio.query.filter_by(id=portfolio_id).one()
+    if portfolio is None:
+        raise BadRequest("No Portfolio found")
 
+    if property_id in [prop.id for prop in portfolio.properties]:
+        tenants = Tenant.query.filter_by(property_id=property_id).all()
+        return tenants
+    else:
+        raise BadRequest("Property id does't exist against this Portfolio.")
 
 def update_tenant(property_id, tenant_id, data):
+    '''Updates a tenent record'''
     if int(data['id']) != tenant_id:
         raise BadRequest("ID's do not match.")
 
@@ -37,11 +46,12 @@ def update_tenant(property_id, tenant_id, data):
                 }
             }
             return response_object, HTTPStatus.NO_CONTENT
-        except IntegrityError as e:
-            raise IntegrityError(e)
+        except IntegrityError as err:
+            raise IntegrityError(err) from err
 
 
 def delete_tenant(property_id, tenant_id):
+    '''Deletes a tenant'''
     tenant = Tenant.query.filter_by(property_id=property_id, id=tenant_id)
     if tenant.scalar() is None:
         raise NotFound()
@@ -56,6 +66,7 @@ def delete_tenant(property_id, tenant_id):
 
 
 def save_new_tenant(portfolio_id, property_id, data):
+    '''Creates a new tenant against the supplied portfolio and property'''
     property = Property.query.filter_by(id=property_id).first()
     if property is None:
         raise NotFound()
@@ -64,11 +75,11 @@ def save_new_tenant(portfolio_id, property_id, data):
         raise NotFound('Property does not exist against this portfolio')
 
     # check if tenant already exists?
-    existingTenant = Tenant.query.filter(Tenant.property_id == property_id,
+    existing_tenant = Tenant.query.filter(Tenant.property_id == property_id,
                                          Tenant.first_name == data['first_name'],
                                          Tenant.last_name == data['last_name'],
                                          Tenant.date_of_birth == data['date_of_birth']).scalar()
-    if existingTenant is not None:
+    if existing_tenant is not None:
         raise BadRequest('Tenant already exists at this property')
 
     title = TitleEnum[data['title']]
@@ -76,6 +87,7 @@ def save_new_tenant(portfolio_id, property_id, data):
         title=title,
         first_name=data.get('first_name'),
         last_name=data.get('last_name'),
+        phone_number=data.get('phone_number'),
         date_of_birth=dt.strptime(data['date_of_birth'], '%Y-%m-%d'),
         job_title=data.get('job_title'),
         tenancy_start_date=dt.strptime(data['tenancy_start_date'], '%Y-%m-%d'),
@@ -102,6 +114,7 @@ def save_new_tenant(portfolio_id, property_id, data):
 
 
 def get_tenant_by_id(portfolio_id, property_id, tenant_id):
+    '''Returns a tenant by supplied id'''
     tenant = Tenant.query.filter(Tenant.property_id == property_id, Tenant.id == tenant_id).first()
     if tenant is None:
         raise NotFound("Tenant not found with id")
@@ -113,6 +126,7 @@ def get_tenant_by_id(portfolio_id, property_id, tenant_id):
 
 
 def add_profile_to_tenant(tenant_id, image_str):
+    '''Adds an image of the tenant to the tenant record'''
     # Save image off
     tenant_profile = TenantProfile(
         tenant_id=tenant_id,
@@ -129,6 +143,7 @@ def add_profile_to_tenant(tenant_id, image_str):
     return response_object, HTTPStatus.CREATED
 
 
-def save_changes(data):
+def save_changes(data) -> None:
+    '''Saves changes'''
     db.session.add(data)
     db.session.commit()

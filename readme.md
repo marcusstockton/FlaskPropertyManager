@@ -1,4 +1,5 @@
 # Dev Notes
+This was just an idea for managing properties for landlords etc.
 
 ## Scaffolded out in line with:
 https://www.freecodecamp.org/news/structuring-a-flask-restplus-web-service-for-production-builds-c2ec676de563/
@@ -6,11 +7,14 @@ https://www.freecodecamp.org/news/structuring-a-flask-restplus-web-service-for-p
 ## Useful commands:
 may need to:
 * Ubuntu: ``export FLASK_APP=manage.py`` from the root
-* Windows: ``set FLASK_APP=manage.py`` from the root
+* Windows: ``set FLASK_APP=manage.py`` from the root or ``set FLASK_APP=FlaskPropertyManager``
+
+### Help:
+    flask --app manage.py --help
 
 ### Migrations:
-    flask db migrate -m "<Migration Message>"
-    flask db upgrade
+    flask --app manage.py db migrate -m "<Migration Message>"
+    flask --app manage.py db upgrade
 
 ### Testing:
     sudo python manage.py test || flask test

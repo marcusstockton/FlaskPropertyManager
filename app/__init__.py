@@ -2,7 +2,7 @@
 
 from http import HTTPStatus
 
-from flask import Blueprint
+from flask import Blueprint, jsonify, json
 from flask_restx import Api
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import NotFound, BadRequest, InternalServerError
@@ -42,30 +42,30 @@ api.add_namespace(auth_ns)
 
 # Global Error Handlers:
 @api.errorhandler(IntegrityError)
-def integrety_exception_handler(error: IntegrityError):
+def integrety_exception_handler(error):
     """Default error handler"""
-    return {'message': error.args}, 500
+    return {'message': error.args}, HTTPStatus.INTERNAL_SERVER_ERROR
 
 
 @api.errorhandler(NotFound)
-def not_found_exception_handler(error: NotFound):
+def not_found_exception_handler(error):
     """Default Not Found error handler"""
     return {'message': str(error)}, getattr(error, 'code', HTTPStatus.NOT_FOUND)
 
 
 @api.errorhandler(BadRequest)
-def bad_request_exception_handler(error: BadRequest):
+def bad_request_exception_handler(error):
     """Default Not Found error handler"""
     return {'message': str(error)}, getattr(error, 'code', HTTPStatus.BAD_REQUEST)
 
 
 @api.errorhandler(InternalServerError)
-def internal_server_error_exception_handler(error: InternalServerError):
+def internal_server_error_exception_handler(error):
     """Default Not Found error handler"""
-    return {'message': str(error)}, getattr(error, 'code', HTTPStatus.BAD_REQUEST)
+    return {'message': str(error)}, getattr(error, 'code', HTTPStatus.INTERNAL_SERVER_ERROR)
 
 
 @api.errorhandler(Exception)
-def generic_exception_handler(error: Exception):
+def generic_exception_handler(error):
     """Default error handler"""
     return {'message': str(error)}, getattr(error, 'code', HTTPStatus.INTERNAL_SERVER_ERROR)

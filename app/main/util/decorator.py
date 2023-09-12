@@ -7,10 +7,12 @@ from app.main.service.auth_helper import Auth
 
 
 def token_required(f):
+    """Checks that the user has the correct JWT"""
+
     @wraps(f)
     def decorated(*args, **kwargs):
         data, status = Auth.get_logged_in_user(request)
-        token = data.get('data')
+        token = data.get("data")
         if not token:
             return data, status
 
@@ -20,19 +22,21 @@ def token_required(f):
 
 
 def admin_token_required(f):
+    """Checks that the user has the admin flag enabled"""
+
     @wraps(f)
     def decorated(*args, **kwargs):
         data, status = Auth.get_logged_in_user(request)
-        token = data.get('data')
+        token = data.get("data")
 
         if not token:
             return data, status
 
-        admin = token.get('admin')
+        admin = token.get("admin")
         if not admin:
             response_object = {
-                'status': 'fail',
-                'message': 'You do not have the correct permission to access this.'
+                "status": "fail",
+                "message": "You do not have the correct permission to access this.",
             }
             return response_object, HTTPStatus.UNAUTHORIZED
 
