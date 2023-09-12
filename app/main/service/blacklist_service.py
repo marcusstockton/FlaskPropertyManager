@@ -7,6 +7,7 @@ from app.main.model.blacklist import BlacklistToken
 
 
 def save_token(token):
+    '''Adds the token to a blacklist'''
     blacklist_token = BlacklistToken(token=token)
     try:
         # insert the token
@@ -19,10 +20,10 @@ def save_token(token):
         }
         app.logger.info(f"Token {blacklist_token} added to blacklist")
         return response_object, HTTPStatus.OK
-    except Exception as e:
-        app.logger.error(f"Unable to add Token {blacklist_token}. {e}")
+    except Exception as err:
+        app.logger.error(f"Unable to add Token {blacklist_token}. {err}")
         response_object = {
             'status': 'fail',
-            'message': e
+            'message': err
         }
         return response_object, HTTPStatus.OK

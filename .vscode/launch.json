@@ -19,6 +19,34 @@
             ],
             "jinja": true,
             "justMyCode": true
+        },
+        {
+            "name": "Python: Seed",
+            "type": "python",
+            "request": "launch",
+            "module": "flask",
+            "env": {
+                "FLASK_APP": "manage.py",
+                "FLASK_ENV": "development"
+            },
+            "args": [
+                "seed",
+                // "--no-debugger"
+            ],
+        },
+        {
+            "name": "Python: Test",
+            "type": "python",
+            "request": "launch",
+            "module": "flask",
+            "env": {
+                "FLASK_APP": "manage.py",
+                "FLASK_ENV": "development"
+            },
+            "args": [
+                "test",
+                // "--no-debugger"
+            ],
         }
     ]
 }

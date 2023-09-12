@@ -2,7 +2,8 @@ from flask_restx import Namespace, fields
 
 
 class AuthDto:
-    api = Namespace('auth', description='authentication related operations')
+    '''Auth DTO'''
+    api = Namespace('Auth', description='Authentication related operations')
     
     user_auth = api.model('auth_details', {
         'email': fields.String(required=True, description='The email address'),
