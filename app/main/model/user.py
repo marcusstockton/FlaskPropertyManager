@@ -1,5 +1,6 @@
 import re
-from datetime import datetime, timedelta
+from datetime import timedelta, datetime, timezone
+
 import jwt
 
 from app.main.model.blacklist import BlacklistToken
@@ -62,8 +63,8 @@ class User(db.Model):
         """
         try:
             payload = {
-                "exp": datetime.utcnow() + timedelta(days=1, seconds=5),
-                "iat": datetime.utcnow(),
+                "exp": datetime.now(timezone.utc) + timedelta(days=1, seconds=5),
+                "iat": datetime.now(timezone.utc),
                 "sub": user_id,
                 "username": User.query.filter_by(id=user_id).first().username,
             }

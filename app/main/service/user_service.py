@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from http import HTTPStatus
 
 from flask import current_app
@@ -26,7 +26,7 @@ def save_new_user(data):
         last_name=data['last_name'] if 'last_name' in data else None,
         date_of_birth=datetime.strptime(data['date_of_birth'], '%Y-%m-%d') if 'date_of_birth' in data else None,
         created_date=datetime.now(),
-        registered_on=datetime.utcnow()
+        registered_on=datetime.now(timezone.utc)
     )
     new_user.roles = [owner_role, ]
     save_changes(new_user)
