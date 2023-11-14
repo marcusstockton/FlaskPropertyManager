@@ -1,19 +1,21 @@
+from dataclasses import dataclass
 from datetime import datetime
 
 from .user import User
 from .. import db
 
 
+@dataclass
 class Portfolio(db.Model):
-	""" Portfolio Model for storing portfolio's """
-	__tablename__ = "portfolio"
-	id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-	name = db.Column(db.String(100), nullable=False)
-	created_date = db.Column(db.DateTime, default=datetime.utcnow)
-	updated_date = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-	owner_id = db.Column(db.Integer, db.ForeignKey(User.id, ondelete='CASCADE'))
-	owner = db.relationship("User")
-	properties = db.relationship("Property", cascade="all, delete")
+    """Portfolio Model for storing portfolio's"""
 
-	def __repr__(self):
-		return f"<Portfolio 'Id:{self.id}, Name:{self.name}'>"
+    __tablename__ = "portfolio"
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(100), nullable=False)
+    created_date = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_date = db.Column(
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )
+    owner_id = db.Column(db.Integer, db.ForeignKey(User.id, ondelete="CASCADE"))
+    owner = db.relationship("User")
+    properties = db.relationship("Property", cascade="all, delete")

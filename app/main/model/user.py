@@ -1,6 +1,6 @@
+from dataclasses import dataclass
 import re
 from datetime import timedelta, datetime, timezone
-
 import jwt
 
 from app.main.model.blacklist import BlacklistToken
@@ -8,20 +8,21 @@ from .. import db, flask_bcrypt
 from ..config import key
 
 
+@dataclass
 class User(db.Model):
     """User Model for storing user related details"""
 
     __tablename__ = "user"
 
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(255), unique=True, nullable=False, index=True)
+    id: int = db.Column(db.Integer, primary_key=True)
+    email: str = db.Column(db.String(255), unique=True, nullable=False, index=True)
     registered_on = db.Column(db.DateTime, nullable=False)
-    admin = db.Column(db.Boolean, nullable=False, default=False)
-    public_id = db.Column(db.String(100), unique=True, index=True)
-    username = db.Column(db.String(50), unique=True, index=True)
-    password_hash = db.Column(db.String(100))
-    first_name = db.Column(db.String(100), nullable=True)
-    last_name = db.Column(db.String(100), nullable=True)
+    admin: bool = db.Column(db.Boolean, nullable=False, default=False)
+    public_id: str = db.Column(db.String(100), unique=True, index=True)
+    username: str = db.Column(db.String(50), unique=True, index=True)
+    password_hash: str = db.Column(db.String(100))
+    first_name: str = db.Column(db.String(100), nullable=True)
+    last_name: str = db.Column(db.String(100), nullable=True)
     date_of_birth = db.Column(db.DateTime, nullable=True)
     created_date = db.Column(db.DateTime, default=datetime.utcnow)
     updated_date = db.Column(
@@ -94,25 +95,20 @@ class User(db.Model):
         except jwt.InvalidTokenError:
             return "Invalid token. Please log in again."
 
-    def __repr__(self):
-        return "<User 'Id: {} {}'>".format(self.id, self.username)
 
-
+@dataclass
 class Role(db.Model):
     __tablename__ = "roles"
-    id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(50), unique=True)
-
-    def __repr__(self):
-        return f"<Role 'Id: {self.id} {self.name}'>"
+    id: int = db.Column(db.Integer(), primary_key=True)
+    name: str = db.Column(db.String(50), unique=True)
 
 
 # Define the UserRoles association tabletest_registered_user_login
+@dataclass
 class UserRoles(db.Model):
     __tablename__ = "user_roles"
-    id = db.Column(db.Integer(), primary_key=True)
-    user_id = db.Column(db.Integer(), db.ForeignKey("user.id", ondelete="CASCADE"))
-    role_id = db.Column(db.Integer(), db.ForeignKey("roles.id", ondelete="CASCADE"))
-
-    def __repr__(self):
-        return f"<UserRole 'Id: {self.id} user_id: {self.user_id}, role_id: {self.role_id}'>"
+    id: int = db.Column(db.Integer(), primary_key=True)
+    user_id: int = db.Column(db.Integer(), db.ForeignKey("user.id", ondelete="CASCADE"))
+    role_id: int = db.Column(
+        db.Integer(), db.ForeignKey("roles.id", ondelete="CASCADE")
+    )
