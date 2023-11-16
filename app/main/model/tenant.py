@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 import enum
 from datetime import datetime
+from typing import List
 
 from sqlalchemy import LargeBinary
 from sqlalchemy_utils import EmailType
@@ -40,20 +41,20 @@ class Tenant(db.Model):
     property_id: int = db.Column(db.Integer, db.ForeignKey(Property.id))
     property = db.relationship("Property", back_populates="tenants")
     phone_number: str = db.Column(db.String(20))
-    email_address = db.Column(EmailType)
-    title = db.Column(db.Enum(TitleEnum))
+    email_address: str = db.Column(EmailType)
+    title: str = db.Column(db.Enum(TitleEnum))
     first_name: str = db.Column(db.String(100))
     last_name: str = db.Column(db.String(100))
-    date_of_birth = db.Column(db.Date, nullable=True)
+    date_of_birth: datetime = db.Column(db.Date, nullable=True)
     job_title: str = db.Column(db.String(100))
-    tenancy_start_date = db.Column(db.Date, nullable=False)
-    tenancy_end_date = db.Column(db.Date, nullable=True)
+    tenancy_start_date: datetime = db.Column(db.Date, nullable=False)
+    tenancy_end_date: datetime = db.Column(db.Date, nullable=True)
     profile_pic = db.relationship(
         "TenantProfile", back_populates="tenant", uselist=False
     )  # uselist demotes a 1:1 relationship
     notes = db.relationship("TenantNote")
-    created_date = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_date = db.Column(
+    created_date: datetime = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_date: datetime = db.Column(
         db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
     )
 
@@ -65,8 +66,8 @@ class TenantNote(db.Model):
     __tablename__ = "tenantNote"
     id: int = db.Column(db.Integer, primary_key=True, autoincrement=True)
     tenant_id: int = db.Column(db.Integer, db.ForeignKey(Tenant.id))
-    created_date = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_date = db.Column(
+    created_date: datetime = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_date: datetime = db.Column(
         db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
     )
     note: str = db.Column(db.String(2000))
@@ -79,9 +80,9 @@ class TenantProfile(db.Model):
     __tablename__ = "tenant-profile"
     id: int = db.Column(db.Integer, primary_key=True, autoincrement=True)
     tenant_id: int = db.Column(db.Integer, db.ForeignKey(Tenant.id))
-    created_date = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_date = db.Column(
+    created_date: datetime = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_date: datetime = db.Column(
         db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
     )
-    image = db.Column(LargeBinary)
+    image: LargeBinary = db.Column(LargeBinary)
     tenant = db.relationship("Tenant", back_populates="profile_pic")

@@ -10,12 +10,12 @@ class Portfolio(db.Model):
     """Portfolio Model for storing portfolio's"""
 
     __tablename__ = "portfolio"
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    name = db.Column(db.String(100), nullable=False)
-    created_date = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_date = db.Column(
+    id: int = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name: str = db.Column(db.String(100), nullable=False)
+    created_date: datetime = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_date: datetime = db.Column(
         db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
     )
-    owner_id = db.Column(db.Integer, db.ForeignKey(User.id, ondelete="CASCADE"))
+    owner_id: int = db.Column(db.Integer, db.ForeignKey(User.id, ondelete="CASCADE"))
     owner = db.relationship("User")
     properties = db.relationship("Property", cascade="all, delete")

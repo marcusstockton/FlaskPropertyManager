@@ -8,7 +8,7 @@ https://www.freecodecamp.org/news/structuring-a-flask-restplus-web-service-for-p
 may need to:
 * Ubuntu: ``export FLASK_APP=manage.py`` from the root
 * Windows: ``set FLASK_APP=manage.py`` from the root or ``set FLASK_APP=FlaskPropertyManager``
-* Windows PowerShell: ``$env:FLASK_APP="manage.py"`` from the root
+* Windows PowerShell: `` $env:FLASK_APP="manage.py" `` from the root
 
 ### Help:
     flask --app manage.py --help
