@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import ClassVar, List
 
 from sqlalchemy import LargeBinary
+from sqlalchemy.orm import Mapped
 
 from app.main.model.address import Address
 
@@ -13,6 +13,7 @@ from .. import db
 
 @dataclass
 class Property(db.Model):
+
     """Property Model for storing properties"""
 
     __tablename__ = "property"
@@ -29,7 +30,7 @@ class Property(db.Model):
     updated_date: datetime = db.Column(
         db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
     )
-    address = db.relationship(
+    address: Mapped[Address] = db.relationship(
         "Address", back_populates="property", uselist=False, cascade="all, delete"
     )
     tenants = db.relationship(
@@ -54,4 +55,6 @@ class PropertyImages(db.Model):
     image: LargeBinary = db.Column(LargeBinary)
     file_name: str = db.Column(db.String(200))
     property_id: int = db.Column(db.Integer, db.ForeignKey(Property.id), nullable=False)
-    property = db.relationship("Property", back_populates="property_pics")
+    property: Mapped[Property] = db.relationship(
+        "Property", back_populates="property_pics"
+    )
