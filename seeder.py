@@ -254,7 +254,7 @@ def seed_data(db):
                         last_name=lastName,
                         email_address=f"{firstName}.{lastName}@{fake.domain_name()}",
                         phone_number=fake.phone_number(),
-                        smoker=fake.random(bool),
+                        smoker=fake.pybool(),
                         date_of_birth=fake.date_of_birth(
                             minimum_age=15, maximum_age=65
                         ),
