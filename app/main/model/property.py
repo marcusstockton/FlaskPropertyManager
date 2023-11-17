@@ -1,10 +1,8 @@
 from dataclasses import dataclass
 from datetime import datetime
-
-from sqlalchemy import LargeBinary
 from sqlalchemy.orm import Mapped
 
-from app.main.model.address import Address
+# from app.main.model.address import Address
 
 from .portfolio import Portfolio
 from .user import User
@@ -30,31 +28,13 @@ class Property(db.Model):
     updated_date: datetime = db.Column(
         db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
     )
-    address: Mapped[Address] = db.relationship(
+    address: Mapped["Address"] = db.relationship(
         "Address", back_populates="property", uselist=False, cascade="all, delete"
     )
-    tenants = db.relationship(
+    tenants: Mapped[list["Tenant"]] = db.relationship(
         "Tenant", back_populates="property", cascade="all, delete"
     )
     owner = db.relationship("User")
-    property_pics = db.relationship(
+    property_pics: Mapped[list["PropertyImages"]] = db.relationship(
         "PropertyImages", back_populates="property", lazy=True
-    )
-
-
-@dataclass
-class PropertyImages(db.Model):
-    """Property Images model for storing property images"""
-
-    __tablename__ = "propertyImages"
-    id: int = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    created_date: datetime = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_date: datetime = db.Column(
-        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
-    )
-    image: LargeBinary = db.Column(LargeBinary)
-    file_name: str = db.Column(db.String(200))
-    property_id: int = db.Column(db.Integer, db.ForeignKey(Property.id), nullable=False)
-    property: Mapped[Property] = db.relationship(
-        "Property", back_populates="property_pics"
     )

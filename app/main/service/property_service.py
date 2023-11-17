@@ -9,7 +9,8 @@ from werkzeug.exceptions import NotFound, InternalServerError, BadRequest
 from app.main import db
 from app.main.model.address import Address
 from app.main.model.portfolio import Portfolio
-from app.main.model.property import Property, PropertyImages
+from app.main.model.property import Property
+from app.main.model.property_image import PropertyImages
 
 
 def get_all_properties_for_portfolio(portfolio_id):
