@@ -1,40 +1,41 @@
 from dataclasses import dataclass
 from datetime import datetime
-from sqlalchemy.orm import Mapped
+from typing import List
+from app.main.model.base import BaseClass
 
-# from app.main.model.address import Address
+from sqlalchemy import Integer, String, DateTime
+from sqlalchemy.orm import Mapped, mapped_column
 
-from .portfolio import Portfolio
-from .user import User
 from .. import db
 
 
 @dataclass
-class Property(db.Model):
+class Property(BaseClass):
 
     """Property Model for storing properties"""
 
     __tablename__ = "property"
-    id: int = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    portfolio_id: int = db.Column(
-        db.Integer, db.ForeignKey(Portfolio.id, ondelete="cascade")
+    portfolio_id: Mapped[int] = mapped_column(
+        db.Integer, db.ForeignKey("portfolio.id", ondelete="cascade")
     )
-    owner_id: int = db.Column(db.Integer, db.ForeignKey(User.id, ondelete="cascade"))
-    purchase_price: float = db.Column(db.Float(precision="10, 2"), nullable=True)
-    purchase_date: datetime = db.Column(db.Date, nullable=True)
-    sold_date: datetime | None = db.Column(db.Date, nullable=True)
-    monthly_rental_price: float = db.Column(db.Float(precision="10, 2"), nullable=True)
-    created_date: datetime = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_date: datetime = db.Column(
-        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    owner_id: Mapped[int] = mapped_column(
+        Integer, db.ForeignKey("user.id", ondelete="cascade")
     )
-    address: Mapped["Address"] = db.relationship(
+    purchase_price: Mapped[float] = mapped_column(
+        db.Float(precision="10, 2"), nullable=True
+    )
+    purchase_date: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    sold_date: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    monthly_rental_price: Mapped[float] = mapped_column(
+        db.Float(precision="10, 2"), nullable=True
+    )
+    address: Mapped[List["Address"]] = db.relationship(
         "Address", back_populates="property", uselist=False, cascade="all, delete"
     )
-    tenants: Mapped[list["Tenant"]] = db.relationship(
+    tenants: Mapped[List["Tenant"]] = db.relationship(
         "Tenant", back_populates="property", cascade="all, delete"
     )
     owner = db.relationship("User")
-    property_pics: Mapped[list["PropertyImages"]] = db.relationship(
+    property_pics: Mapped[List["PropertyImages"]] = db.relationship(
         "PropertyImages", back_populates="property", lazy=True
     )

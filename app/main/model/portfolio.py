@@ -1,21 +1,27 @@
 from dataclasses import dataclass
 from datetime import datetime
+from sqlalchemy import Integer, String
+from sqlalchemy.orm import Mapped, mapped_column
+
+from app.main.model.base import BaseClass
 
 from .user import User
 from .. import db
 
 
 @dataclass
-class Portfolio(db.Model):
+class Portfolio(BaseClass):  # Revert this to db.Model
     """Portfolio Model for storing portfolio's"""
 
     __tablename__ = "portfolio"
-    id: int = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    name: str = db.Column(db.String(100), nullable=False)
-    created_date: datetime = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_date: datetime = db.Column(
-        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    # id: int = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(String, nullable=False)
+    # created_date: Mapped[datetime] = mapped_column(db.DateTime, default=datetime.utcnow)
+    # updated_date: Mapped[datetime] = mapped_column(
+    #     db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    # )
+    owner_id: Mapped[int] = mapped_column(
+        Integer, db.ForeignKey(User.id, ondelete="CASCADE")
     )
-    owner_id: int = db.Column(db.Integer, db.ForeignKey(User.id, ondelete="CASCADE"))
     owner = db.relationship("User")
     properties = db.relationship("Property", cascade="all, delete")

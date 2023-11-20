@@ -182,7 +182,7 @@ def seed_data(db):
     ## Seed using a loop?
 
     # Get all user.id's for users with an owner role
-    user_ids = [
+    user_ids: list[int] = [
         value
         for value, in db.session.query(user.User.id)
         .filter(user.User.roles.any(user.Role.name == "Owner"))

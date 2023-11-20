@@ -60,7 +60,6 @@ def save_new_portfolio(data, user_id) -> Portfolio:
         new_portfolio = Portfolio(
             name=sanitised_name,
             owner_id=user_id,
-            created_date=datetime.datetime.utcnow(),
         )
         save_changes(new_portfolio)
         current_app.logger.info(f"Portfolio {sanitised_name} successfully added.")

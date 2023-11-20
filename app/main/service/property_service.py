@@ -47,7 +47,7 @@ def save_new_property(portfolio_id, data):
             purchase_price=data["purchase_price"],
             purchase_date=datetime.datetime.strptime(data["purchase_date"], "%Y-%m-%d"),
             monthly_rental_price=data["monthly_rental_price"],
-            created_date=datetime.datetime.utcnow(),
+            sold_date=None,
         )
         current_app.logger.info("Created property")
 
@@ -81,6 +81,9 @@ def get_property_by_id(portfolio_id, property_id):
             property_id,
         )
         print(err)
+        raise BadRequest(
+            f"Multiple properties found... portfolio_id {portfolio_id} property_id {property_id}"
+        ) from err
     except NoResultFound as err:
         current_app.logger.error(
             "No properties found with portfolio_id %s property_id %s",
@@ -88,6 +91,9 @@ def get_property_by_id(portfolio_id, property_id):
             property_id,
         )
         print(err)
+        raise NotFound(
+            f"No properties found with portfolio_id {portfolio_id} property_id {property_id}"
+        ) from err
 
 
 def add_images_to_property(portfolio_id, property_id, images):
