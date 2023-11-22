@@ -29,7 +29,7 @@ class Property(BaseClass):
     monthly_rental_price: Mapped[float] = mapped_column(
         db.Float(precision="10, 2"), nullable=True
     )
-    address: Mapped[List["Address"]] = db.relationship(
+    address: Mapped["Address"] = db.relationship(
         "Address", back_populates="property", uselist=False, cascade="all, delete"
     )
     tenants: Mapped[List["Tenant"]] = db.relationship(

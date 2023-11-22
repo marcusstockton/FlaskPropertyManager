@@ -99,15 +99,12 @@ class TestPortfolioBlueprint(BaseTestCase):
         # get portfolio to append a property or two to it
         portfolio = db.session.query(Portfolio).filter(Portfolio.id == 1).one()
         property1 = Property(
-            id=1,
             portfolio_id=1,
             owner_id=1,
             purchase_price=32000,
             purchase_date=datetime.datetime(2020, 5, 17),
             monthly_rental_price=670,
-            created_date=datetime.datetime.now(),
             address=Address(
-                id=1,
                 line_1="Test Line 1",
                 line_2="Test Line 2",
                 post_code="EX11EX",
@@ -166,6 +163,7 @@ class TestPortfolioBlueprint(BaseTestCase):
         date = datetime.datetime.now()
         date -= datetime.timedelta(6 * 30)  # date 6 months ago.
         admin_role = db.session.query(Role).filter(Role.name == "Admin").one()
+        owner_role = db.session.query(Role).filter(Role.name == "Owner").one()
 
         user_1 = User(
             email="test@test.com",
@@ -173,10 +171,10 @@ class TestPortfolioBlueprint(BaseTestCase):
             registered_on=date,
             last_name="Bar",
             username="test@test.com",
-            admin=0,
+            admin=False,
         )
         db.session.add(user_1)
-        user_1_role = UserRoles(user_id=user_1.id, role_id=admin_role.id)
+        user_1_role = UserRoles(user_id=user_1.id, role_id=owner_role.id)
         db.session.add(user_1_role)
 
         user_2 = User(
@@ -185,28 +183,27 @@ class TestPortfolioBlueprint(BaseTestCase):
             registered_on=date,
             last_name="Buzz",
             username="test2@test.com",
-            admin=0,
+            admin=False,
         )
         db.session.add(user_2)
-        user_2_role = UserRoles(user_id=user_2.id, role_id=admin_role.id)
+        user_2_role = UserRoles(user_id=user_2.id, role_id=owner_role.id)
         db.session.add(user_2_role)
 
         portfolio1 = Portfolio(
-            id=1,
             name="Test 1",
-            created_date=datetime.datetime.now(),
             owner=user_1,
             properties=[],
         )
         db.session.add(portfolio1)
 
         portfolio2 = Portfolio(
-            id=2,
             name="Test 2",
-            created_date=datetime.datetime.now(),
             owner=user_2,
             properties=[],
         )
         db.session.add(portfolio2)
 
         db.session.commit()
+
+        portfolios = db.session.query(Portfolio).all()
+        print()

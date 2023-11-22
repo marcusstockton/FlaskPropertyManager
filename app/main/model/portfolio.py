@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
+from typing import List
 from sqlalchemy import Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -23,5 +24,7 @@ class Portfolio(BaseClass):  # Revert this to db.Model
     owner_id: Mapped[int] = mapped_column(
         Integer, db.ForeignKey(User.id, ondelete="CASCADE")
     )
-    owner = db.relationship("User")
-    properties = db.relationship("Property", cascade="all, delete")
+    owner: Mapped["User"] = db.relationship("User")
+    properties: Mapped[List["Property"]] = db.relationship(
+        "Property", cascade="all, delete"
+    )
