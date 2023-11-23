@@ -1,5 +1,0 @@
-__pycache__/
- *.pyc
-venv/
-app/main/flask_PropertyManager_main.db
-app/main/flask_PropertyManager_test.db
