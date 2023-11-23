@@ -11,15 +11,24 @@ from app.main.service.auth_helper import Auth
 from app.test.base import BaseTestCase
 from app.test.helpers import mock_get_logged_in_user_success, mock_logged_in_user
 from manage import app
+from sqlalchemy import delete
 
 
 class TestPortfolioBlueprint(BaseTestCase):
+    """Test class for Portfolio endpoints"""
+
+    def setUp(self):
+        self.create_data()
+
+    def tearDown(self):
+        self.remove_data()
+
     @patch.object(
         Auth, "get_logged_in_user", return_value=mock_get_logged_in_user_success()
     )
     @patch.object(Auth, "get_logged_in_user_object", return_value=mock_logged_in_user())
     def test_users_can_only_see_their_own_portfolios(self, mock_user, mock_auth):
-        self.create_data()
+        # self.create_data()
 
         with app.test_client() as client:
             response = client.get("/portfolio/")
@@ -32,7 +41,7 @@ class TestPortfolioBlueprint(BaseTestCase):
     )
     @patch.object(Auth, "get_logged_in_user_object", return_value=mock_logged_in_user())
     def test_correct_portfolio_is_returned_for_id(self, mock_user, mock_auth):
-        self.create_data()
+        # self.create_data()
 
         with app.test_client() as client:
             response = client.get("/portfolio/1")
@@ -47,7 +56,7 @@ class TestPortfolioBlueprint(BaseTestCase):
     def test_portfolio_is_not_returned_for_non_owner_user_id(
         self, mock_user, mock_auth
     ):
-        self.create_data()
+        # self.create_data()
 
         with app.test_client() as client:
             response = client.get("/portfolio/2")
@@ -60,7 +69,7 @@ class TestPortfolioBlueprint(BaseTestCase):
     def test_update_portfolio_works_with_correct_data_and_user(
         self, mock_user, mock_auth
     ):
-        self.create_data()
+        # self.create_data()
         dict_data = {"id": "1", "name": "Updated Test 1"}
         with app.test_client() as client:
             response = client.put(
@@ -78,7 +87,7 @@ class TestPortfolioBlueprint(BaseTestCase):
     )
     @patch.object(Auth, "get_logged_in_user_object", return_value=mock_logged_in_user())
     def test_update_portfolio_fails_if_incorrect_data_used(self, mock_user, mock_auth):
-        self.create_data()
+        # self.create_data()
         dict_data = {"id": "2", "name": "Updated Test 1"}
         with app.test_client() as client:
             response = client.put(
@@ -95,11 +104,11 @@ class TestPortfolioBlueprint(BaseTestCase):
     def test_get_portfolio_returns_correct_property_count_with_correct_data_and_user(
         self, mock_user, mock_auth
     ):
-        self.create_data()
+        # self.create_data()
         # get portfolio to append a property or two to it
         portfolio = db.session.query(Portfolio).filter(Portfolio.id == 1).one()
         property1 = Property(
-            portfolio_id=1,
+            portfolio_id=portfolio.id,
             owner_id=1,
             purchase_price=32000,
             purchase_date=datetime.datetime(2020, 5, 17),
@@ -207,3 +216,19 @@ class TestPortfolioBlueprint(BaseTestCase):
 
         portfolios = db.session.query(Portfolio).all()
         print()
+
+    @staticmethod
+    def remove_data():
+        user1 = delete(User).where(User.username == "test@test.com")
+        db.session.execute(user1)
+
+        user2 = delete(User).where(User.username == "test2@test.com")
+        db.session.execute(user2)
+
+        p1 = delete(Portfolio).where(Portfolio.name == "Test 1")
+        db.session.execute(p1)
+
+        p1 = delete(Portfolio).where(Portfolio.name == "Test 2")
+        db.session.execute(p1)
+
+        db.session.commit()

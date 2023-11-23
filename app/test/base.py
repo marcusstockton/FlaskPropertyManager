@@ -7,13 +7,16 @@ from manage import app
 
 
 class BaseTestCase(TestCase):
-    """ Base Tests """
+    """Base Tests"""
+
     def create_app(self):
-        app.config.from_object('app.main.config.TestingConfig')
+        app.config.from_object("app.main.config.TestingConfig")
         return app
 
     def setUp(self):
-        db.create_all()
+        db.session.remove()  # blat the db
+        db.drop_all()  # blat the db
+        db.create_all()  # create all the tables
         if Role.query.first() is None:
             owner_role = Role(name="Owner")
             admin_role = Role(name="Admin")
@@ -21,7 +24,7 @@ class BaseTestCase(TestCase):
             db.session.add(admin_role)
 
             admin_user = User(
-                email='admin@user.com',
+                email="admin@user.com",
                 username="AdminUser",
                 first_name="Admin",
                 last_name="User",
@@ -29,8 +32,8 @@ class BaseTestCase(TestCase):
                 registered_on=datetime.now(),
                 public_id=str(uuid4()),
                 date_of_birth=datetime(2001, 1, 1),
-                password="test"
             )
+            admin_user.password = "test"
             admin_user.roles.append(admin_role)
             db.session.add(admin_user)
 

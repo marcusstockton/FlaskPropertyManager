@@ -10,9 +10,9 @@ class TestUserModel(BaseTestCase):
     def test_encode_auth_token(self):
         user = User(
             email="test@test.com",
-            password="test",
             registered_on=datetime.datetime.utcnow(),
         )
+        user.password = "test"
         db.session.add(user)
         db.session.commit()
         auth_token = user.encode_auth_token(user.id)

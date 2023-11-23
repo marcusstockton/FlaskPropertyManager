@@ -20,7 +20,7 @@ db = SQLAlchemy(metadata=MetaData(naming_convention=naming_convention))
 flask_bcrypt = Bcrypt()
 
 
-def create_app(config_name):
+def create_app(config_name: str) -> Flask:
     """Creates the application"""
     app = Flask(__name__)
     CORS(app)
