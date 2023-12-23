@@ -17,18 +17,18 @@ from sqlalchemy import delete
 class TestPortfolioBlueprint(BaseTestCase):
     """Test class for Portfolio endpoints"""
 
-    def setUp(self):
-        self.create_data()
+    # def setUp(self):
+    #     self.create_data()
 
-    def tearDown(self):
-        self.remove_data()
+    # def tearDown(self):
+    #     self.remove_data()
 
     @patch.object(
         Auth, "get_logged_in_user", return_value=mock_get_logged_in_user_success()
     )
     @patch.object(Auth, "get_logged_in_user_object", return_value=mock_logged_in_user())
     def test_users_can_only_see_their_own_portfolios(self, mock_user, mock_auth):
-        # self.create_data()
+        self.create_data()
 
         with app.test_client() as client:
             response = client.get("/portfolio/")
@@ -41,7 +41,7 @@ class TestPortfolioBlueprint(BaseTestCase):
     )
     @patch.object(Auth, "get_logged_in_user_object", return_value=mock_logged_in_user())
     def test_correct_portfolio_is_returned_for_id(self, mock_user, mock_auth):
-        # self.create_data()
+        self.create_data()
 
         with app.test_client() as client:
             response = client.get("/portfolio/1")
@@ -56,7 +56,7 @@ class TestPortfolioBlueprint(BaseTestCase):
     def test_portfolio_is_not_returned_for_non_owner_user_id(
         self, mock_user, mock_auth
     ):
-        # self.create_data()
+        self.create_data()
 
         with app.test_client() as client:
             response = client.get("/portfolio/2")
@@ -69,7 +69,7 @@ class TestPortfolioBlueprint(BaseTestCase):
     def test_update_portfolio_works_with_correct_data_and_user(
         self, mock_user, mock_auth
     ):
-        # self.create_data()
+        self.create_data()
         dict_data = {"id": "1", "name": "Updated Test 1"}
         with app.test_client() as client:
             response = client.put(
@@ -87,7 +87,7 @@ class TestPortfolioBlueprint(BaseTestCase):
     )
     @patch.object(Auth, "get_logged_in_user_object", return_value=mock_logged_in_user())
     def test_update_portfolio_fails_if_incorrect_data_used(self, mock_user, mock_auth):
-        # self.create_data()
+        self.create_data()
         dict_data = {"id": "2", "name": "Updated Test 1"}
         with app.test_client() as client:
             response = client.put(
@@ -104,7 +104,7 @@ class TestPortfolioBlueprint(BaseTestCase):
     def test_get_portfolio_returns_correct_property_count_with_correct_data_and_user(
         self, mock_user, mock_auth
     ):
-        # self.create_data()
+        self.create_data()
         # get portfolio to append a property or two to it
         portfolio = db.session.query(Portfolio).filter(Portfolio.id == 1).one()
         property1 = Property(
@@ -169,53 +169,54 @@ class TestPortfolioBlueprint(BaseTestCase):
 
     @staticmethod
     def create_data():
-        date = datetime.datetime.now()
-        date -= datetime.timedelta(6 * 30)  # date 6 months ago.
-        admin_role = db.session.query(Role).filter(Role.name == "Admin").one()
-        owner_role = db.session.query(Role).filter(Role.name == "Owner").one()
+        with app.test_client():
+            date = datetime.datetime.now()
+            date -= datetime.timedelta(6 * 30)  # date 6 months ago.
+            admin_role = db.session.query(Role).filter(Role.name == "Admin").one()
+            owner_role = db.session.query(Role).filter(Role.name == "Owner").one()
 
-        user_1 = User(
-            email="test@test.com",
-            first_name="Foo",
-            registered_on=date,
-            last_name="Bar",
-            username="test@test.com",
-            admin=False,
-        )
-        db.session.add(user_1)
-        user_1_role = UserRoles(user_id=user_1.id, role_id=owner_role.id)
-        db.session.add(user_1_role)
+            user_1 = User(
+                email="test@test.com",
+                first_name="Foo",
+                registered_on=date,
+                last_name="Bar",
+                username="test@test.com",
+                admin=False,
+            )
+            db.session.add(user_1)
+            user_1_role = UserRoles(user_id=user_1.id, role_id=owner_role.id)
+            db.session.add(user_1_role)
 
-        user_2 = User(
-            email="test2@test.com",
-            first_name="Fizz",
-            registered_on=date,
-            last_name="Buzz",
-            username="test2@test.com",
-            admin=False,
-        )
-        db.session.add(user_2)
-        user_2_role = UserRoles(user_id=user_2.id, role_id=owner_role.id)
-        db.session.add(user_2_role)
+            user_2 = User(
+                email="test2@test.com",
+                first_name="Fizz",
+                registered_on=date,
+                last_name="Buzz",
+                username="test2@test.com",
+                admin=False,
+            )
+            db.session.add(user_2)
+            user_2_role = UserRoles(user_id=user_2.id, role_id=owner_role.id)
+            db.session.add(user_2_role)
 
-        portfolio1 = Portfolio(
-            name="Test 1",
-            owner=user_1,
-            properties=[],
-        )
-        db.session.add(portfolio1)
+            portfolio1 = Portfolio(
+                name="Test 1",
+                owner=user_1,
+                properties=[],
+            )
+            db.session.add(portfolio1)
 
-        portfolio2 = Portfolio(
-            name="Test 2",
-            owner=user_2,
-            properties=[],
-        )
-        db.session.add(portfolio2)
+            portfolio2 = Portfolio(
+                name="Test 2",
+                owner=user_2,
+                properties=[],
+            )
+            db.session.add(portfolio2)
 
-        db.session.commit()
+            db.session.commit()
 
-        portfolios = db.session.query(Portfolio).all()
-        print()
+            portfolios = db.session.query(Portfolio).all()
+            print()
 
     @staticmethod
     def remove_data():

@@ -10,18 +10,22 @@ from bleach import clean
 
 from app.main import db
 from app.main.model.portfolio import Portfolio
+from app.main.model.user import User
 
 
-def get_all_portfolios_for_user(user_id: int) -> List[Portfolio]:
+def get_all_portfolios_for_user(user: User) -> List[Portfolio]:
     """Gets all Portfolios for the logged in user"""
-    portfolios = (
-        Portfolio.query.filter_by(owner_id=user_id)
-        .options(
-            lazyload(Portfolio.owner), lazyload(Portfolio.properties)  # type: ignore
-        )
-        .all()
-    )  # type: ignore
-    return portfolios
+    if user.admin:
+        return Portfolio.query.all()
+    else:
+        portfolios = (
+            Portfolio.query.filter_by(owner_id=user.id)
+            .options(
+                lazyload(Portfolio.owner), lazyload(Portfolio.properties)  # type: ignore
+            )
+            .all()
+        )  # type: ignore
+        return portfolios
 
 
 def get_portfolio_by_id(user_id: int, portfolio_id: int) -> Portfolio:

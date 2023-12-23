@@ -18,18 +18,6 @@ def seed_data(db):
     db.create_all()
     db.session.commit()
 
-    # fake_tenancy_start_date_1 = fake.date_this_decade()
-    # fake_tenancy_start_date_2 = fake.date_this_decade()
-    # fake_tenancy_start_date_3 = fake.date_this_decade()
-    # fake_tenancy_start_date_4 = fake.date_this_decade()
-    # fake_tenancy_start_date_5 = fake.date_this_decade()
-    # fake_tenancy_start_date_6 = fake.date_this_decade()
-    # fake_tenancy_start_date_7 = fake.date_this_decade()
-    # fake_tenancy_start_date_8 = fake.date_this_decade()
-    # fake_tenancy_start_date_9 = fake.date_this_decade()
-    # fake_tenancy_start_date_10 = fake.date_this_decade()
-    # fake_tenancy_start_date_11 = fake.date_this_decade()
-
     base_64_images = []
     base_64_images.append(
         base64.b64decode(

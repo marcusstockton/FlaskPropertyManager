@@ -11,6 +11,7 @@ class BaseTestCase(TestCase):
 
     def create_app(self):
         app.config.from_object("app.main.config.TestingConfig")
+        self.app = app.test_client()
         return app
 
     def setUp(self):

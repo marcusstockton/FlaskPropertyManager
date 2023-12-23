@@ -1,6 +1,7 @@
 from flask import current_app as app
 from flask import request
 from flask_restx import Resource
+from werkzeug.exceptions import NotFound
 
 from ..service.auth_helper import Auth
 from ..service.portfolio_service import (
@@ -31,7 +32,7 @@ class PortfolioList(Resource):
         """Get all portfolio's for the logged-in user"""
         user = Auth.get_logged_in_user_object(request)
         app.logger.info(f"Getting all portfolios' for {user.username}")
-        return get_all_portfolios_for_user(user.id)
+        return get_all_portfolios_for_user(user)
 
     @token_required
     @api.response(201, "Portfolio successfully created.")
@@ -42,6 +43,8 @@ class PortfolioList(Resource):
         """Creates a new Portfolio"""
         data = _portfolio_create_parser.parse_args()
         user = Auth.get_logged_in_user_object(request)
+        if user is None:
+            raise NotFound(user)
         app.logger.info(f"Creating a new portfolio for {user.username}")
         return save_new_portfolio(data=data, user_id=user.id)
 

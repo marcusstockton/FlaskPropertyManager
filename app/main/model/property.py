@@ -18,9 +18,6 @@ class Property(BaseClass):
     portfolio_id: Mapped[int] = mapped_column(
         db.Integer, db.ForeignKey("portfolio.id", ondelete="cascade")
     )
-    owner_id: Mapped[int] = mapped_column(
-        Integer, db.ForeignKey("user.id", ondelete="cascade")
-    )
     purchase_price: Mapped[float] = mapped_column(
         db.Float(precision="10, 2"), nullable=True
     )
@@ -35,7 +32,6 @@ class Property(BaseClass):
     tenants: Mapped[List["Tenant"]] = db.relationship(
         "Tenant", back_populates="property", cascade="all, delete"
     )
-    owner = db.relationship("User")
     property_pics: Mapped[List["PropertyImages"]] = db.relationship(
         "PropertyImages", back_populates="property", lazy=True
     )
