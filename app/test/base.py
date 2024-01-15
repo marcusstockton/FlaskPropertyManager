@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from uuid import uuid4
 from flask_testing import TestCase
 from app.main import db
@@ -11,7 +11,6 @@ class BaseTestCase(TestCase):
 
     def create_app(self):
         app.config.from_object("app.main.config.TestingConfig")
-        self.app = app.test_client()
         return app
 
     def setUp(self):
@@ -37,6 +36,34 @@ class BaseTestCase(TestCase):
             admin_user.password = "test"
             admin_user.roles.append(admin_role)
             db.session.add(admin_user)
+
+            date = datetime.now(timezone.utc)
+            date -= timedelta(6 * 30)  # date 6 months ago.
+
+            user_1 = User(
+                email="test@test.com",
+                first_name="Foo",
+                registered_on=date,
+                last_name="Bar",
+                username="test@test.com",
+                admin=False,
+            )
+            db.session.add(user_1)
+            user_1.roles.append(owner_role)
+            db.session.add(user_1)
+
+            user_2 = User(
+                email="test2@test.com",
+                first_name="Fizz",
+                registered_on=date,
+                last_name="Buzz",
+                username="test2@test.com",
+                admin=False,
+            )
+            db.session.add(user_2)
+            user_2.roles.append(owner_role)
+            db.session.add(user_2)
+
 
         db.session.commit()
 

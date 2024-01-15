@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-
+from sqlalchemy.orm import Mapped
 from app.main.model.base import BaseClass
 from .. import db
 
@@ -20,7 +20,5 @@ class Address(BaseClass):
     # updated_date: datetime = db.Column(
     #     db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
     # )
-    property_id: int = db.Column(db.Integer, db.ForeignKey("property.id"))
-    property = db.relationship(
-        "Property", back_populates="address", foreign_keys=[property_id]
-    )
+    property_id: Mapped[int] = db.Column(db.Integer, db.ForeignKey("property.id"))
+    property: Mapped["Property"] = db.relationship(back_populates="address")

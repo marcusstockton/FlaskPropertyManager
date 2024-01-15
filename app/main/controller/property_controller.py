@@ -3,7 +3,7 @@ from collections import namedtuple
 
 from flask import request
 from flask import current_app as app
-from flask_restx import Resource, abort
+from flask_restx import Resource, abort, reqparse
 from werkzeug.datastructures import FileStorage
 from werkzeug.exceptions import BadRequest
 from http import HTTPStatus
@@ -22,7 +22,7 @@ _property = PropertyDto.property
 _property_list = PropertyDto.property_list
 _property_create = PropertyDto.property_create
 
-upload_parser = api.parser()
+upload_parser = reqparse.RequestParser()
 upload_parser.add_argument(
     "images", location="files", type=FileStorage, required=True, action="append"
 )
@@ -64,6 +64,13 @@ class PropertyItem(Resource):
         data = request.json
         pass
 
+    @token_required
+    @api.doc("delete a property")
+    def delete(self, property_id):
+        """Deletes a property"""
+        data = request.json
+        pass
+
 
 @api.route("/<int:property_id>/images")
 class PropertyImage(Resource):
@@ -73,6 +80,9 @@ class PropertyImage(Resource):
     @api.marshal_list_with(_property)
     def post(self, portfolio_id, property_id):
         """Add images of property."""
+
+        imgs = request.files
+
         args = upload_parser.parse_args()
         images = args["images"]
         ImageTuple = namedtuple("ImageTuple", ["file_name", "image"])

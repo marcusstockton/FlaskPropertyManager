@@ -17,7 +17,7 @@ def seed_data(db):
     db.drop_all()
     db.create_all()
     db.session.commit()
-
+    print(db)
     base_64_images = []
     base_64_images.append(
         base64.b64decode(
@@ -198,7 +198,6 @@ def seed_data(db):
             )
             x.properties.append(
                 property.Property(
-                    owner_id=owner_user2.id,
                     purchase_price=random.randrange(95000, 200000, 1075),
                     purchase_date=purchase_date,
                     sold_date=sold_date_or_null,

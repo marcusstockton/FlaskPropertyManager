@@ -3,7 +3,9 @@
 ########################
 
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+
+from app.main import db
 from app.main.model.user import User
 
 
@@ -19,17 +21,20 @@ def mock_get_logged_in_user_success():
 
 def mock_logged_in_user():
     """Mocks a logged in user"""
-    date = datetime.now()
+    date = datetime.now(timezone.utc)
     date -= timedelta(6 * 30)  # date 6 months ago
 
-    # usr = db.session.query(User).filter_by(User.username == "test@test.com").one()
-
-    return User(
+    usr = db.session.query(User).filter_by(username="test@test.com").one_or_none()
+    if usr is not None:
+        return usr[0]
+    else:
+     return User(
         email="test@test.com",
         first_name="Foo",
         last_name="Bar",
         username="test@test.com",
         admin=False,
+        id=2
     )
 
 

@@ -27,7 +27,7 @@ class Property(BaseClass):
         db.Float(precision="10, 2"), nullable=True
     )
     address: Mapped["Address"] = db.relationship(
-        "Address", back_populates="property", uselist=False, cascade="all, delete"
+        back_populates="property", uselist=False, cascade="all, delete"
     )
     tenants: Mapped[List["Tenant"]] = db.relationship(
         "Tenant", back_populates="property", cascade="all, delete"
