@@ -26,7 +26,7 @@ def mock_logged_in_user():
 
     usr = db.session.query(User).filter_by(username="test@test.com").one_or_none()
     if usr is not None:
-        return usr[0]
+        return usr
     else:
      return User(
         email="test@test.com",

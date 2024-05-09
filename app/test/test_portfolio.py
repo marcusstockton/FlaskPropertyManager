@@ -1,5 +1,6 @@
 import datetime
 import json
+import unittest
 from functools import wraps
 from unittest.mock import patch
 
@@ -18,8 +19,8 @@ from sqlalchemy import delete
 class TestPortfolioBlueprint(BaseTestCase):
     """Test class for Portfolio endpoints"""
 
-    #def setUp(self):
-    #    self.create_data()
+    # def setUp(self):
+    #     self.create_data()
 
     @patch.object(
         Auth, "get_logged_in_user", return_value=mock_get_logged_in_user_success()
@@ -205,3 +206,6 @@ class TestPortfolioBlueprint(BaseTestCase):
     #     db.session.execute(p1)
     #
     #     db.session.commit()
+
+if __name__ == "__main__":
+    unittest.main()

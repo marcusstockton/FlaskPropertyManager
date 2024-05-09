@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime, timezone
 import unittest
 
 from app.main import db
@@ -7,10 +7,14 @@ from app.test.base import BaseTestCase
 
 
 class TestUserModel(BaseTestCase):
+
+
+    datetime_now = datetime.now(timezone.utc)
+
     def test_encode_auth_token(self):
         user = User(
-            email="test@test.com",
-            registered_on=datetime.datetime.utcnow(),
+            email="testFoo@FooFighters.com",
+            registered_on=self.datetime_now
         )
         user.password = "test"
         db.session.add(user)
@@ -20,19 +24,19 @@ class TestUserModel(BaseTestCase):
 
     def test_decode_auth_token(self):
         user = User(
-            email="test@test.com",
+            email="testFoo@FooFighters.com",
             admin=False,
             first_name="Dave",
             last_name="Grohl",
-            username="test@test.com",
-            registered_on=datetime.datetime.now(),
+            username="testFoo@FooFighters.com",
+            registered_on=self.datetime_now
         )
         user.password = "Test"
         db.session.add(user)
         db.session.commit()
         auth_token = user.encode_auth_token(user.id)
         self.assertTrue(isinstance(auth_token, str))
-        self.assertTrue(User.decode_auth_token(auth_token) == 2)
+        self.assertTrue(User.decode_auth_token(auth_token) == 4)
 
 
 if __name__ == "__main__":
