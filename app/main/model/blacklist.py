@@ -1,3 +1,5 @@
+"""Blacklist Entity"""
+
 from dataclasses import dataclass
 from .. import db
 from datetime import datetime
@@ -5,9 +7,7 @@ from datetime import datetime
 
 @dataclass
 class BlacklistToken(db.Model):
-    """
-    Token Model for storing JWT tokens
-    """
+    """Token Model for storing JWT tokens"""
 
     __tablename__ = "blacklist_tokens"
 

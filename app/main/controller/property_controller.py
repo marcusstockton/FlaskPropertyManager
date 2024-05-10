@@ -1,12 +1,14 @@
-import imghdr
+"""Property Controller API Routes"""
+
 from collections import namedtuple
 
+from http import HTTPStatus
 from flask import request
 from flask import current_app as app
 from flask_restx import Resource, abort, reqparse
 from werkzeug.datastructures import FileStorage
 from werkzeug.exceptions import BadRequest
-from http import HTTPStatus
+
 
 from ..service.property_service import (
     get_all_properties_for_portfolio,
@@ -30,6 +32,8 @@ upload_parser.add_argument(
 
 @api.route("/")
 class PropertyList(Resource):
+    """Property Items endpoint"""
+
     @token_required
     @api.doc("list_of_properties")
     @api.marshal_list_with(_property_list)
@@ -49,6 +53,8 @@ class PropertyList(Resource):
 
 @api.route("/<int:property_id>")
 class PropertyItem(Resource):
+    """Single Property Endpoints"""
+
     @token_required
     @api.doc("property details")
     @api.marshal_list_with(_property)
@@ -58,22 +64,26 @@ class PropertyItem(Resource):
 
     @token_required
     @api.doc("update property")
-    @api.marshal_list_with(_property)
+    @api.marshal_with(_property)
     def put(self, portfolio_id, property_id):
         """Updates the property"""
-        data = request.json
+        app.logger.info(f"Updating property {property_id} for portfolio {portfolio_id}")
+        data = request.get_json(force=True)
         pass
 
     @token_required
     @api.doc("delete a property")
     def delete(self, property_id):
         """Deletes a property"""
-        data = request.json
+        app.logger.info(f"Deleting property {property_id}")
+        data = request.get_json(force=True)
         pass
 
 
 @api.route("/<int:property_id>/images")
 class PropertyImage(Resource):
+    """Property Image endpoint"""
+
     @token_required
     @api.doc("add images of property")
     @api.expect(upload_parser)
@@ -81,16 +91,14 @@ class PropertyImage(Resource):
     def post(self, portfolio_id, property_id):
         """Add images of property."""
 
-        imgs = request.files
-
         args = upload_parser.parse_args()
         images = args["images"]
         ImageTuple = namedtuple("ImageTuple", ["file_name", "image"])
         if images:
             image_strings = []
             for image in images:
-                # The imghdr module determines the type of image contained in a file or byte stream.
-                if imghdr.what(image) not in app.config["UPLOAD_EXTENSIONS"]:
+                img_ext = image.content_type.rsplit("/")[1]
+                if img_ext.lower() not in app.config["UPLOAD_EXTENSIONS"]:
                     abort(
                         HTTPStatus=HTTPStatus.BAD_REQUEST, message="Invalid image type"
                     )

@@ -1,9 +1,8 @@
+"""Tenant Entity"""
+
 from dataclasses import dataclass
 import enum
 from datetime import datetime
-from typing import List
-from sqlalchemy.orm import Mapped
-
 from sqlalchemy import LargeBinary
 from sqlalchemy_utils import EmailType
 
@@ -16,13 +15,17 @@ from .. import db
 class TitleEnum(enum.Enum):
     """Title Enum"""
 
-    Mr = 1
-    Mrs = 2
-    Miss = 3
-    Ms = 4
-    Lord = 5
-    Sir = 6
-    Dr = 7
+    MR = 1, "Mr"
+    MRS = 2, "Mrs"
+    MISS = 3, "Miss"
+    MS = 4, "Ms"
+    LORD = 5, "Lord"
+    SIR = 6, "Sir"
+    DR = 7, "Dr"
+    LADY = 8, "Lady"
+    DAME = 9, "Dame"
+    PROFESSOR = 10, "Professor"
+    MX = 11, "Mx"
 
     @classmethod
     def has_key(cls, name):
@@ -53,10 +56,10 @@ class Tenant(BaseClass):
     tenancy_start_date: datetime = db.Column(db.Date, nullable=False)
     tenancy_end_date: datetime | None = db.Column(db.Date, nullable=True)
     smoker: bool = db.Column(db.Boolean, nullable=False, default=False)
-    profile_pic: Mapped["TenantProfile"] = db.relationship(
+    profile_pic = db.relationship(
         "TenantProfile", back_populates="tenant", uselist=False
     )  # uselist demotes a 1:1 relationship
-    notes: Mapped[List["TenantNote"]] = db.relationship("TenantNote")
+    notes = db.relationship("TenantNote")
     # created_date: datetime = db.Column(db.DateTime, default=datetime.utcnow)
     # updated_date: datetime = db.Column(
     #     db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow

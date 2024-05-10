@@ -1,6 +1,8 @@
+"""User Controller API Endpoints"""
+
 from flask import current_app as app
 from flask import request
-from flask_restx import Resource, marshal
+from flask_restx import Resource
 
 from app.main.util.decorator import token_required, admin_token_required
 from ..service.user_service import (
@@ -20,12 +22,14 @@ _user_details = UserDto.user_details
 
 @api.route("/")
 class UserList(Resource):
+    """User List API Endpoints"""
+
     @admin_token_required
     @api.doc("list_of_registered_users")
     @api.marshal_list_with(_user)
     def get(self):
         """List all registered users"""
-        app.logger.info(f"Getting all registered users")
+        app.logger.info("Getting all registered users")
         return get_all_users()
 
     @api.response(201, "User successfully created.")
@@ -34,7 +38,7 @@ class UserList(Resource):
     @api.expect(_user_create, validate=True)
     def post(self):
         """Creates a new User"""
-        data = request.json
+        data = request.get_json(force=True)
         app.logger.info(f"Creating a new user for {data['username']}")
         return save_new_user(data=data)
 
@@ -44,6 +48,8 @@ class UserList(Resource):
 @api.response(404, "User not found.")
 @api.response(200, "User record returned.")
 class User(Resource):
+    """Singular User API endpoints"""
+
     @token_required
     @api.doc("get a user")
     @api.marshal_with(_user_details)
@@ -60,7 +66,7 @@ class User(Resource):
     @api.expect(_user_details, validate=True)
     def put(self, public_id):
         """update a user"""
-        data = request.json
+        data = request.get_json(force=True)
         app.logger.info(
             f"Updating user with public_id {public_id}, payload received {data}"
         )

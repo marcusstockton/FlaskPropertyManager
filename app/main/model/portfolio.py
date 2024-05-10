@@ -1,3 +1,5 @@
+"""Portfolio Entity"""
+
 from dataclasses import dataclass
 from datetime import datetime
 from typing import List
@@ -15,12 +17,7 @@ class Portfolio(BaseClass):  # Revert this to db.Model
     """Portfolio Model for storing portfolio's"""
 
     __tablename__ = "portfolio"
-    # id: int = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
-    # created_date: Mapped[datetime] = mapped_column(db.DateTime, default=datetime.utcnow)
-    # updated_date: Mapped[datetime] = mapped_column(
-    #     db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
-    # )
     owner_id: Mapped[int] = mapped_column(
         Integer, db.ForeignKey(User.id, ondelete="CASCADE")
     )

@@ -1,3 +1,5 @@
+"""User Entity"""
+
 from dataclasses import dataclass
 import re
 from datetime import timedelta, datetime, timezone

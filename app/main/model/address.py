@@ -1,6 +1,9 @@
+"""Address Entity"""
+
 from dataclasses import dataclass
 from sqlalchemy.orm import Mapped
 from app.main.model.base import BaseClass
+from .property import Property
 from .. import db
 
 

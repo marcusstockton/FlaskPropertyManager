@@ -1,3 +1,5 @@
+"""Portfolio Controller API Endpoints"""
+
 from flask import current_app as app
 from flask import request
 from flask_restx import Resource
@@ -31,8 +33,10 @@ class PortfolioList(Resource):
     def get(self):
         """Get all portfolio's for the logged-in user"""
         user = Auth.get_logged_in_user_object(request)
-        app.logger.info(f"Getting all portfolios' for {user.username}")
-        return get_all_portfolios_for_user(user)
+        if user is not None:
+            app.logger.info(f"Getting all portfolios' for {user.username}")
+            return get_all_portfolios_for_user(user)
+        raise NotFound(user)
 
     @token_required
     @api.response(201, "Portfolio successfully created.")
@@ -57,6 +61,8 @@ class PortfolioItem(Resource):
     def get(self, portfolio_id):
         """Displays a portfolio's details"""
         user = Auth.get_logged_in_user_object(request)
+        if user is None:
+            raise NotFound(user)
         app.logger.info(f"Finding Portfolio by Id {portfolio_id} for {user.username}")
         return get_portfolio_by_id(user.id, portfolio_id)
 

@@ -1,3 +1,5 @@
+""" Entry point for the flask app."""
+
 import os
 import unittest
 
@@ -6,6 +8,7 @@ from flask_migrate import Migrate
 
 from app import blueprint
 from app.main import create_app, db
+from seeder import seed_data
 
 app = create_app(os.getenv("PROPERTYMANAGER_ENV") or "dev")
 app.register_blueprint(blueprint)
@@ -16,6 +19,7 @@ ma = Marshmallow(app)
 
 @app.cli.command()
 def run():
+    """Command to run the app."""
     app.logger.info("run called")
     app.run(debug=True)
 
@@ -35,8 +39,6 @@ def test():
 @app.cli.command()
 def seed():
     """Reseeds the database with new data"""
-    from seeder import seed_data
-
     seed_data(db)
 
 

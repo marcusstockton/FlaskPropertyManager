@@ -1,3 +1,5 @@
+"""Property Entity"""
+
 from dataclasses import dataclass
 from datetime import datetime
 from typing import List
@@ -11,7 +13,6 @@ from .. import db
 
 @dataclass
 class Property(BaseClass):
-
     """Property Model for storing properties"""
 
     __tablename__ = "property"

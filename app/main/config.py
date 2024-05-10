@@ -1,3 +1,5 @@
+"""Config settings for the app."""
+
 import os
 
 # uncomment the line below for postgres database url from environment variable

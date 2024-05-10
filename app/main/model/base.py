@@ -1,3 +1,5 @@
+"""Abstract Base Class (to be inherited only)"""
+
 from datetime import datetime
 from sqlalchemy.orm import Mapped
 from .. import db
@@ -5,6 +7,8 @@ from .. import db
 
 # @dataclass(kw_only=True)
 class BaseClass(db.Model):
+    """Base class"""
+
     __abstract__ = True
 
     # id: int = field(init=False)
