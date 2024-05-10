@@ -55,6 +55,8 @@ class PortfolioList(Resource):
 
 @api.route("/<int:portfolio_id>")
 class PortfolioItem(Resource):
+    """Singular Portfolio endpoints"""
+
     @token_required
     @api.doc("single portfolio")
     @api.marshal_with(_portfolio_details)
@@ -80,5 +82,6 @@ class PortfolioItem(Resource):
 
     @token_required
     def delete(self, portfolio_id):
+        """Deletes a portfolio"""
         user = Auth.get_logged_in_user_object(request)
         return delete_portfolio_by_id(user, portfolio_id)

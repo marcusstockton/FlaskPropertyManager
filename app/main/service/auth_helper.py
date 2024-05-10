@@ -1,10 +1,10 @@
-"""Module DocString"""
+"""Auth Helper Service for managing users"""
 
 from http import HTTPStatus
 from flask import current_app as app
+from werkzeug.exceptions import NotFound
 from app.main.model.user import User
 from ..service.blacklist_service import save_token
-from werkzeug.exceptions import NotFound
 
 
 class Auth:

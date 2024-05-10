@@ -4,10 +4,10 @@ from dataclasses import dataclass
 import re
 from datetime import timedelta, datetime, timezone
 import jwt
+from sqlalchemy.orm import relationship
 from app.main.model.base import BaseClass
 
 from app.main.model.blacklist import BlacklistToken
-from sqlalchemy.orm import relationship
 from .. import db, flask_bcrypt
 from ..config import key
 
@@ -26,7 +26,7 @@ class User(BaseClass):
     password_hash: str = db.Column(db.String(100))
     first_name: str = db.Column(db.String(100), nullable=True)
     last_name: str = db.Column(db.String(100), nullable=True)
-    date_of_birth: datetime = db.Column(db.DateTime, nullable=True)
+    date_of_birth: datetime | None = db.Column(db.DateTime, nullable=True)
     roles = relationship(
         "Role", secondary="user_roles", backref=db.backref("user", lazy="dynamic")
     )

@@ -1,5 +1,7 @@
-import datetime
-from typing import List, Dict
+"""Portfolio Service for interacting with portfolios"""
+
+from typing import List
+
 
 from flask import current_app
 from sqlalchemy import update
@@ -20,35 +22,34 @@ def get_all_portfolios_for_user(user: User) -> List[Portfolio]:
     else:
         portfolios = (
             Portfolio.query.filter_by(owner_id=user.id)
-            .options(
-                lazyload(Portfolio.owner), lazyload(Portfolio.properties)  # type: ignore
-            )
+            .options(lazyload(Portfolio.owner), lazyload(Portfolio.properties))
             .all()
-        )  # type: ignore
+        )
         return portfolios
 
 
 def get_portfolio_by_id(user_id: int, portfolio_id: int) -> Portfolio:
+    """Returns the portfolio from the given portfolio Id"""
     try:
         current_app.logger.info(f"Getting portfolio by {portfolio_id}")
         return (
             Portfolio.query.filter_by(owner_id=user_id)
             .filter_by(id=portfolio_id)
             .options(
-                lazyload(Portfolio.owner),  # type: ignore
+                lazyload(Portfolio.owner),
                 lazyload(Portfolio.properties),
             )
             .one()
-        )  # type: ignore
+        )
     except NoResultFound as err:
         error_message = f"Portfolio not found for userid: {user_id} and portfolio_id {portfolio_id}. Error {err}"
         current_app.logger.error(error_message)
-        raise NotFound(error_message)
+        raise NotFound(error_message) from err
 
     except MultipleResultsFound as err:
-        error = f"Multiple portfolio's not found for userid {user_id} and portfolio_id {portfolio_id}"
+        error = f"Multiple portfolio's not found for userid {user_id} and portfolio_id {portfolio_id}. Error: {err}"
         current_app.logger.error(error)
-        raise BadRequest(error)
+        raise BadRequest(error) from err
 
 
 def save_new_portfolio(data, user_id) -> Portfolio:
@@ -84,6 +85,8 @@ def update_portfolio(portfolio_id: int, data: dict) -> Portfolio:
         return portfolio_query
     except IntegrityError as err:
         raise InternalServerError(err.statement) from err
+    except Exception as e:
+        raise Exception(e) from e
 
 
 def delete_portfolio_by_id(user, portfolio_id):
@@ -92,17 +95,19 @@ def delete_portfolio_by_id(user, portfolio_id):
         Portfolio.query.filter_by(id=portfolio_id)
         .filter_by(id=portfolio_id)
         .options(
-            lazyload(Portfolio.owner),  # type: ignore
-            lazyload(Portfolio.properties),  # type: ignore
+            lazyload(Portfolio.owner),
+            lazyload(Portfolio.properties),
             lazyload(Portfolio.properties.images),
             lazyload(Portfolio.properties),
         )
-    )  # type: ignore
-    if portfolio:
+        .scalar()
+    )
+    if portfolio is not None:
         if portfolio.owner_id == user.id:
             portfolio.delete()
 
 
 def save_changes(data) -> None:
+    """Saves changes"""
     db.session.add(data)
     db.session.commit()

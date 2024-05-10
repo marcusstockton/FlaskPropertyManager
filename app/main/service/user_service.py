@@ -1,3 +1,5 @@
+"""User Service for interacting with users"""
+
 import uuid
 from datetime import datetime, timezone
 from http import HTTPStatus
@@ -12,6 +14,7 @@ from app.main.model.user import User, Role
 
 
 def save_new_user(data):
+    """Creates a new user"""
     user = User.query.filter_by(email=data["email"]).first()
     if user:
         raise BadRequest("User already exists. Please Log in.")
@@ -23,15 +26,13 @@ def save_new_user(data):
         public_id=str(uuid.uuid4()),
         email=data["email"],
         username=data["username"],
-        # password=data["password"],
-        first_name=data["first_name"] if "first_name" in data else None,
-        last_name=data["last_name"] if "last_name" in data else None,
+        first_name=data["first_name"],
+        last_name=data["last_name"],
         date_of_birth=(
             datetime.strptime(data["date_of_birth"], "%Y-%m-%d")
             if "date_of_birth" in data
             else None
         ),
-        # created_date=datetime.now(),
         registered_on=datetime.now(timezone.utc),
     )
     new_user.password = data["password"]
@@ -43,6 +44,7 @@ def save_new_user(data):
 
 
 def update_user(user_id, data):
+    """Updates a user"""
     user_query = User.query.filter_by(public_id=user_id).one()
     if not user_query:
         raise NotFound("User not found.")
@@ -62,10 +64,11 @@ def update_user(user_id, data):
         }
         return response_object, HTTPStatus.NO_CONTENT
     except IntegrityError as e:
-        raise InternalServerError(e)
+        raise InternalServerError(e) from e
 
 
 def delete_user(user_id):
+    """Deletes a user"""
     obj = User.query.filter_by(public_id=user_id).one()
     try:
         db.session.delete(obj)
@@ -76,7 +79,7 @@ def delete_user(user_id):
         }
         return response_object, HTTPStatus.NO_CONTENT
     except IntegrityError as e:
-        raise InternalServerError(e)
+        raise InternalServerError(e) from e
 
 
 def get_all_users():
@@ -99,6 +102,7 @@ def get_a_user_by_username(username):
 
 
 def generate_token(user):
+    """Generates a JWT Token"""
     try:
         # generate the auth token
         auth_token = user.encode_auth_token(user.id)
@@ -112,9 +116,10 @@ def generate_token(user):
         current_app.logger.info("auth_token created successfully")
         return response_object, HTTPStatus.CREATED
     except Exception as e:
-        raise InternalServerError(e)
+        raise InternalServerError(e) from e
 
 
 def save_changes(data):
+    """Saves changes"""
     db.session.add(data)
     db.session.commit()

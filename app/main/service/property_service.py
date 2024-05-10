@@ -1,6 +1,9 @@
+"""User Service for interacting with users"""
+
 import datetime
 from http import HTTPStatus
 
+from bleach import clean
 from flask import current_app
 from sqlalchemy.orm import lazyload
 from sqlalchemy.exc import MultipleResultsFound, NoResultFound
@@ -34,10 +37,10 @@ def save_new_property(portfolio_id, data):
     if data["address"]:
         # create address
         new_address = Address(
-            line_1=data["address"]["line_1"],
+            line_1=clean(data["address"]["line_1"]),
             line_2=data["address"].get("line_2", None),
             line_3=data["address"].get("line_3", None),
-            post_code=data["address"]["post_code"],
+            post_code=clean(data["address"]["post_code"]),
             town=data["address"].get("town", None),
             city=data["address"].get("city", None),
         )
