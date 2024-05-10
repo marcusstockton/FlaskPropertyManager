@@ -60,10 +60,6 @@ class Tenant(BaseClass):
         "TenantProfile", back_populates="tenant", uselist=False
     )  # uselist demotes a 1:1 relationship
     notes = db.relationship("TenantNote")
-    # created_date: datetime = db.Column(db.DateTime, default=datetime.utcnow)
-    # updated_date: datetime = db.Column(
-    #     db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
-    # )
 
 
 @dataclass
@@ -71,12 +67,7 @@ class TenantNote(BaseClass):
     """Tenant note Model for storing tenant notes"""
 
     __tablename__ = "tenantNote"
-    # id: int = db.Column(db.Integer, primary_key=True, autoincrement=True)
     tenant_id: int = db.Column(db.Integer, db.ForeignKey(Tenant.id))
-    # created_date: datetime = db.Column(db.DateTime, default=datetime.utcnow)
-    # updated_date: datetime = db.Column(
-    #     db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
-    # )
     note: str = db.Column(db.String(2000))
 
 
@@ -85,11 +76,6 @@ class TenantProfile(BaseClass):
     """Tenant profile pic stored as base64 str"""
 
     __tablename__ = "tenant-profile"
-    # id: int = db.Column(db.Integer, primary_key=True, autoincrement=True)
     tenant_id: int = db.Column(db.Integer, db.ForeignKey(Tenant.id))
-    # created_date: datetime = db.Column(db.DateTime, default=datetime.utcnow)
-    # updated_date: datetime = db.Column(
-    #     db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
-    # )
     image: LargeBinary = db.Column(LargeBinary)
     tenant = db.relationship("Tenant", back_populates="profile_pic")

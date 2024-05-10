@@ -3,10 +3,11 @@
 from dataclasses import dataclass
 from datetime import datetime
 from typing import List
+from sqlalchemy import DateTime
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from app.main.model.base import BaseClass
 
-from sqlalchemy import Integer, String, DateTime
-from sqlalchemy.orm import Mapped, mapped_column
 
 from .. import db
 
@@ -27,12 +28,12 @@ class Property(BaseClass):
     monthly_rental_price: Mapped[float] = mapped_column(
         db.Float(precision="10, 2"), nullable=True
     )
-    address: Mapped["Address"] = db.relationship(
+    address: Mapped["Address"] = relationship(
         back_populates="property", uselist=False, cascade="all, delete"
     )
-    tenants: Mapped[List["Tenant"]] = db.relationship(
+    tenants: Mapped[List["Tenant"]] = relationship(
         "Tenant", back_populates="property", cascade="all, delete"
     )
-    property_pics: Mapped[List["PropertyImages"]] = db.relationship(
+    property_pics: Mapped[List["PropertyImages"]] = relationship(
         "PropertyImages", back_populates="property", lazy=True
     )

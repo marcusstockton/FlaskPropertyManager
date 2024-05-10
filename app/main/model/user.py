@@ -7,6 +7,7 @@ import jwt
 from app.main.model.base import BaseClass
 
 from app.main.model.blacklist import BlacklistToken
+from sqlalchemy.orm import relationship
 from .. import db, flask_bcrypt
 from ..config import key
 
@@ -17,7 +18,6 @@ class User(BaseClass):
 
     __tablename__ = "user"
 
-    # id: int = db.Column(db.Integer, primary_key=True)
     email: str = db.Column(db.String(255), unique=True, nullable=False, index=True)
     registered_on: datetime = db.Column(db.DateTime, nullable=False)
     admin: bool = db.Column(db.Boolean, nullable=False, default=False)
@@ -27,11 +27,7 @@ class User(BaseClass):
     first_name: str = db.Column(db.String(100), nullable=True)
     last_name: str = db.Column(db.String(100), nullable=True)
     date_of_birth: datetime = db.Column(db.DateTime, nullable=True)
-    # created_date: datetime = db.Column(db.DateTime, default=datetime.utcnow)
-    # updated_date: datetime = db.Column(
-    #     db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
-    # )
-    roles = db.relationship(
+    roles = relationship(
         "Role", secondary="user_roles", backref=db.backref("user", lazy="dynamic")
     )
 
@@ -70,6 +66,7 @@ class User(BaseClass):
             username = (
                 db.session.query(User.username).filter(User.id == user_id).scalar()
             )
+
             payload = {
                 "exp": datetime.now(timezone.utc) + timedelta(days=1, seconds=5),
                 "iat": datetime.now(timezone.utc),
