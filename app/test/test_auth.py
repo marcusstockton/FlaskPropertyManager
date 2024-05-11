@@ -2,6 +2,32 @@ import json
 import unittest
 
 from app.test.base import BaseTestCase
+from werkzeug.exceptions import BadRequest
+
+
+def register_admin_user(self, auth_token):
+    """Regiater a new admin user"""
+    headers = {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+        "Authorization": auth_token,
+    }
+
+    return (
+        self.client.post(
+            "/user/",
+            data=json.dumps(
+                dict(
+                    email="admin@user.com",
+                    username="username",
+                    firstname="test",
+                    lastname="user",
+                    password="test",
+                )
+            ),
+            headers=headers,
+        ),
+    )
 
 
 def register_user(self, auth_token):
@@ -12,22 +38,25 @@ def register_user(self, auth_token):
         "Authorization": auth_token,
     }
 
-    return self.client.post(
-        "/user/",
-        data=json.dumps(
-            dict(
-                email="example@gmail.com",
-                username="username",
-                firstname="test",
-                lastname="user",
-                password="123456",
-            )
+    return (
+        self.client.post(
+            "/user/",
+            data=json.dumps(
+                dict(
+                    email="example@gmail.com",
+                    username="username",
+                    firstname="test",
+                    lastname="user",
+                    password="123456",
+                )
+            ),
+            headers=headers,
         ),
-        headers=headers,
     )
 
 
 def login_user(self):
+    """Logs in the user"""
     return self.client.post(
         "/Auth/login",
         data=json.dumps(dict(email="example@gmail.com", password="123456")),
@@ -36,6 +65,7 @@ def login_user(self):
 
 
 def login_auth_user(self):
+    """Logs in the auth user"""
     return self.client.post(
         "/Auth/login",
         data=json.dumps(dict(email="admin@user.com", password="test")),
@@ -44,6 +74,8 @@ def login_auth_user(self):
 
 
 class TestAuthBlueprint(BaseTestCase):
+    """Registers the TestAuthBlueprint"""
+
     def test_registered_user_login(self):
         """Test for login of registered-user login"""
         with self.client:
@@ -52,6 +84,9 @@ class TestAuthBlueprint(BaseTestCase):
             auth_header = json.loads(auth_login.text)["Authorization"]
 
             user_response = register_user(self, auth_header)
+            if user_response is None:
+                return BadRequest(user_response)
+
             response_data = json.loads(user_response.data.decode())
             self.assertTrue(response_data["Authorization"])
             self.assertEqual(user_response.status_code, 201)

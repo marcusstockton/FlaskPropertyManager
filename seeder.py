@@ -236,7 +236,7 @@ def seed_data(db):
                 )
                 pr.tenants.append(
                     tenant.Tenant(
-                        title=tenant.TitleEnum.Mr,
+                        title=tenant.TitleEnum.MR,
                         first_name=firstName,
                         last_name=lastName,
                         email_address=f"{firstName}.{lastName}@{fake.domain_name()}",
