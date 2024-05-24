@@ -11,7 +11,7 @@ from werkzeug.exceptions import NotFound
 from manage import app
 
 
-def create_admin_user(self) -> str:
+def create_admin_user() -> str:
     """Creates an admin user and returns the auth token"""
     datetime_now = datetime.now(timezone.utc)
     user = User(email="admin@testing.com", registered_on=datetime_now, admin=True)
@@ -24,7 +24,8 @@ def create_admin_user(self) -> str:
     return ""
 
 
-def create_owner_user(self) -> str:
+def create_owner_user() -> str:
+    """Creates a non-admin user and returns the auth token"""
     datetime_now = datetime.now(timezone.utc)
     user = User(email="user@testing.com", registered_on=datetime_now, admin=False)
     user.password = "test"
@@ -42,7 +43,7 @@ class TestPortfolioBlueprint(BaseTestCase):
     @patch("app.main.controller.portfolio_controller.get_all_portfolios_for_user")
     def test_users_can_only_see_their_own_portfolios(self, mock_portfolios):
         """Checks that users can only see their own portfolios"""
-        access_token = create_admin_user(self)
+        access_token = create_admin_user()
         headers = {
             "Access-Control-Allow-Origin": "*",
             "Content-Type": "application/json",
@@ -62,7 +63,7 @@ class TestPortfolioBlueprint(BaseTestCase):
     @patch("app.main.controller.portfolio_controller.get_portfolio_by_id")
     def test_correct_portfolio_is_returned_for_id(self, mock_portfolios):
         """Tests that the correct portfolio is returned"""
-        access_token = create_admin_user(self)
+        access_token = create_admin_user()
         headers = {
             "Access-Control-Allow-Origin": "*",
             "Content-Type": "application/json",
@@ -80,7 +81,8 @@ class TestPortfolioBlueprint(BaseTestCase):
             self.assertEqual("1", data[0].get("id"))
 
     def test_portfolio_is_not_returned_for_non_owner_user_id(self):
-        access_token = create_owner_user(self)
+        """Unit test to test that users cannot access other user records"""
+        access_token = create_owner_user()
         headers = {
             "Access-Control-Allow-Origin": "*",
             "Content-Type": "application/json",
