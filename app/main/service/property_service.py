@@ -2,6 +2,7 @@
 
 import datetime
 from http import HTTPStatus
+from typing import List
 
 from bleach import clean
 from flask import current_app
@@ -16,7 +17,7 @@ from app.main.model.property import Property
 from app.main.model.property_image import PropertyImages
 
 
-def get_all_properties_for_portfolio(portfolio_id):
+def get_all_properties_for_portfolio(portfolio_id) -> List[Property]:
     """Gets all properties for the portfolio id"""
     current_app.logger.info("Getting all properties for portfolio_id %s", portfolio_id)
     return (
@@ -68,7 +69,7 @@ def save_new_property(portfolio_id, data):
             raise InternalServerError(f"Unable to save new Property. {ex}") from ex
 
 
-def get_property_by_id(portfolio_id, property_id):
+def get_property_by_id(portfolio_id, property_id) -> Property:
     """Gets a property by its ID"""
     try:
         current_app.logger.info(

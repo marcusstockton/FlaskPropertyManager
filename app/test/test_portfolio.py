@@ -1,64 +1,100 @@
-# import datetime
-# import json
-# import unittest
-# from functools import wraps
-# from unittest.mock import patch
+from datetime import datetime, timezone
+import json
 
-# from app.main import db
-# from app.main.model.address import Address
-# from app.main.model.portfolio import Portfolio
-# from app.main.model.property import Property
-# from app.main.model.user import User, Role, UserRoles
-# from app.main.service.auth_helper import Auth
-# from app.test.base import BaseTestCase
-# from app.test.helpers import mock_get_logged_in_user_success, mock_logged_in_user
-# from manage import app
-# from sqlalchemy import delete
+from unittest.mock import patch
+from app.main import db
+from app.main.model.user import User
+from app.test.base import BaseTestCase
+from app.test.helpers import mock_get_all_portfolios_for_user
+from werkzeug.exceptions import NotFound
+
+from manage import app
 
 
-# class TestPortfolioBlueprint(BaseTestCase):
-#     """Test class for Portfolio endpoints"""
-
-#     # def setUp(self):
-#     #     self.create_data()
-
-#     @patch.object(
-#         Auth, "get_logged_in_user", return_value=mock_get_logged_in_user_success()
-#     )
-#     @patch.object(Auth, "get_logged_in_user_object", return_value=mock_logged_in_user())
-#     def test_users_can_only_see_their_own_portfolios(self, mock_user, mock_auth):
-#         self.create_data()
-#         response = self.client.get("/portfolio/")
-#         self.assert200(response)
-#         data = json.loads(response.get_data(as_text=True))
-#         self.assertEqual(1, len(data))
+def create_admin_user(self) -> str:
+    """Creates an admin user and returns the auth token"""
+    datetime_now = datetime.now(timezone.utc)
+    user = User(email="admin@testing.com", registered_on=datetime_now, admin=True)
+    user.password = "test"
+    db.session.add(user)
+    db.session.commit()
+    auth_token = user.encode_auth_token(user.id)
+    if isinstance(auth_token, str):
+        return auth_token
+    return ""
 
 
-#     # @patch.object(
-#     #     Auth, "get_logged_in_user", return_value=mock_get_logged_in_user_success()
-#     # )
-#     # @patch.object(Auth, "get_logged_in_user_object", return_value=mock_logged_in_user())
-#     # def test_correct_portfolio_is_returned_for_id(self, mock_user, mock_auth):
-#     #     self.create_data()
-#     #
-#     #     with app.test_client() as client:
-#     #         response = client.get("/portfolio/1")
-#     #         data = response.get_json()
-#     #         self.assertEqual("Test 1", data.get("name"))
-#     #         self.assertEqual("1", data.get("id"))
-#     #
-#     # @patch.object(
-#     #     Auth, "get_logged_in_user", return_value=mock_get_logged_in_user_success()
-#     # )
-#     # @patch.object(Auth, "get_logged_in_user_object", return_value=mock_logged_in_user())
-#     # def test_portfolio_is_not_returned_for_non_owner_user_id(
-#     #     self, mock_user, mock_auth
-#     # ):
-#     #     self.create_data()
-#     #
-#     #     with app.test_client() as client:
-#     #         response = client.get("/portfolio/2")
-#     #         self.assert404(response)
+def create_owner_user(self) -> str:
+    datetime_now = datetime.now(timezone.utc)
+    user = User(email="user@testing.com", registered_on=datetime_now, admin=False)
+    user.password = "test"
+    db.session.add(user)
+    db.session.commit()
+    auth_token = user.encode_auth_token(user.id)
+    if isinstance(auth_token, str):
+        return auth_token
+    return ""
+
+
+class TestPortfolioBlueprint(BaseTestCase):
+    """Test class for Portfolio endpoints"""
+
+    @patch("app.main.controller.portfolio_controller.get_all_portfolios_for_user")
+    def test_users_can_only_see_their_own_portfolios(self, mock_portfolios):
+        """Checks that users can only see their own portfolios"""
+        access_token = create_admin_user(self)
+        headers = {
+            "Access-Control-Allow-Origin": "*",
+            "Content-Type": "application/json",
+            "Authorization": access_token,
+        }
+
+        mock_portfolios.return_value = [
+            portfolio for portfolio in mock_get_all_portfolios_for_user()
+        ]
+
+        with app.test_client() as client:
+            response = client.get("/portfolio/", headers=headers)
+            self.assert200(response)
+            data = json.loads(response.get_data(as_text=True))
+            self.assertEqual(1, len(data))
+
+    @patch("app.main.controller.portfolio_controller.get_portfolio_by_id")
+    def test_correct_portfolio_is_returned_for_id(self, mock_portfolios):
+        """Tests that the correct portfolio is returned"""
+        access_token = create_admin_user(self)
+        headers = {
+            "Access-Control-Allow-Origin": "*",
+            "Content-Type": "application/json",
+            "Authorization": access_token,
+        }
+
+        mock_portfolios.return_value = [
+            portfolio for portfolio in mock_get_all_portfolios_for_user()
+        ]
+
+        with app.test_client() as client:
+            response = client.get("/portfolio/1", headers=headers)
+            data = response.get_json()
+            self.assertEqual("Test Portfolio One", data[0].get("name"))
+            self.assertEqual("1", data[0].get("id"))
+
+    def test_portfolio_is_not_returned_for_non_owner_user_id(self):
+        access_token = create_owner_user(self)
+        headers = {
+            "Access-Control-Allow-Origin": "*",
+            "Content-Type": "application/json",
+            "Authorization": access_token,
+        }
+        with patch(
+            "app.main.controller.portfolio_controller.get_portfolio_by_id"
+        ) as mock_get_portfolio_by_id:
+            mock_get_portfolio_by_id.side_effect = NotFound()
+            with app.test_client() as client:
+                response = client.get("/portfolio/2", headers=headers)
+                self.assert404(response)
+
+
 #     #
 #     # @patch.object(
 #     #     Auth, "get_logged_in_user", return_value=mock_get_logged_in_user_success()

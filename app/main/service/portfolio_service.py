@@ -20,7 +20,7 @@ def get_all_portfolios_for_user(user: User) -> List[Portfolio]:
     if user.admin:
         return Portfolio.query.all()
     else:
-        portfolios = (
+        portfolios: List[Portfolio] = (
             Portfolio.query.filter_by(owner_id=user.id)
             .options(lazyload(Portfolio.owner), lazyload(Portfolio.properties))
             .all()
@@ -32,7 +32,7 @@ def get_portfolio_by_id(user_id: int, portfolio_id: int) -> Portfolio:
     """Returns the portfolio from the given portfolio Id"""
     try:
         current_app.logger.info(f"Getting portfolio by {portfolio_id}")
-        return (
+        portfolio = (
             Portfolio.query.filter_by(owner_id=user_id)
             .filter_by(id=portfolio_id)
             .options(
@@ -41,6 +41,7 @@ def get_portfolio_by_id(user_id: int, portfolio_id: int) -> Portfolio:
             )
             .one()
         )
+        return portfolio
     except NoResultFound as err:
         error_message = f"Portfolio not found for userid: {user_id} and portfolio_id {portfolio_id}. Error {err}"
         current_app.logger.error(error_message)
@@ -86,7 +87,7 @@ def update_portfolio(portfolio_id: int, data: dict) -> Portfolio:
     except IntegrityError as err:
         raise InternalServerError(err.statement) from err
     except Exception as e:
-        raise Exception(e) from e
+        raise InternalServerError(repr(e)) from e
 
 
 def delete_portfolio_by_id(user, portfolio_id):

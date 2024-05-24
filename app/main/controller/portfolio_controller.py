@@ -35,7 +35,8 @@ class PortfolioList(Resource):
         user = Auth.get_logged_in_user_object(request)
         if user is not None:
             app.logger.info(f"Getting all portfolios' for {user.username}")
-            return get_all_portfolios_for_user(user)
+            portfolios = get_all_portfolios_for_user(user)
+            return portfolios
         raise NotFound(user)
 
     @token_required

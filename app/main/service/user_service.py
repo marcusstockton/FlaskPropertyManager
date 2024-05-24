@@ -64,7 +64,7 @@ def update_user(user_id, data):
         }
         return response_object, HTTPStatus.NO_CONTENT
     except IntegrityError as e:
-        raise InternalServerError(e) from e
+        raise InternalServerError(repr(e)) from e
 
 
 def delete_user(user_id):
@@ -79,7 +79,7 @@ def delete_user(user_id):
         }
         return response_object, HTTPStatus.NO_CONTENT
     except IntegrityError as e:
-        raise InternalServerError(e) from e
+        raise InternalServerError(repr(e)) from e
 
 
 def get_all_users():
@@ -116,7 +116,7 @@ def generate_token(user):
         current_app.logger.info("auth_token created successfully")
         return response_object, HTTPStatus.CREATED
     except Exception as e:
-        raise InternalServerError(e) from e
+        raise InternalServerError(repr(e)) from e
 
 
 def save_changes(data):
