@@ -3,6 +3,7 @@ import json
 
 from unittest.mock import patch
 from app.main import db
+from app.main.model.portfolio import Portfolio
 from app.main.model.user import User
 from app.test.base import BaseTestCase
 from app.test.helpers import mock_get_all_portfolios_for_user
@@ -96,27 +97,31 @@ class TestPortfolioBlueprint(BaseTestCase):
                 response = client.get("/portfolio/2", headers=headers)
                 self.assert404(response)
 
+    def test_update_portfolio_works_with_correct_data_and_user(self):
+        access_token = create_owner_user()
+        headers = {
+            "Access-Control-Allow-Origin": "*",
+            "Content-Type": "application/json",
+            "Authorization": access_token,
+        }
 
-#     #
-#     # @patch.object(
-#     #     Auth, "get_logged_in_user", return_value=mock_get_logged_in_user_success()
-#     # )
-#     # @patch.object(Auth, "get_logged_in_user_object", return_value=mock_logged_in_user())
-#     # def test_update_portfolio_works_with_correct_data_and_user(
-#     #     self, mock_user, mock_auth
-#     # ):
-#     #     self.create_data()
-#     #     dict_data = {"id": "1", "name": "Updated Test 1"}
-#     #     with app.test_client() as client:
-#     #         response = client.put(
-#     #             "/portfolio/1",
-#     #             data=json.dumps(dict_data),
-#     #             headers={"Content-Type": "application/json"},
-#     #         )
-#     #         self.assert200(response)
-#     #         data = json.loads(response.get_data(as_text=True))
-#     #
-#     #         self.assertEqual("Updated Test 1", data.get("name"))
+        dict_data = {"id": "1", "name": "Updated Test 1"}
+        with patch(
+            "app.main.controller.portfolio_controller.update_portfolio"
+        ) as update_patch:
+            update_patch.return_value = Portfolio(name=dict_data["name"])
+            with app.test_client() as client:
+                response = client.put(
+                    "/portfolio/1",
+                    data=json.dumps(dict_data),
+                    headers=headers,
+                )
+                self.assert200(response)
+                data = json.loads(response.get_data(as_text=True))
+
+                self.assertEqual("Updated Test 1", data.get("name"))
+
+
 #     #
 #     # @patch.object(
 #     #     Auth, "get_logged_in_user", return_value=mock_get_logged_in_user_success()
