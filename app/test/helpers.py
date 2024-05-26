@@ -115,3 +115,57 @@ def mock_get_all_portfolios_for_user() -> List[Portfolio]:
     new_list.append(portfolio)
 
     return new_list
+
+
+def mock_portfolio_by_id() -> Portfolio:
+    """Mocks a single portfolio with one property"""
+    user = User(
+        email="test@test.com",
+        first_name="Foo",
+        last_name="Bar",
+        username="test@test.com",
+        registered_on=datetime.now(),
+        admin=False,
+    )
+    user.id = 1
+    user.created_date = datetime.now()
+    user.updated_date = datetime.now()
+
+    address = Address(
+        line_1="Line 1",
+        line_2="Line 2",
+        line_3="Line 3",
+        city="Exeter",
+        post_code="EX11EX",
+        town="Pinhow",
+    )
+    address.id = 1
+    address.created_date = datetime.now()
+    address.updated_date = datetime.now()
+
+    prop_list = []
+
+    property1 = Property(
+        address=address,
+        monthly_rental_price=1000,
+        purchase_date=datetime(2012, 3, 12),
+        purchase_price=213000,
+    )
+    property1.id = 1
+    property1.portfolio_id = 1
+
+    property1.created_date = datetime.now()
+    property1.updated_date = datetime.now()
+    prop_list.append(property1)
+
+    portfolio = Portfolio(
+        name="Test Portfolio One",
+        owner_id=user.id,
+        owner=user,
+        properties=prop_list,
+    )
+    portfolio.created_date = datetime(2011, 2, 5, 12, 12, 12)
+    portfolio.updated_date = datetime(2022, 5, 8, 12, 12, 12)
+    portfolio.id = 1
+
+    return portfolio

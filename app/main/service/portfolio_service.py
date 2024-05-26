@@ -58,11 +58,11 @@ def save_new_portfolio(data, user_id) -> Portfolio:
     sanitised_name = clean(data["name"])
     current_app.logger.info(f"Adding portfolio {sanitised_name}")
     portfolio = (
-        Portfolio.query.filter_by(name=sanitised_name)
-        .filter_by(owner_id=user_id)
-        .first()
+        db.session.query(Portfolio.id)
+        .filter_by(name=sanitised_name, owner_id=user_id)
+        .scalar()
     )
-    if not portfolio:
+    if portfolio is None:
         new_portfolio = Portfolio(
             name=sanitised_name,
             owner_id=user_id,
@@ -77,6 +77,8 @@ def save_new_portfolio(data, user_id) -> Portfolio:
 def update_portfolio(portfolio_id: int, data: dict) -> Portfolio:
     """Update a portfolio"""
     portfolio_query = Portfolio.query.filter_by(id=portfolio_id).one()
+    sanitised_name = clean(data["name"])
+    data["name"] = sanitised_name
     if not portfolio_query:
         raise NotFound("Portfolio not found.")
     try:
@@ -92,20 +94,14 @@ def update_portfolio(portfolio_id: int, data: dict) -> Portfolio:
 
 def delete_portfolio_by_id(user, portfolio_id):
     """Deletes the Portfolio and related data"""
-    portfolio = (
-        Portfolio.query.filter_by(id=portfolio_id)
-        .filter_by(id=portfolio_id)
-        .options(
-            lazyload(Portfolio.owner),
-            lazyload(Portfolio.properties),
-            lazyload(Portfolio.properties.images),
-            lazyload(Portfolio.properties),
-        )
-        .scalar()
-    )
+    portfolio = db.session.query(Portfolio.id).filter_by(id=portfolio_id).scalar()
+    if portfolio is None:
+        raise NotFound("Portfolio not found")
     if portfolio is not None:
         if portfolio.owner_id == user.id:
-            portfolio.delete()
+            db.session.delete(portfolio)
+            db.session.commit()
+            return None
 
 
 def save_changes(data) -> None:

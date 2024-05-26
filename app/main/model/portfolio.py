@@ -23,5 +23,5 @@ class Portfolio(BaseClass):  # Revert this to db.Model
     )
     owner: Mapped["User"] = relationship("User")
     properties: Mapped[List["Property"]] = relationship(
-        "Property", cascade="all, delete"
+        "Property", cascade="all, delete, delete-orphan"
     )

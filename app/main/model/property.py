@@ -29,11 +29,14 @@ class Property(BaseClass):
         db.Float(precision="10, 2"), nullable=True
     )
     address: Mapped["Address"] = relationship(
-        back_populates="property", uselist=False, cascade="all, delete"
+        back_populates="property", uselist=False, cascade="all, delete, delete-orphan"
     )
     tenants: Mapped[List["Tenant"]] = relationship(
-        "Tenant", back_populates="property", cascade="all, delete"
+        "Tenant", back_populates="property", cascade="all, delete, delete-orphan"
     )
     property_pics: Mapped[List["PropertyImages"]] = relationship(
-        "PropertyImages", back_populates="property", lazy=True
+        "PropertyImages",
+        back_populates="property",
+        lazy=True,
+        cascade="all, delete, delete-orphan",
     )

@@ -18,7 +18,6 @@ from ..util.dto.portfolio_dto import PortfolioDto
 
 api = PortfolioDto.api
 _portfolio_details = PortfolioDto.portfolio_details
-_portfolio_update = PortfolioDto.portfolio_update
 _portfolio_update_parser = PortfolioDto.portfolio_update_parser
 _portfolio_create_parser = PortfolioDto.portfolio_create_parser
 
@@ -82,6 +81,8 @@ class PortfolioItem(Resource):
         return update_portfolio(portfolio_id, data)
 
     @token_required
+    @api.response(204, "Portfolio and related data deleted.")
+    @api.response(404, "Portfolio Not found")
     def delete(self, portfolio_id):
         """Deletes a portfolio"""
         user = Auth.get_logged_in_user_object(request)

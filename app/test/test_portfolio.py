@@ -1,13 +1,15 @@
 from datetime import datetime, timezone
 import json
-
 from unittest.mock import patch
+from werkzeug.exceptions import NotFound
+
 from app.main import db
 from app.main.model.portfolio import Portfolio
 from app.main.model.user import User
+from app.main.service.portfolio_service import save_new_portfolio
 from app.test.base import BaseTestCase
-from app.test.helpers import mock_get_all_portfolios_for_user
-from werkzeug.exceptions import NotFound
+from app.test.helpers import mock_get_all_portfolios_for_user, mock_portfolio_by_id
+
 
 from manage import app
 
@@ -98,6 +100,7 @@ class TestPortfolioBlueprint(BaseTestCase):
                 self.assert404(response)
 
     def test_update_portfolio_works_with_correct_data_and_user(self):
+        """Unit test to made sure correct user returns correct data"""
         access_token = create_owner_user()
         headers = {
             "Access-Control-Allow-Origin": "*",
@@ -121,73 +124,66 @@ class TestPortfolioBlueprint(BaseTestCase):
 
                 self.assertEqual("Updated Test 1", data.get("name"))
 
+    def test_update_portfolio_fails_if_incorrect_data_used(self):
+        """Handle invalid user updating portfolio"""
+        access_token = create_owner_user()
+        headers = {
+            "Access-Control-Allow-Origin": "*",
+            "Content-Type": "application/json",
+            "Authorization": access_token,
+        }
+        with patch(
+            "app.main.controller.portfolio_controller.update_portfolio"
+        ) as update_patch:
+            update_patch.side_effect = NotFound()
+            dict_data = {"id": "2", "name": "Updated Test 1"}
+            with app.test_client() as client:
+                response = client.put(
+                    "/portfolio/2",
+                    data=json.dumps(dict_data),
+                    headers=headers,
+                )
+                self.assertEqual(response.status_code, 404)
 
-#     #
-#     # @patch.object(
-#     #     Auth, "get_logged_in_user", return_value=mock_get_logged_in_user_success()
-#     # )
-#     # @patch.object(Auth, "get_logged_in_user_object", return_value=mock_logged_in_user())
-#     # def test_update_portfolio_fails_if_incorrect_data_used(self, mock_user, mock_auth):
-#     #     self.create_data()
-#     #     dict_data = {"id": "2", "name": "Updated Test 1"}
-#     #     with app.test_client() as client:
-#     #         response = client.put(
-#     #             "/portfolio/1",
-#     #             data=json.dumps(dict_data),
-#     #             headers={"Content-Type": "application/json"},
-#     #         )
-#     #         self.assertEqual(response.status_code, 500)
-#     #
-#     # @patch.object(
-#     #     Auth, "get_logged_in_user", return_value=mock_get_logged_in_user_success()
-#     # )
-#     # @patch.object(Auth, "get_logged_in_user_object", return_value=mock_logged_in_user())
-#     # def test_get_portfolio_returns_correct_property_count_with_correct_data_and_user(
-#     #     self, mock_user, mock_auth
-#     # ):
-#     #     self.create_data()
-#     #     # get portfolio to append a property or two to it
-#     #     portfolio = db.session.query(Portfolio).filter(Portfolio.id == 1).one()
-#     #     property1 = Property(
-#     #         portfolio_id=portfolio.id,
-#     #         owner_id=1,
-#     #         purchase_price=32000,
-#     #         purchase_date=datetime.datetime(2020, 5, 17),
-#     #         monthly_rental_price=670,
-#     #         address=Address(
-#     #             line_1="Test Line 1",
-#     #             line_2="Test Line 2",
-#     #             post_code="EX11EX",
-#     #             city="Exeter",
-#     #         ),
-#     #     )
-#     #     portfolio.properties.append(property1)
-#     #     db.session.commit()
-#     #
-#     #     # Do the test:
-#     #     with app.test_client() as client:
-#     #         response = client.get("/portfolio/1")
-#     #         self.assert200(response)
-#     #         data = json.loads(response.get_data(as_text=True))
-#     #
-#     #         self.assertEqual(1, data.get("property_count"))
-#     #
-#     # @patch.object(
-#     #     Auth, "get_logged_in_user", return_value=mock_get_logged_in_user_success()
-#     # )
-#     # @patch.object(Auth, "get_logged_in_user_object", return_value=mock_logged_in_user())
-#     # def test_create_portfolio_with_xss_input_is_sanitized(self, mock_user, mock_auth):
-#     #     new_portfolio = {"name": "<script>alert();</script>"}
-#     #     # Do the test:
-#     #     with app.test_client() as client:
-#     #         response = client.post(
-#     #             "/portfolio/",
-#     #             data=json.dumps(new_portfolio),
-#     #             headers={"Content-Type": "application/json"},
-#     #         )
-#     #         self.assert200(response)
-#     #         data = json.loads(response.get_data(as_text=True))
-#     #         self.assertEqual("&lt;script&gt;alert();&lt;/script&gt;", data.get("name"))
+    def test_get_portfolio_returns_correct_property_count_with_correct_data_and_user(
+        self,
+    ):
+        """Tests that get portfolio by id returns portfolio and properties"""
+        access_token = create_owner_user()
+        headers = {
+            "Access-Control-Allow-Origin": "*",
+            "Content-Type": "application/json",
+            "Authorization": access_token,
+        }
+
+        # Do the test:
+        with patch(
+            "app.main.controller.portfolio_controller.get_portfolio_by_id"
+        ) as mock_get_portfolio_by_id:
+            mock_get_portfolio_by_id.return_value = mock_portfolio_by_id()
+            with app.test_client() as client:
+                response = client.get("/portfolio/1", headers=headers)
+                self.assert200(response)
+                data = json.loads(response.get_data(as_text=True))
+
+                self.assertEqual(1, data.get("property_count"))
+
+    # def test_create_portfolio_with_xss_input_is_sanitized(self):
+    #     new_portfolio = {"name": "<script>alert();</script>"}
+
+    #     user_id = db.session.query(User.id).filter_by(email="user@testing.com").scalar()
+    #     # Do the test:
+    #     with app.test_client() as client:
+    #         response = client.post(
+    #             "/portfolio/",
+    #             data=json.dumps(new_portfolio),
+    #             headers={"Content-Type": "application/json"},
+    #         )
+    #         self.assert200(response)
+    #         data = json.loads(response.get_data(as_text=True))
+    #         self.assertEqual("&lt;script&gt;alert();&lt;/script&gt;", data.get("name"))
+
+
 #     #
 #     # @patch.object(
 #     #     Auth, "get_logged_in_user", return_value=mock_get_logged_in_user_success()
