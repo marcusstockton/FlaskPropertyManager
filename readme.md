@@ -17,31 +17,36 @@ may need to:
     flask --app manage.py db migrate -m "<Migration Message>"
     flask --app manage.py db upgrade
 
-### Testing:
+### Testing
+
     sudo python manage.py test || flask test
 
-### Running:
+### Running
+
     sudo python manage.py run || flask run
 
-### Seeding:
+### Seeding
+
     sudo python manage.py seed || flask seed
 
-### Shell:
+### Shell
+
     flask shell
 
-### Example insert of property against Portfolio in shell:
+### Example insert of property against Portfolio in shell
+
     from app.main.model.portfolio import Portfolio
     port = Portfolio.query.first()
     new_property = Property(portfolio_id=1, purchase_price=234561, purchase_date= datetime.datetime(2020,3,12))
     port.properties.append(new_property)
     db.session.commit()
 
-
 ## Usernames
+
 test@test.com | marcus_stockton@hotmail.co.uk
 test
 
-
 ## Idea's
+
 * Add error logging to a mongodb database
 * Add caching to auto-completes (AddressSearchList)

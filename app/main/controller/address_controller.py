@@ -4,11 +4,13 @@ import os
 
 import requests
 from flask import current_app
+
 from flask import make_response
 from flask_restx import Resource
 
 from ..util.decorator import token_required
 from ..util.dto.address_dto import AddressDto
+from ...main import cache
 
 api = AddressDto.api
 
@@ -18,6 +20,7 @@ class AddressSearchList(Resource):
     """Looks up address's from postcode"""
 
     @token_required
+    @cache.cached(timeout=50, key_prefix="all_comments")
     @api.doc("search for address by postcode")
     def get(
         self, search
@@ -33,6 +36,7 @@ class AddressSearchList(Resource):
         )
         current_app.logger.debug(f"{AddressSearchList.__name__} calling {url}")
         try:
+            current_app.logger.debug(f"{AddressSearchList.__name__} calling api {url}")
             r = requests.get(url=url)
             data = r.json()
             return make_response(data, r.status_code)

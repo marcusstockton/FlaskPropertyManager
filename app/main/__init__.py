@@ -2,6 +2,7 @@ import logging
 
 from flask import Flask
 from flask_bcrypt import Bcrypt
+from flask_caching import Cache
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
@@ -17,6 +18,7 @@ naming_convention = {
 }
 
 db = SQLAlchemy(metadata=MetaData(naming_convention=naming_convention))
+cache = Cache(config={"CACHE_TYPE": "SimpleCache"})
 flask_bcrypt = Bcrypt()
 
 
@@ -32,6 +34,7 @@ def create_app(config_name: str) -> Flask:
     app.config["MAX_CONTENT_LENGTH"] = 2 * 1024 * 1024  # 2MB limit
     app.config["UPLOAD_EXTENSIONS"] = ["jpg", "jpeg", "png", "gif", "tif"]
     db.init_app(app)
+    cache.init_app(app)
 
     flask_bcrypt.init_app(app)
 
