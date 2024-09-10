@@ -36,8 +36,7 @@ class AddressSearchList(Resource):
         )
         current_app.logger.debug(f"{AddressSearchList.__name__} calling {url}")
         try:
-            current_app.logger.debug(f"{AddressSearchList.__name__} calling api {url}")
-            r = requests.get(url=url)
+            r = requests.get(url=url, timeout=15)
             data = r.json()
             return make_response(data, r.status_code)
         except requests.HTTPError as err:

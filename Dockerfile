@@ -1,12 +1,22 @@
 # syntax=docker/dockerfile:1
 
-FROM python:3.12.3-slim
+FROM python:3.12-slim
+
+ENV FLASK_APP=manage.py
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+ADD . /app
+
+COPY ./requirements.txt /app/requirements.txt
 
 WORKDIR /app
 
-COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
-COPY . .
+COPY . /app
 
-CMD ["gunicorn", "--bind", "0.0.0.0:80", "manage:app"]
+EXPOSE 5000
+
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "manage:app"]
+# CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"]

@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 from typing import List
-from sqlalchemy import DateTime
+from sqlalchemy import DateTime, DECIMAL, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.main.model.base import BaseClass
@@ -18,16 +18,12 @@ class Property(BaseClass):
 
     __tablename__ = "property"
     portfolio_id: Mapped[int] = mapped_column(
-        db.Integer, db.ForeignKey("portfolio.id", ondelete="cascade")
+        Integer, db.ForeignKey("portfolio.id", ondelete="cascade")
     )
-    purchase_price: Mapped[float] = mapped_column(
-        db.Float(precision="10, 2"), nullable=True
-    )
+    purchase_price: Mapped[float] = mapped_column(DECIMAL(10, 2), nullable=True)
     purchase_date: Mapped[datetime] = mapped_column(DateTime, nullable=True)
     sold_date: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
-    monthly_rental_price: Mapped[float] = mapped_column(
-        db.Float(precision="10, 2"), nullable=True
-    )
+    monthly_rental_price: Mapped[float] = mapped_column(DECIMAL(10, 2), nullable=True)
     address: Mapped["Address"] = relationship(
         back_populates="property", uselist=False, cascade="all, delete, delete-orphan"
     )

@@ -1,19 +1,25 @@
 # Dev Notes
+
 This was just an idea for managing properties for landlords etc.
 
-## Scaffolded out in line with:
+## Scaffolded out in line with
+
 https://www.freecodecamp.org/news/structuring-a-flask-restplus-web-service-for-production-builds-c2ec676de563/
 
-## Useful commands:
+## Useful commands
+
 may need to:
 * Ubuntu: ``export FLASK_APP=manage.py`` from the root
 * Windows: ``set FLASK_APP=manage.py`` from the root or ``set FLASK_APP=FlaskPropertyManager``
 * Windows PowerShell: `` $env:FLASK_APP="manage.py" `` from the root
 
-### Help:
+### Help
+
     flask --app manage.py --help
 
-### Migrations:
+### Migrations
+
+    flask --app manage.py db init
     flask --app manage.py db migrate -m "<Migration Message>"
     flask --app manage.py db upgrade
 
@@ -43,10 +49,19 @@ may need to:
 
 ## Usernames
 
-test@test.com | marcus_stockton@hotmail.co.uk
+<test@test.com> | <marcus_stockton@hotmail.co.uk>
 test
 
 ## Idea's
 
 * Add error logging to a mongodb database
 * Add caching to auto-completes (AddressSearchList)
+
+
+## Docker Commands
+
+``docker build -t flaskpropertymanager .``
+``docker run -it -p 5000:5000 flaskpropertymanager``
+
+``docker exec -it <container name> bash`` # to load up the docker image to navigate in linux
+

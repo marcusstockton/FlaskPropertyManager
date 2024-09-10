@@ -1,8 +1,8 @@
-"""tester
+"""empty message
 
-Revision ID: 9c329c81c5e9
-Revises: 6645e5442d50
-Create Date: 2024-05-11 13:10:10.458945
+Revision ID: d8a8abc97714
+Revises: 
+Create Date: 2024-09-10 19:55:56.050298
 
 """
 from alembic import op
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '9c329c81c5e9'
-down_revision = '6645e5442d50'
+revision = 'd8a8abc97714'
+down_revision = None
 branch_labels = None
 depends_on = None
 
@@ -70,10 +70,10 @@ def upgrade():
     )
     op.create_table('property',
     sa.Column('portfolio_id', sa.Integer(), nullable=False),
-    sa.Column('purchase_price', sa.Float(precision='10, 2'), nullable=True),
+    sa.Column('purchase_price', sa.DECIMAL(precision=10, scale=2), nullable=True),
     sa.Column('purchase_date', sa.DateTime(), nullable=True),
     sa.Column('sold_date', sa.DateTime(), nullable=True),
-    sa.Column('monthly_rental_price', sa.Float(precision='10, 2'), nullable=True),
+    sa.Column('monthly_rental_price', sa.DECIMAL(precision=10, scale=2), nullable=True),
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('created_date', sa.DateTime(), nullable=True),
     sa.Column('updated_date', sa.DateTime(), nullable=True),
@@ -107,7 +107,7 @@ def upgrade():
     op.create_table('tenant',
     sa.Column('property_id', sa.Integer(), nullable=True),
     sa.Column('phone_number', sa.String(length=20), nullable=True),
-    sa.Column('email_address', sqlalchemy_utils.types.email.EmailType(length=255), nullable=True),
+    sa.Column('email_address', sa.String(length=100), nullable=True),
     sa.Column('title', sa.Enum('MR', 'MRS', 'MISS', 'MS', 'LORD', 'SIR', 'DR', 'LADY', 'DAME', 'PROFESSOR', 'MX', name='titleenum'), nullable=True),
     sa.Column('first_name', sa.String(length=100), nullable=True),
     sa.Column('last_name', sa.String(length=100), nullable=True),
