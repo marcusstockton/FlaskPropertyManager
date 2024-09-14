@@ -178,7 +178,7 @@ def seed_data(db):
     ]
 
     portfolio_list = []
-    for _ in range(2):
+    for _ in range(8):
         portfolio_list.append(
             portfolio.Portfolio(
                 name=fake.city(),
@@ -189,7 +189,7 @@ def seed_data(db):
         )
 
     for x in portfolio_list:
-        for pr in range(random.randint(3, 7)):
+        for pr in range(random.randint(3, 12)):
             purchase_date = fake.date_this_century()
             sold_date_or_null = (
                 fake.date_between_dates(purchase_date)

@@ -4,8 +4,9 @@ from dataclasses import dataclass
 import enum
 from datetime import datetime
 from sqlalchemy import LargeBinary
-
+from sqlalchemy_utils import EmailType
 from app.main.model.base import BaseClass
+
 
 from .property import Property
 from .. import db
@@ -42,11 +43,10 @@ class Tenant(BaseClass):
     """Tenant Model for storing tenants"""
 
     __tablename__ = "tenant"
-    # id: int = db.Column(db.Integer, primary_key=True, autoincrement=True)
     property_id: int = db.Column(db.Integer, db.ForeignKey(Property.id))
     property = db.relationship("Property", back_populates="tenants")
     phone_number: str = db.Column(db.String(20))
-    email_address: str = db.Column(db.String(100))
+    email_address: str = db.Column(EmailType)
     title: TitleEnum = db.Column(db.Enum(TitleEnum))
     first_name: str = db.Column(db.String(100))
     last_name: str = db.Column(db.String(100))

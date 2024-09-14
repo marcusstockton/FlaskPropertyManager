@@ -23,7 +23,6 @@ class DevelopmentConfig(Config):
     # SQLALCHEMY_DATABASE_URI = postgres_local_base
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.environ["DATABASE_URL"]
-    # SQLALCHEMY_DATABASE_URI = "sqlite:////db.db"
     # SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(
     #     basedir, "flask_PropertyManager_main.db?check_same_thread=False"
     # )

@@ -65,3 +65,7 @@ test
 
 ``docker exec -it <container name> bash`` # to load up the docker image to navigate in linux
 
+``docker compose build`` # builds all images
+``docker compose build flask_app`` # Builds specific image
+``docker compose up -d`` # runs all images in detached mode
+``docker compose up -d flask_app`` # runs one particular image in detached mode
