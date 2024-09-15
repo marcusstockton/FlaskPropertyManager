@@ -1,13 +1,4 @@
 services:
-  # sqlite3:
-  #   image: nouchka/sqlite3:latest
-  #   stdin_open: true
-  #   tty: true
-  #   environment:
-  #     - SQLITE3_DB=flask_PropertyManager_main.db
-  #   volumes:
-  #     - ./data/db:/root/db
-
   flask_db:
     image: postgres
     container_name: flask_db
@@ -19,9 +10,14 @@ services:
     shm_size: 128mb
     healthcheck:
       test: ["CMD", "pg_isready", "-q", "-d", "postgres", "-U", "postgres"]
-      interval: 10s
+      interval: 5s
       timeout: 5s
       retries: 5 
+    mem_limit: 512m
+    mem_reservation: 128M
+    memswap_limit: 1g
+    cpus: "0.5"
+    cpuset: "1"
     ports:
       - "5432:5432"
     volumes:
@@ -35,15 +31,17 @@ services:
       - 5000:5000
     volumes:
       - .:/app/
-      # - ./db/:/my/sqlite/path/
     depends_on:
       flask_db:
         condition: service_healthy
     environment:
       - PROPERTYMANAGER_ENV=dev
       - DATABASE_URL=postgresql://postgres:postgres@flask_db:5432/postgres
-    # command: gunicorn --bind=0.0.0.0:5000 manage:app
-
+    mem_limit: 512m
+    mem_reservation: 128M
+    memswap_limit: 1g
+    cpus: "0.5"
+    cpuset: "1"
 
 volumes:
   pgdata: {}

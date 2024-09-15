@@ -3,7 +3,9 @@
 from dataclasses import dataclass
 import enum
 from datetime import datetime
+from typing import Optional
 from sqlalchemy import LargeBinary
+from sqlalchemy.orm import Mapped
 from sqlalchemy_utils import EmailType
 from app.main.model.base import BaseClass
 
@@ -43,18 +45,18 @@ class Tenant(BaseClass):
     """Tenant Model for storing tenants"""
 
     __tablename__ = "tenant"
-    property_id: int = db.Column(db.Integer, db.ForeignKey(Property.id))
+    property_id: Mapped[int] = db.Column(db.Integer, db.ForeignKey(Property.id))
     property = db.relationship("Property", back_populates="tenants")
-    phone_number: str = db.Column(db.String(20))
-    email_address: str = db.Column(EmailType)
+    phone_number: Mapped[str] = db.Column(db.String(20))
+    email_address: Mapped[str] = db.Column(EmailType)
     title: TitleEnum = db.Column(db.Enum(TitleEnum))
-    first_name: str = db.Column(db.String(100))
-    last_name: str = db.Column(db.String(100))
-    date_of_birth: datetime = db.Column(db.Date, nullable=True)
-    job_title: str = db.Column(db.String(100))
-    tenancy_start_date: datetime = db.Column(db.Date, nullable=False)
-    tenancy_end_date: datetime | None = db.Column(db.Date, nullable=True)
-    smoker: bool = db.Column(db.Boolean, nullable=False, default=False)
+    first_name: Mapped[str] = db.Column(db.String(100))
+    last_name: Mapped[str] = db.Column(db.String(100))
+    date_of_birth: Mapped[datetime] = db.Column(db.Date, nullable=True)
+    job_title: Mapped[str] = db.Column(db.String(100))
+    tenancy_start_date: Mapped[datetime] = db.Column(db.Date, nullable=False)
+    tenancy_end_date: Mapped[Optional[datetime]] = db.Column(db.Date, nullable=True)
+    smoker: Mapped[bool] = db.Column(db.Boolean, nullable=False, default=False)
     profile_pic = db.relationship(
         "TenantProfile", back_populates="tenant", uselist=False
     )  # uselist demotes a 1:1 relationship
@@ -66,8 +68,8 @@ class TenantNote(BaseClass):
     """Tenant note Model for storing tenant notes"""
 
     __tablename__ = "tenantNote"
-    tenant_id: int = db.Column(db.Integer, db.ForeignKey(Tenant.id))
-    note: str = db.Column(db.String(2000))
+    tenant_id: Mapped[int] = db.Column(db.Integer, db.ForeignKey(Tenant.id))
+    note: Mapped[str] = db.Column(db.String(2000))
 
 
 @dataclass
@@ -75,6 +77,6 @@ class TenantProfile(BaseClass):
     """Tenant profile pic stored as base64 str"""
 
     __tablename__ = "tenant-profile"
-    tenant_id: int = db.Column(db.Integer, db.ForeignKey(Tenant.id))
-    image: LargeBinary = db.Column(LargeBinary)
+    tenant_id: Mapped[int] = db.Column(db.Integer, db.ForeignKey(Tenant.id))
+    image: Mapped[LargeBinary] = db.Column(LargeBinary)
     tenant = db.relationship("Tenant", back_populates="profile_pic")

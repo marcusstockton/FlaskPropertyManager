@@ -3,9 +3,11 @@
 from dataclasses import dataclass
 import re
 from datetime import timedelta, datetime, timezone
+from typing import Optional
 import jwt
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, Mapped
 from app.main.model.base import BaseClass
+from sqlalchemy_utils import EmailType
 
 from app.main.model.blacklist import BlacklistToken
 from .. import db, flask_bcrypt
@@ -18,15 +20,15 @@ class User(BaseClass):
 
     __tablename__ = "user"
 
-    email: str = db.Column(db.String(255), unique=True, nullable=False, index=True)
-    registered_on: datetime = db.Column(db.DateTime, nullable=False)
-    admin: bool = db.Column(db.Boolean, nullable=False, default=False)
-    public_id: str = db.Column(db.String(100), unique=True, index=True)
-    username: str = db.Column(db.String(50), unique=True, index=True)
-    password_hash: str = db.Column(db.String(100))
-    first_name: str = db.Column(db.String(100), nullable=True)
-    last_name: str = db.Column(db.String(100), nullable=True)
-    date_of_birth: datetime | None = db.Column(db.DateTime, nullable=True)
+    email: Mapped[str] = db.Column(EmailType, unique=True, nullable=False, index=True)
+    registered_on: Mapped[datetime] = db.Column(db.DateTime, nullable=False)
+    admin: Mapped[bool] = db.Column(db.Boolean, nullable=False, default=False)
+    public_id: Mapped[str] = db.Column(db.String(100), unique=True, index=True)
+    username: Mapped[str] = db.Column(db.String(50), unique=True, index=True)
+    password_hash: Mapped[str] = db.Column(db.String(100))
+    first_name: Mapped[str] = db.Column(db.String(100), nullable=True)
+    last_name: Mapped[str] = db.Column(db.String(100), nullable=True)
+    date_of_birth: Mapped[Optional[datetime]] = db.Column(db.DateTime, nullable=True)
     roles = relationship(
         "Role", secondary="user_roles", backref=db.backref("user", lazy="dynamic")
     )

@@ -1,8 +1,9 @@
 """Blacklist Entity"""
 
 from dataclasses import dataclass
-from .. import db
 from datetime import datetime
+from .. import db
+from sqlalchemy.orm import Mapped
 
 
 @dataclass
@@ -11,9 +12,9 @@ class BlacklistToken(db.Model):
 
     __tablename__ = "blacklist_tokens"
 
-    id: int = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    token: str = db.Column(db.String(500), unique=True, nullable=False)
-    blacklisted_on: datetime = db.Column(db.DateTime, nullable=False)
+    id: Mapped[int] = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    token: Mapped[str] = db.Column(db.String(500), unique=True, nullable=False)
+    blacklisted_on: Mapped[datetime] = db.Column(db.DateTime, nullable=False)
 
     def __init__(self, token):
         self.token = token

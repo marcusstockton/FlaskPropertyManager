@@ -2,7 +2,7 @@
 
 from http import HTTPStatus
 
-from flask import Blueprint, jsonify, json
+from flask import Blueprint
 from flask_restx import Api
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import NotFound, BadRequest, InternalServerError

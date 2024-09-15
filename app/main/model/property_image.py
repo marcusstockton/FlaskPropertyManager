@@ -14,9 +14,9 @@ class PropertyImages(BaseClass):
     """Property Images model for storing property images"""
 
     __tablename__ = "propertyImages"
-    image: LargeBinary = db.Column(LargeBinary)
-    file_name: str = db.Column(db.String(200))
-    property_id: int = db.Column(
+    image: Mapped[LargeBinary] = db.Column(LargeBinary)
+    file_name: Mapped[str] = db.Column(db.String(200))
+    property_id: Mapped[int] = db.Column(
         db.Integer, db.ForeignKey("property.id"), nullable=False
     )
     property: Mapped["Property"] = relationship(
