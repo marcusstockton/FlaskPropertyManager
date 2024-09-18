@@ -7,11 +7,18 @@ from sqlite3 import IntegrityError
 from bleach import clean
 from sqlalchemy import update
 from werkzeug.exceptions import NotFound, BadRequest
+from werkzeug.utils import secure_filename
 
 from app.main import db
 from app.main.model.portfolio import Portfolio
 from app.main.model.property import Property
-from app.main.model.tenant import Tenant, TenantNote, TenantProfile, TitleEnum
+from app.main.model.tenant import (
+    Tenant,
+    TenantDocument,
+    TenantNote,
+    TenantProfile,
+    TitleEnum,
+)
 
 
 def get_all_tenants_for_property(portfolio_id, property_id):
@@ -122,7 +129,7 @@ def save_new_tenant(portfolio_id, property_id, data):
     return response_object, HTTPStatus.CREATED
 
 
-def get_tenant_by_id(portfolio_id, property_id, tenant_id):
+def get_tenant_by_id(portfolio_id: int, property_id: int, tenant_id: int):
     """Returns a tenant by supplied id"""
     tenant = Tenant.query.filter(
         Tenant.property_id == property_id, Tenant.id == tenant_id
@@ -147,6 +154,51 @@ def add_profile_to_tenant(tenant_id, image_str):
         "data": {"id": tenant_profile.id},
     }
     return response_object, HTTPStatus.CREATED
+
+
+def add_tenant_document(
+    portfolio_id: int, property_id: int, tenant_id: int, doc_type_id: int, doc_file
+):
+    """Service for uploading documents against a tenant"""
+    # Check we have a valid tenant:
+    exists = (
+        db.session.query(Tenant, Property, Portfolio)
+        .filter(Tenant.property_id == Property.id)
+        .filter(Property.portfolio_id == Portfolio.id)
+        .filter(Tenant.id == tenant_id)
+        .filter(Property.id == property_id)
+        .filter(Portfolio.id == portfolio_id)
+        .scalar()
+    )
+    if exists is not None:
+        doc_str = doc_file.read()
+
+        tenant_doc = TenantDocument(
+            tenant_id=tenant_id,
+            document_blob=doc_str,
+            document_type_id=doc_type_id,
+            file_name=secure_filename(doc_file.filename),
+            file_ext=doc_file.content_type.rsplit("/")[1],
+        )
+        save_changes(tenant_doc)
+        response_object = {
+            "status": "success",
+            "message": "Successfully uploaded the tenant document.",
+            "data": {"id": tenant_doc.id},
+        }
+        return response_object, HTTPStatus.CREATED
+    else:
+        raise BadRequest("Details supplied were incorrect.")
+
+
+def get_tenant_documents(tenant_id):
+    """Retrieves all documents for the tenant"""
+
+    tenant_docs = TenantDocument.query.filter_by(tenant_id=tenant_id).all()
+    if tenant_docs is None:
+        raise NotFound(f"Tenant documents not found with id {tenant_id}")
+
+    return tenant_docs
 
 
 def save_changes(data) -> None:

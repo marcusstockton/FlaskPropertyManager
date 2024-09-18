@@ -7,7 +7,9 @@ from flask_restx import Resource, abort
 from werkzeug.datastructures import FileStorage
 
 from ..service.tenant_service import (
+    add_tenant_document,
     get_all_tenants_for_property,
+    get_tenant_documents,
     save_new_tenant,
     get_tenant_by_id,
     delete_tenant,
@@ -22,6 +24,7 @@ _tenant = TenantDto.tenant
 _tenant_list = TenantDto.tenant_list
 _tenant_create = TenantDto.tenant_create
 _tenant_update = TenantDto.tenant_update
+_tenant_documents = TenantDto.tenant_documents
 
 upload_parser = api.parser()
 upload_parser.add_argument(
@@ -30,6 +33,15 @@ upload_parser.add_argument(
     type=FileStorage,
     required=True,
     help="Image file cannot empty",
+)
+doc_upload_parser = api.parser()
+doc_upload_parser.add_argument("document_type_id", type=int, required=True)
+doc_upload_parser.add_argument(
+    "file",
+    location="files",
+    type=FileStorage,
+    required=True,
+    help="File cannot empty",
 )
 
 
@@ -135,3 +147,23 @@ class TenantImage(Resource):
             )
             image_string = file.read()
             return add_profile_to_tenant(tenant_id, image_string)
+
+
+@api.route("/<int:tenant_id>/documents")
+class TenantDocument(Resource):
+    """Tenant Documents API endpoints"""
+
+    @api.expect(doc_upload_parser)
+    def post(self, portfolio_id:int, property_id:int, tenant_id: int):
+        args = doc_upload_parser.parse_args()
+        doc_data = args["file"]
+        print(type(doc_data))
+        doc_type_id = args["document_type_id"]
+        app.logger.info(f"file data received: name: {doc_data.filename}, ext:{doc_data.content_type.rsplit("/")[1]}, tenant_id: {tenant_id}")
+
+        return add_tenant_document(portfolio_id, property_id, tenant_id, doc_type_id, doc_data)
+
+    @api.marshal_list_with(_tenant_documents)
+    def get(self, portfolio_id: int, property_id: int, tenant_id):
+        app.logger.info(f"Finding tenant documents for tenant id {tenant_id}")
+        return get_tenant_documents(tenant_id)

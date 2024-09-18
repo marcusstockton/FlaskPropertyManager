@@ -61,6 +61,7 @@ class Tenant(BaseClass):
         "TenantProfile", back_populates="tenant", uselist=False
     )  # uselist demotes a 1:1 relationship
     notes = db.relationship("TenantNote")
+    documents = db.relationship("TenantDocument")
 
 
 @dataclass
@@ -80,3 +81,29 @@ class TenantProfile(BaseClass):
     tenant_id: Mapped[int] = db.Column(db.Integer, db.ForeignKey(Tenant.id))
     image: Mapped[LargeBinary] = db.Column(LargeBinary)
     tenant = db.relationship("Tenant", back_populates="profile_pic")
+
+
+@dataclass
+class DocumentType(BaseClass):
+    """Document Type"""
+
+    __tablename__ = "document-type"
+    description: Mapped[str] = db.Column(db.String(100))
+    expiry: Mapped[Optional[datetime]] = db.Column(db.Date)
+    document = db.relationship("TenantDocument", back_populates="document_type")
+
+
+@dataclass
+class TenantDocument(BaseClass):
+    """Tenant Documents stored as base64 str"""
+
+    __tablename__ = "tenant-document"
+    tenant_id: Mapped[int] = db.Column(db.Integer, db.ForeignKey(Tenant.id))
+    tenant = db.relationship("Tenant", back_populates="documents")
+    document_blob: Mapped[LargeBinary] = db.Column(LargeBinary)
+    file_name: Mapped[str] = db.Column(db.String(100))
+    file_ext: Mapped[set] = db.Column(db.String(4))
+    document_type_id: Mapped[int] = db.Column(
+        db.Integer, db.ForeignKey(DocumentType.id)
+    )
+    document_type = db.relationship("DocumentType")

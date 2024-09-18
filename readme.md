@@ -56,6 +56,7 @@ test
 
 * Add error logging to a mongodb database
 * Add caching to auto-completes (AddressSearchList)
+* Look at using flask-marshmallow for marshalling?
 
 
 ## Docker Commands

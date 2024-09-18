@@ -200,3 +200,20 @@ class TenantDto:
             ),
         },
     )
+    tenant_documents = api.model(
+        "TenantDocument",
+        {
+            "id": fields.Integer(required=True, description="id"),
+            "tenant_id": fields.Integer(required=True, description="tenant id"),
+            "created_date": fields.DateTime(required=False, description="date created"),
+            "updated_date": fields.DateTime(
+                required=False, description="date last updated"
+            ),
+            "document_type_id": fields.Integer(
+                required=True, description="document type"
+            ),
+            "file_name": fields.String(required=True, description="last name"),
+            "file_ext": fields.String(required=True, description="last name"),
+            "document_blob": fields.String(),
+        },
+    )
