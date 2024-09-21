@@ -5,8 +5,6 @@ import unittest
 
 from flask import current_app
 from flask_testing import TestCase
-
-from app.main.config import basedir
 from manage import app
 
 
@@ -23,10 +21,7 @@ class TestDevelopmentConfig(TestCase):
         self.assertFalse(current_app is None)
         self.assertTrue(
             app.config["SQLALCHEMY_DATABASE_URI"]
-            == "sqlite:///"
-            + os.path.join(
-                basedir, "flask_PropertyManager_main.db?check_same_thread=False"
-            )
+            == "postgresql://postgres:postgres@flask_db:5432/postgres"
         )
 
 
@@ -41,13 +36,7 @@ class TestTestingConfig(TestCase):
         self.assertFalse(app.config["SECRET_KEY"] is "my_precious")
         self.assertTrue(app.config["DEBUG"])
         self.assertTrue(app.config["TESTING"])
-        self.assertTrue(
-            app.config["SQLALCHEMY_DATABASE_URI"]
-            == "sqlite:///"
-            + os.path.join(
-                basedir, "flask_PropertyManager_test.db?check_same_thread=False"
-            )
-        )
+        self.assertTrue(app.config["SQLALCHEMY_DATABASE_URI"] == "sqlite:///:memory")
 
 
 class TestProductionConfig(TestCase):
