@@ -19,6 +19,7 @@ class BaseTestCase(TestCase):
         # if "_test.db" not in str(db.engine.url):
         #     raise ValueError("Not using test database!")
         # print("Engine URL: %s", db.engine.url)
+        app.logger.info("Setting up %s", db.engine.url)
         db.session.remove()
         db.drop_all()
         db.create_all()  # create all the tables
@@ -26,11 +27,13 @@ class BaseTestCase(TestCase):
         db.session.commit()
 
     def tearDown(self):
+        app.logger.info("Tearing down db %s", db.engine.url)
         db.session.remove()
         db.drop_all()
 
     def seed_test_data(self):
         """Seeds the roles and a test admin user"""
+        app.logger.info("Seeding test database %s", db.engine.url)
         q = db.session.query(user.Role).filter_by(name="Admin")
         admin_role_exists = db.session.query(
             q.exists()

@@ -168,81 +168,45 @@ class TestPortfolioBlueprint(BaseTestCase):
 
                 self.assertEqual(1, data.get("property_count"))
 
-    # def test_create_portfolio_with_xss_input_is_sanitized(self):
-    #     new_portfolio = {"name": "<script>alert();</script>"}
+    def test_create_portfolio_with_xss_input_is_sanitized(self):
+        """Tests that adding potenially dangerous xss script into the name will get sanitised"""
+        new_portfolio = {"name": "<script>alert();</script>"}
 
-    #     user_id = db.session.query(User.id).filter_by(email="user@testing.com").scalar()
-    #     # Do the test:
-    #     with app.test_client() as client:
-    #         response = client.post(
-    #             "/portfolio/",
-    #             data=json.dumps(new_portfolio),
-    #             headers={"Content-Type": "application/json"},
-    #         )
-    #         self.assert200(response)
-    #         data = json.loads(response.get_data(as_text=True))
-    #         self.assertEqual("&lt;script&gt;alert();&lt;/script&gt;", data.get("name"))
+        access_token = create_owner_user()
+        headers = {
+            "Access-Control-Allow-Origin": "*",
+            "Content-Type": "application/json",
+            "Authorization": access_token,
+        }
+        # Do the test:
+        with app.test_client() as client:
+            response = client.post(
+                "/portfolio/",
+                data=json.dumps(new_portfolio),
+                headers=headers,
+            )
+            self.assert200(response)
+            data = json.loads(response.get_data(as_text=True))
+            self.assertEqual("&lt;script&gt;alert();&lt;/script&gt;", data.get("name"))
 
 
-#     #
-#     # @patch.object(
-#     #     Auth, "get_logged_in_user", return_value=mock_get_logged_in_user_success()
-#     # )
-#     # @patch.object(Auth, "get_logged_in_user_object", return_value=mock_logged_in_user())
-#     # def test_create_portfolio_with_normal_input_is_saved_correctly(
-#     #     self, mock_user, mock_auth
-#     # ):
-#     #     new_portfolio = {"name": "Testing Portfolio Name"}
-#     #     # Do the test:
-#     #     with app.test_client() as client:
-#     #         response = client.post(
-#     #             "/portfolio/",
-#     #             data=json.dumps(new_portfolio),
-#     #             headers={"Content-Type": "application/json"},
-#     #         )
-#     #         self.assert200(response)
-#     #         data = json.loads(response.get_data(as_text=True))
-#     #         self.assertEqual("Testing Portfolio Name", data.get("name"))
-#     #
-#     @staticmethod
-#     def create_data():
-#         user_1 = db.session.query(User).filter(User.username == "test@test.com").one()
-#         user_2 = db.session.query(User).filter(User.username == "test2@test.com").one()
+def test_create_portfolio_with_normal_input_is_saved_correctly(self):
+    """Tests that adding non xss text into the name will work"""
+    new_portfolio = {"name": "Testing Portfolio Name"}
 
-#         portfolio1 = Portfolio(
-#             name="Test 1",
-#             owner=user_1,
-#             properties=[],
-#         )
-#         db.session.add(portfolio1)
-
-#         portfolio2 = Portfolio(
-#             name="Test 2",
-#             owner=user_2,
-#             properties=[],
-#         )
-#         db.session.add(portfolio2)
-
-#         db.session.commit()
-
-#         portfolios = db.session.query(Portfolio).all()
-#         print()
-#     #
-#     # @staticmethod
-#     # def remove_data():
-#     #     user1 = delete(User).where(User.username == "test@test.com")
-#     #     db.session.execute(user1)
-#     #
-#     #     user2 = delete(User).where(User.username == "test2@test.com")
-#     #     db.session.execute(user2)
-#     #
-#     #     p1 = delete(Portfolio).where(Portfolio.name == "Test 1")
-#     #     db.session.execute(p1)
-#     #
-#     #     p1 = delete(Portfolio).where(Portfolio.name == "Test 2")
-#     #     db.session.execute(p1)
-#     #
-#     #     db.session.commit()
-
-# if __name__ == "__main__":
-#     unittest.main()
+    access_token = create_owner_user()
+    headers = {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+        "Authorization": access_token,
+    }
+    # Do the test:
+    with app.test_client() as client:
+        response = client.post(
+            "/portfolio/",
+            data=json.dumps(new_portfolio),
+            headers=headers,
+        )
+        self.assert200(response)
+        data = json.loads(response.get_data(as_text=True))
+        self.assertEqual("Testing Portfolio Name", data.get("name"))

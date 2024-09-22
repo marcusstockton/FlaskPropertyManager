@@ -1,5 +1,6 @@
 """Portfolio Service for interacting with portfolios"""
 
+from http import HTTPStatus
 from typing import List
 
 
@@ -63,6 +64,7 @@ def save_new_portfolio(data, user_id) -> Portfolio:
         .scalar()
     )
     if portfolio is None:
+        current_app.logger.info(f"Portfolio {sanitised_name} does not exist so adding.")
         new_portfolio = Portfolio(
             name=sanitised_name,
             owner_id=user_id,
@@ -94,17 +96,26 @@ def update_portfolio(portfolio_id: int, data: dict) -> Portfolio:
 
 def delete_portfolio_by_id(user, portfolio_id):
     """Deletes the Portfolio and related data"""
-    portfolio = db.session.query(Portfolio.id).filter_by(id=portfolio_id).scalar()
+    portfolio = db.session.query(Portfolio).filter_by(id=portfolio_id).scalar()
     if portfolio is None:
         raise NotFound("Portfolio not found")
     if portfolio is not None:
         if portfolio.owner_id == user.id:
             db.session.delete(portfolio)
             db.session.commit()
-            return None
+            response_object = {
+                "status": "success",
+                "message": "Successfully deleted the portfolio.",
+                "data": {"id": portfolio_id},
+            }
+        return response_object, HTTPStatus.NO_CONTENT
 
 
 def save_changes(data) -> None:
     """Saves changes"""
-    db.session.add(data)
-    db.session.commit()
+    try:
+        db.session.add(data)
+        db.session.commit()
+    except Exception as ex:
+        current_app.logger.exception(ex)
+        raise BaseException(ex)
