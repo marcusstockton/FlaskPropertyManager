@@ -6,7 +6,12 @@ from typing import List
 
 from flask import current_app
 from sqlalchemy import update
-from sqlalchemy.exc import IntegrityError, NoResultFound, MultipleResultsFound
+from sqlalchemy.exc import (
+    IntegrityError,
+    NoResultFound,
+    MultipleResultsFound,
+    SQLAlchemyError,
+)
 from sqlalchemy.orm import lazyload
 from werkzeug.exceptions import NotFound, BadRequest, InternalServerError
 from bleach import clean
@@ -116,6 +121,6 @@ def save_changes(data) -> None:
     try:
         db.session.add(data)
         db.session.commit()
-    except Exception as ex:
+    except SQLAlchemyError as ex:
         current_app.logger.exception(ex)
-        raise BaseException(ex)
+        raise Exception(ex) from ex

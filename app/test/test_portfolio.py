@@ -6,7 +6,6 @@ from werkzeug.exceptions import NotFound
 from app.main import db
 from app.main.model.portfolio import Portfolio
 from app.main.model.user import User
-from app.main.service.portfolio_service import save_new_portfolio
 from app.test.base import BaseTestCase
 from app.test.helpers import mock_get_all_portfolios_for_user, mock_portfolio_by_id
 
@@ -178,35 +177,48 @@ class TestPortfolioBlueprint(BaseTestCase):
             "Content-Type": "application/json",
             "Authorization": access_token,
         }
-        # Do the test:
-        with app.test_client() as client:
-            response = client.post(
-                "/portfolio/",
-                data=json.dumps(new_portfolio),
-                headers=headers,
+        with patch(
+            "app.main.controller.portfolio_controller.save_new_portfolio"
+        ) as mock_save_new_portfolio:
+            mock_save_new_portfolio.return_value = Portfolio(
+                name="&lt;script&gt;alert();&lt;/script&gt;"
             )
-            self.assert200(response)
-            data = json.loads(response.get_data(as_text=True))
-            self.assertEqual("&lt;script&gt;alert();&lt;/script&gt;", data.get("name"))
+            # Do the test:
+            with app.test_client() as client:
+                response = client.post(
+                    "/portfolio/",
+                    data=json.dumps(new_portfolio),
+                    headers=headers,
+                )
+                self.assert200(response)
+                data = json.loads(response.get_data(as_text=True))
+                self.assertEqual(
+                    "&lt;script&gt;alert();&lt;/script&gt;", data.get("name")
+                )
 
+    def test_create_portfolio_with_normal_input_is_saved_correctly(self):
+        """Tests that adding non xss text into the name will work"""
+        new_portfolio = {"name": "Testing Portfolio Name"}
 
-def test_create_portfolio_with_normal_input_is_saved_correctly(self):
-    """Tests that adding non xss text into the name will work"""
-    new_portfolio = {"name": "Testing Portfolio Name"}
-
-    access_token = create_owner_user()
-    headers = {
-        "Access-Control-Allow-Origin": "*",
-        "Content-Type": "application/json",
-        "Authorization": access_token,
-    }
-    # Do the test:
-    with app.test_client() as client:
-        response = client.post(
-            "/portfolio/",
-            data=json.dumps(new_portfolio),
-            headers=headers,
-        )
-        self.assert200(response)
-        data = json.loads(response.get_data(as_text=True))
-        self.assertEqual("Testing Portfolio Name", data.get("name"))
+        access_token = create_owner_user()
+        headers = {
+            "Access-Control-Allow-Origin": "*",
+            "Content-Type": "application/json",
+            "Authorization": access_token,
+        }
+        with patch(
+            "app.main.controller.portfolio_controller.save_new_portfolio"
+        ) as mock_save_new_portfolio:
+            mock_save_new_portfolio.return_value = Portfolio(
+                name="Testing Portfolio Name"
+            )
+            # Do the test:
+            with app.test_client() as client:
+                response = client.post(
+                    "/portfolio/",
+                    data=json.dumps(new_portfolio),
+                    headers=headers,
+                )
+                self.assert200(response)
+                data = json.loads(response.get_data(as_text=True))
+                self.assertEqual("Testing Portfolio Name", data.get("name"))

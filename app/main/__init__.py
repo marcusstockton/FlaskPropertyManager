@@ -34,7 +34,7 @@ def create_app(config_name: str) -> Flask:
     app.config["MAX_CONTENT_LENGTH"] = 2 * 1024 * 1024  # 2MB limit
     app.config["UPLOAD_EXTENSIONS"] = ["jpg", "jpeg", "png", "gif", "tif"]
 
-    # app.logger.debug("DB URL: %s", app.config["SQLALCHEMY_DATABASE_URI"])
+    app.logger.debug("DB URL: %s", app.config["SQLALCHEMY_DATABASE_URI"])
 
     db.init_app(app)
     cache.init_app(app)
