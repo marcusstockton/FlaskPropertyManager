@@ -6,13 +6,6 @@ This was just an idea for managing properties for landlords etc.
 
 https://www.freecodecamp.org/news/structuring-a-flask-restplus-web-service-for-production-builds-c2ec676de563/
 
-## Useful commands
-
-may need to:
-* Ubuntu: ``export FLASK_APP=manage.py`` from the root
-* Windows: ``set FLASK_APP=manage.py`` from the root or ``set FLASK_APP=FlaskPropertyManager``
-* Windows PowerShell: `` $env:FLASK_APP="manage.py" `` from the root
-
 ### Help
 
     flask --app manage.py --help
@@ -47,9 +40,9 @@ may need to:
     port.properties.append(new_property)
     db.session.commit()
 
-## Usernames
+#### Usernames
 
-<test@test.com> | <marcus_stockton@hotmail.co.uk>
+<test@test.com> | <marcus_stockton@hotmail.co.uk>\
 test
 
 ## Idea's
@@ -58,14 +51,19 @@ test
 * Add caching to auto-completes (AddressSearchList)
 * Remove Flask-Caching and add in redis caching
 
-## Docker Commands
+### Docker Commands
 
-``docker build -t flaskpropertymanager .``
-``docker run -it -p 5000:5000 flaskpropertymanager``
-
-``docker exec -it <container name> bash`` # to load up the docker image to navigate in linux
-
-``docker compose build`` # builds all images
-``docker compose build flask_app`` # Builds specific image
-``docker compose up -d`` # runs all images in detached mode
+``docker build -t flaskpropertymanager .``\
+``docker run -it -p 5000:5000 flaskpropertymanager``\
+``docker exec -it <container name> bash`` # to load up the docker image to navigate in linux\
+``docker compose build`` # builds all images\
+``docker compose build flask_app`` # Builds specific image\
+``docker compose up -d`` # runs all images in detached mode\
 ``docker compose up -d flask_app`` # runs one particular image in detached mode
+
+### Debugging against a docker container
+
+Firstly, make sure docker desktop is running.\
+Then you'll want to build the latest images (assuming something has changed since last time)\
+Then, once both images are up and running, you can just hit the debug in vs code choosing the Python Debugger: Remote Attach option.\
+Should get a blue bar along the bottom in vs code - should be good to go!\
