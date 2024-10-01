@@ -19,7 +19,7 @@ class UserLogin(Resource):
     @api.expect(user_auth, validate=True)
     @api.response(401, "Invalid username and/or password")
     def post(self):
-        """Create a new Login"""
+        """Logs a User in"""
         # get the post data
         app.logger.info(f"Received login details for  {request.json}")
         post_data = request.json

@@ -11,7 +11,7 @@ class PortfolioDto:
     portfolio_details = api.model(
         "Portfolio",
         {
-            "id": fields.String(required=True, description="id"),
+            "id": fields.Integer(required=True, description="id"),
             "name": fields.String(required=True, description="portfolio name"),
             "created_date": fields.DateTime(
                 required=True,
@@ -38,12 +38,14 @@ class PortfolioDto:
     portfolio_update = api.model(
         "Portfolio",
         {
-            "id": fields.String(required=True, description="id"),
+            "id": fields.Integer(required=True, description="id"),
             "name": fields.String(required=True, description="portfolio name"),
         },
     )
     portfolio_update_parser = api.parser()
-    # portfolio_update_parser.add_argument('id', location='json', type=int, required=True, help="ID of portfolio")
+    portfolio_update_parser.add_argument(
+        "id", location="json", type=int, required=True, help="ID of portfolio"
+    )
     portfolio_update_parser.add_argument(
         "name", location="json", type=str, required=True, help="Name of portfolio"
     )

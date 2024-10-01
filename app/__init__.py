@@ -49,19 +49,25 @@ def integrety_exception_handler(error):
 @api.errorhandler(NotFound)
 def not_found_exception_handler(error):
     """Default Not Found error handler"""
-    return {"message": str(error)}, getattr(error, "code", HTTPStatus.NOT_FOUND)
+    # gets the description property from error obj, and defaults to
+    # output the error string if if can't get the description property.
+    return {"message": getattr(error, "description", str(error))}, getattr(
+        error, "code", HTTPStatus.NOT_FOUND
+    )
 
 
 @api.errorhandler(BadRequest)
 def bad_request_exception_handler(error):
     """Default Bad Request error handler"""
-    return {"message": str(error)}, getattr(error, "code", HTTPStatus.BAD_REQUEST)
+    return {"message": getattr(error, "description", str(error))}, getattr(
+        error, "code", HTTPStatus.BAD_REQUEST
+    )
 
 
 @api.errorhandler(InternalServerError)
 def internal_server_error_exception_handler(error):
     """Default Not Found error handler"""
-    return {"message": str(error)}, getattr(
+    return {"message": getattr(error, "description", str(error))}, getattr(
         error, "code", HTTPStatus.INTERNAL_SERVER_ERROR
     )
 
@@ -69,6 +75,6 @@ def internal_server_error_exception_handler(error):
 @api.errorhandler(Exception)
 def generic_exception_handler(error):
     """Default error handler"""
-    return {"message": str(error)}, getattr(
+    return {"message": getattr(error, "description", str(error))}, getattr(
         error, "code", HTTPStatus.INTERNAL_SERVER_ERROR
     )

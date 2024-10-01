@@ -83,6 +83,8 @@ def save_new_portfolio(data, user_id) -> Portfolio:
 
 def update_portfolio(portfolio_id: int, data: dict) -> Portfolio:
     """Update a portfolio"""
+    if portfolio_id is not data["id"]:
+        raise BadRequest("Invalid Request. Please check your data")
     portfolio_query = Portfolio.query.filter_by(id=portfolio_id).one()
     sanitised_name = clean(data["name"])
     data["name"] = sanitised_name

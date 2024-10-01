@@ -13,36 +13,33 @@ class Auth:
     @staticmethod
     def login_user(data):
         """User Auth"""
-        try:
-            # fetch the user data
-            user = User.query.filter_by(email=data.get("email")).first()
-            app.logger.info(
-                f"User with email {data.get('email')} found...checking password..."
-            )
-            if user and user.check_password(data.get("password")):
-                app.logger.info(
-                    f"User with email {data.get('email')} password confirmed."
-                )
-                auth_token = user.encode_auth_token(user.id)
-                if auth_token:
-                    response_object = {
-                        "status": "success",
-                        "message": "Successfully logged in.",
-                        "Authorization": auth_token,
-                        "username": user.username,
-                    }
-                    return response_object, HTTPStatus.OK
-            else:
+        # try:
+        # fetch the user data
+        user = User.query.filter_by(email=data.get("email")).first()
+        if user is None:
+            raise NotFound("Username or password invalid.")
+        if user and user.check_password(data.get("password")):
+            app.logger.info(f"User with email {data.get('email')} password confirmed.")
+            auth_token = user.encode_auth_token(user.id)
+            if auth_token:
                 response_object = {
-                    "status": "fail",
-                    "message": "Email or password does not match.",
+                    "status": "success",
+                    "message": "Successfully logged in.",
+                    "Authorization": auth_token,
+                    "username": user.username,
                 }
-                return response_object, HTTPStatus.UNAUTHORIZED
+                return response_object, HTTPStatus.OK
+        else:
+            response_object = {
+                "status": "fail",
+                "message": "Username or password invalid.",
+            }
+            return response_object, HTTPStatus.UNAUTHORIZED
 
-        except Exception as err:
-            print(err)
-            response_object = {"status": "fail", "message": "Try again"}
-            return response_object, HTTPStatus.INTERNAL_SERVER_ERROR
+        # except Exception as err:
+        #     print(err)
+        #     response_object = {"status": "fail", "message": "Try again"}
+        #     return response_object, HTTPStatus.INTERNAL_SERVER_ERROR
 
     @staticmethod
     def logout_user(data):

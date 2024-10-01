@@ -28,8 +28,11 @@ services:
     build: 
       context: .
       dockerfile: /Dockerfile
+      target: debugger # only for dev
+      #target: primary # for prod
     ports:
-      - 5000:5000
+       - 5000:5000
+       - 5678:5678 # only for dev
     volumes:
       - .:/app/
     depends_on:
