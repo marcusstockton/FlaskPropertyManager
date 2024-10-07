@@ -50,8 +50,6 @@ test
 * Add error logging to a mongodb database
 * Add caching to auto-completes (AddressSearchList)
 * Remove Flask-Caching and add in redis caching
-* Add in user forgotten password functionality, user password change
-* Implement emailing functionality
 
 ### Docker Commands
 

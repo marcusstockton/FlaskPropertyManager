@@ -72,6 +72,10 @@ class ForgotPassword(Resource):
                 post_data["email"],
                 "Password Reset",
                 f"Dear {user.first_name},\n You or someone else has requested that a new password be generated for your account.\n If you made this request, then please follow this link:\n {url_reset}",
+                "email/password_reset.html",
+                first_name=user.first_name,
+                token=token,
+                url_reset=url_reset,
             )
             return {"message": "Password reset link sent"}
         raise NotFound(user)
@@ -105,3 +109,18 @@ class ResetPassword(Resource):
 
         except:
             raise BadRequest("Something went wrong resetting your password.")
+
+
+# @api.route("/test-email")
+# class EmailTester(Resource):
+#     def post(self):
+
+#         mail_service.send_email(
+#             "test@test.com",
+#             "Test_email",
+#             "Testing Testing 123",
+#             "email/password_reset.html",
+#             first_name="Dave",
+#             token="Some Token Here",
+#             url_reset="URL Reset link",
+#         )
