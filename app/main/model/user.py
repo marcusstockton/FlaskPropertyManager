@@ -59,7 +59,7 @@ class User(BaseClass):
         else:
             print("Your password seems fine")
 
-    def encode_auth_token(self, user_id):
+    def encode_auth_token(self, user_id, expires_mins=1440) -> str:
         """
         Generates the Auth Token
         :return: string
@@ -70,14 +70,14 @@ class User(BaseClass):
             )
 
             payload = {
-                "exp": datetime.now(timezone.utc) + timedelta(days=1, seconds=5),
+                "exp": datetime.now(timezone.utc) + timedelta(minutes=expires_mins),
                 "iat": datetime.now(timezone.utc),
                 "sub": user_id,
                 "username": username,
             }
             return jwt.encode(payload, key, algorithm="HS256")
         except Exception as e:
-            return e
+            raise Exception from e
 
     @staticmethod
     def decode_auth_token(auth_token):

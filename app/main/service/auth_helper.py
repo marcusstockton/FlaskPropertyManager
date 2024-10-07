@@ -2,7 +2,7 @@
 
 from http import HTTPStatus
 from flask import current_app as app
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import NotFound, Unauthorized
 from app.main.model.user import User
 from ..service.blacklist_service import save_token
 
@@ -13,8 +13,6 @@ class Auth:
     @staticmethod
     def login_user(data):
         """User Auth"""
-        # try:
-        # fetch the user data
         user = User.query.filter_by(email=data.get("email")).first()
         if user is None:
             raise NotFound("Username or password invalid.")
@@ -30,16 +28,7 @@ class Auth:
                 }
                 return response_object, HTTPStatus.OK
         else:
-            response_object = {
-                "status": "fail",
-                "message": "Username or password invalid.",
-            }
-            return response_object, HTTPStatus.UNAUTHORIZED
-
-        # except Exception as err:
-        #     print(err)
-        #     response_object = {"status": "fail", "message": "Try again"}
-        #     return response_object, HTTPStatus.INTERNAL_SERVER_ERROR
+            raise Unauthorized("Username or password invalid")
 
     @staticmethod
     def logout_user(data):
@@ -53,11 +42,7 @@ class Auth:
                 response_object = {"status": "fail", "message": resp}
                 return response_object, HTTPStatus.UNAUTHORIZED
         else:
-            response_object = {
-                "status": "fail",
-                "message": "Provide a valid auth token.",
-            }
-            return response_object, HTTPStatus.FORBIDDEN
+            raise Unauthorized("Provide a valid auth token.")
 
     @staticmethod
     def get_logged_in_user(new_request):
@@ -88,11 +73,7 @@ class Auth:
             response_object = {"status": "fail", "message": resp}
             return response_object, HTTPStatus.UNAUTHORIZED
         else:
-            response_object = {
-                "status": "fail",
-                "message": "Provide a valid auth token.",
-            }
-            return response_object, HTTPStatus.UNAUTHORIZED
+            raise Unauthorized("Provide a valid auth token.")
 
     @staticmethod
     def get_logged_in_user_object(request) -> User | None:

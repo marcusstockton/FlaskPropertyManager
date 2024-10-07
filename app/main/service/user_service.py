@@ -6,9 +6,10 @@ from http import HTTPStatus
 
 from flask import current_app
 from sqlalchemy import update
+from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import BadRequest, InternalServerError, NotFound
-
+from sqlalchemy.exc import IntegrityError, NoResultFound
 from app.main import db
 from app.main.model.user import User, Role
 
@@ -82,23 +83,35 @@ def delete_user(user_id):
         raise InternalServerError(repr(e)) from e
 
 
-def get_all_users():
+def get_all_users() -> list[User]:
     """Returns all users"""
     current_app.logger.info("Calling get all users")
     return User.query.all()
 
 
-def get_a_user(public_id):
+def get_a_user(public_id) -> User | None:
     """Retrieves a user via its public id"""
     current_app.logger.info(f"Calling get a user with public_id {public_id}")
     user = User.query.filter_by(public_id=public_id).first()
     return user
 
 
-def get_a_user_by_username(username):
+def get_a_user_by_username(username) -> User | None:
     """Retrieves a user via its username"""
     current_app.logger.info(f"Calling get a user with username {username}")
     return User.query.filter_by(username=username).first()
+
+
+def forgotten_password_user_lookup(email_address: str, date_of_birth: datetime) -> User:
+    """Function for looking up a user by email address and date of birth"""
+    try:
+        return (
+            User.query.filter_by(email=email_address)
+            .filter(func.DATE(User.date_of_birth) == date_of_birth)
+            .one()
+        )
+    except NoResultFound as e:
+        raise Exception(e) from e
 
 
 def generate_token(user):
@@ -117,6 +130,20 @@ def generate_token(user):
         return response_object, HTTPStatus.CREATED
     except Exception as e:
         raise InternalServerError(repr(e)) from e
+
+
+def reset_user_password(auth_token: str, new_password: str) -> User | None:
+    """Helper method for updating the users password"""
+    user_id = User.decode_auth_token(auth_token)
+    user = User.query.filter_by(id=user_id).first()
+    try:
+        if user:
+            user.password = new_password
+            save_changes(user)
+            return user
+        return None
+    except Exception as e:
+        raise Exception from e
 
 
 def save_changes(data):

@@ -2,10 +2,8 @@
 
 import os
 import unittest
-
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
-
 from app import blueprint
 from app.main import create_app, db
 from seeder import seed_data

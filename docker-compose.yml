@@ -1,4 +1,5 @@
 services:
+
   flask_db:
     image: postgres
     container_name: flask_db
@@ -22,6 +23,7 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+
 
   flask_app:
     container_name: flask-app
@@ -47,5 +49,30 @@ services:
     cpus: "0.5"
     cpuset: "1"
 
+
+  smtp4dev:
+    image: rnwood/smtp4dev:v3
+    restart: always
+    ports:
+      # Change the number before : to the port the web interface should be accessible on
+      - '5050:80'
+      # Change the number before : to the port the SMTP server should be accessible on
+      - '25:25'
+      # Change the number before : to the port the IMAP server should be accessible on
+      - '143:143'
+    volumes:
+     - smtp4dev-data:/smtp4dev
+    environment:
+    - ServerOptions__Urls=http://*:80
+    - ServerOptions__HostName=smtp4dev
+    mem_limit: 512m
+    mem_reservation: 128M
+    memswap_limit: 1g
+    cpus: "0.5"
+    cpuset: "1"
+
+
+
 volumes:
   pgdata: {}
+  smtp4dev-data:

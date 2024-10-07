@@ -5,7 +5,7 @@ from http import HTTPStatus
 from flask import Blueprint
 from flask_restx import Api
 from sqlalchemy.exc import IntegrityError
-from werkzeug.exceptions import NotFound, BadRequest, InternalServerError
+from werkzeug.exceptions import NotFound, BadRequest, InternalServerError, Unauthorized
 
 from .main.controller.address_controller import api as address_ns
 from .main.controller.auth_controller import api as auth_ns
@@ -69,6 +69,14 @@ def internal_server_error_exception_handler(error):
     """Default Not Found error handler"""
     return {"message": getattr(error, "description", str(error))}, getattr(
         error, "code", HTTPStatus.INTERNAL_SERVER_ERROR
+    )
+
+
+@api.errorhandler(Unauthorized)
+def unauthorised_exception_handler(error):
+    """Default Unauthorised error handler"""
+    return {"message": getattr(error, "description", str(error))}, getattr(
+        error, "code", HTTPStatus.UNAUTHORIZED
     )
 
 

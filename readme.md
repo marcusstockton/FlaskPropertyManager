@@ -50,6 +50,8 @@ test
 * Add error logging to a mongodb database
 * Add caching to auto-completes (AddressSearchList)
 * Remove Flask-Caching and add in redis caching
+* Add in user forgotten password functionality, user password change
+* Implement emailing functionality
 
 ### Docker Commands
 
@@ -64,6 +66,6 @@ test
 ### Debugging against a docker container
 
 Firstly, make sure docker desktop is running.\
-Then you'll want to build the latest images (assuming something has changed since last time)\
+Then you'll want to build the latest images (assuming something has changed since last time) and run them up\
 Then, once both images are up and running, you can just hit the debug in vs code choosing the Python Debugger: Remote Attach option.\
 Should get a blue bar along the bottom in vs code - should be good to go!\
