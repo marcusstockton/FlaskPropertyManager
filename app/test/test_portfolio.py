@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 import json
 from unittest.mock import patch
 from werkzeug.exceptions import NotFound
+from werkzeug.test import TestResponse
 
 from app.main import db
 from app.main.model.portfolio import Portfolio
@@ -43,7 +44,7 @@ class TestPortfolioBlueprint(BaseTestCase):
     """Test class for Portfolio endpoints"""
 
     @patch("app.main.controller.portfolio_controller.get_all_portfolios_for_user")
-    def test_users_can_only_see_their_own_portfolios(self, mock_portfolios):
+    def test_users_can_only_see_their_own_portfolios(self, mock_portfolios) -> None:
         """Checks that users can only see their own portfolios"""
         access_token = create_admin_user()
         headers = {
@@ -57,13 +58,13 @@ class TestPortfolioBlueprint(BaseTestCase):
         ]
 
         with app.test_client() as client:
-            response = client.get("/portfolio/", headers=headers)
+            response: TestResponse = client.get("/portfolio/", headers=headers)
             self.assert200(response)
             data = json.loads(response.get_data(as_text=True))
             self.assertEqual(1, len(data))
 
     @patch("app.main.controller.portfolio_controller.get_portfolio_by_id")
-    def test_correct_portfolio_is_returned_for_id(self, mock_portfolios):
+    def test_correct_portfolio_is_returned_for_id(self, mock_portfolios) -> None:
         """Tests that the correct portfolio is returned"""
         access_token = create_admin_user()
         headers = {
@@ -77,12 +78,12 @@ class TestPortfolioBlueprint(BaseTestCase):
         ]
 
         with app.test_client() as client:
-            response = client.get("/portfolio/1", headers=headers)
+            response: TestResponse = client.get("/portfolio/1", headers=headers)
             data = response.get_json()
             self.assertEqual("Test Portfolio One", data[0].get("name"))
             self.assertEqual("1", data[0].get("id"))
 
-    def test_portfolio_is_not_returned_for_non_owner_user_id(self):
+    def test_portfolio_is_not_returned_for_non_owner_user_id(self) -> None:
         """Unit test to test that users cannot access other user records"""
         access_token = create_owner_user()
         headers = {
@@ -95,10 +96,10 @@ class TestPortfolioBlueprint(BaseTestCase):
         ) as mock_get_portfolio_by_id:
             mock_get_portfolio_by_id.side_effect = NotFound()
             with app.test_client() as client:
-                response = client.get("/portfolio/2", headers=headers)
+                response: TestResponse = client.get("/portfolio/2", headers=headers)
                 self.assert404(response)
 
-    def test_update_portfolio_works_with_correct_data_and_user(self):
+    def test_update_portfolio_works_with_correct_data_and_user(self) -> None:
         """Unit test to made sure correct user returns correct data"""
         access_token = create_owner_user()
         headers = {
@@ -113,7 +114,7 @@ class TestPortfolioBlueprint(BaseTestCase):
         ) as update_patch:
             update_patch.return_value = Portfolio(name=dict_data["name"])
             with app.test_client() as client:
-                response = client.put(
+                response: TestResponse = client.put(
                     "/portfolio/1",
                     data=json.dumps(dict_data),
                     headers=headers,
@@ -123,7 +124,7 @@ class TestPortfolioBlueprint(BaseTestCase):
 
                 self.assertEqual("Updated Test 1", data.get("name"))
 
-    def test_update_portfolio_fails_if_incorrect_data_used(self):
+    def test_update_portfolio_fails_if_incorrect_data_used(self) -> None:
         """Handle invalid user updating portfolio"""
         access_token = create_owner_user()
         headers = {
@@ -137,7 +138,7 @@ class TestPortfolioBlueprint(BaseTestCase):
             update_patch.side_effect = NotFound()
             dict_data = {"id": "2", "name": "Updated Test 1"}
             with app.test_client() as client:
-                response = client.put(
+                response: TestResponse = client.put(
                     "/portfolio/2",
                     data=json.dumps(dict_data),
                     headers=headers,
@@ -146,7 +147,7 @@ class TestPortfolioBlueprint(BaseTestCase):
 
     def test_get_portfolio_returns_correct_property_count_with_correct_data_and_user(
         self,
-    ):
+    ) -> None:
         """Tests that get portfolio by id returns portfolio and properties"""
         access_token = create_owner_user()
         headers = {
@@ -161,13 +162,13 @@ class TestPortfolioBlueprint(BaseTestCase):
         ) as mock_get_portfolio_by_id:
             mock_get_portfolio_by_id.return_value = mock_portfolio_by_id()
             with app.test_client() as client:
-                response = client.get("/portfolio/1", headers=headers)
+                response: TestResponse = client.get("/portfolio/1", headers=headers)
                 self.assert200(response)
                 data = json.loads(response.get_data(as_text=True))
 
                 self.assertEqual(1, data.get("property_count"))
 
-    def test_create_portfolio_with_xss_input_is_sanitized(self):
+    def test_create_portfolio_with_xss_input_is_sanitized(self) -> None:
         """Tests that adding potenially dangerous xss script into the name will get sanitised"""
         new_portfolio = {"name": "<script>alert();</script>"}
 
@@ -185,7 +186,7 @@ class TestPortfolioBlueprint(BaseTestCase):
             )
             # Do the test:
             with app.test_client() as client:
-                response = client.post(
+                response: TestResponse = client.post(
                     "/portfolio/",
                     data=json.dumps(new_portfolio),
                     headers=headers,
@@ -196,7 +197,7 @@ class TestPortfolioBlueprint(BaseTestCase):
                     "&lt;script&gt;alert();&lt;/script&gt;", data.get("name")
                 )
 
-    def test_create_portfolio_with_normal_input_is_saved_correctly(self):
+    def test_create_portfolio_with_normal_input_is_saved_correctly(self) -> None:
         """Tests that adding non xss text into the name will work"""
         new_portfolio = {"name": "Testing Portfolio Name"}
 
@@ -214,7 +215,7 @@ class TestPortfolioBlueprint(BaseTestCase):
             )
             # Do the test:
             with app.test_client() as client:
-                response = client.post(
+                response: TestResponse = client.post(
                     "/portfolio/",
                     data=json.dumps(new_portfolio),
                     headers=headers,

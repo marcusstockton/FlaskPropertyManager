@@ -13,7 +13,7 @@ class Auth:
     @staticmethod
     def login_user(data):
         """User Auth"""
-        user = User.query.filter_by(email=data.get("email")).first()
+        user: User | None = User.query.filter_by(email=data.get("email")).first()
         if user is None:
             raise NotFound("Username or password invalid.")
         if user and user.check_password(data.get("password")):
@@ -39,7 +39,7 @@ class Auth:
                 # mark the token as blacklisted
                 return save_token(token=data)
             else:
-                response_object = {"status": "fail", "message": resp}
+                response_object: dict[str, str] = {"status": "fail", "message": resp}
                 return response_object, HTTPStatus.UNAUTHORIZED
         else:
             raise Unauthorized("Provide a valid auth token.")

@@ -4,6 +4,7 @@ from flask import current_app as app
 from flask import request
 from flask_restx import Resource
 
+from app.main.model.user import User
 from app.main.util.decorator import token_required, admin_token_required
 from ..service.user_service import (
     save_new_user,
@@ -47,7 +48,7 @@ class UserList(Resource):
 @api.param("public_id", "The User identifier")
 @api.response(404, "User not found.")
 @api.response(200, "User record returned.")
-class User(Resource):
+class UserItem(Resource):
     """Singular User API endpoints"""
 
     @token_required
@@ -56,7 +57,7 @@ class User(Resource):
     def get(self, public_id):
         """get a user given its identifier"""
         app.logger.info(f"Finding user with public_id {public_id}")
-        user = get_a_user(public_id)
+        user: User | None = get_a_user(public_id)
         if not user:
             app.logger.error(f"Unable to find user with public_id {public_id}")
             api.abort(404)

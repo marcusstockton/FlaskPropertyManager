@@ -10,7 +10,7 @@ from app.main.model import user, portfolio, property, address, tenant
 from app.main.model.property_image import PropertyImages
 
 
-def seed_data(db):
+def seed_data(db) -> None:
     """Load initial data into database."""
     fake = Faker("en-GB")
 

@@ -8,7 +8,8 @@ class TestUserModel(BaseTestCase):
 
     datetime_now = datetime.now(timezone.utc)
 
-    def test_encode_auth_token(self):
+    def test_encode_auth_token(self) -> None:
+        """Tests encode auth token works"""
         user = User(email="testFoo@FooFighters.com", registered_on=self.datetime_now)
         user.password = "test"
         db.session.add(user)
@@ -16,7 +17,8 @@ class TestUserModel(BaseTestCase):
         auth_token = user.encode_auth_token(user.id)
         self.assertTrue(isinstance(auth_token, str))
 
-    def test_decode_auth_token(self):
+    def test_decode_auth_token(self) -> None:
+        """Tests decode auth token works"""
         user = User(
             email="testFoo@FooFighters.com",
             admin=False,

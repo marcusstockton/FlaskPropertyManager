@@ -16,13 +16,15 @@ from app.main.model.user import User, Role
 
 def save_new_user(data):
     """Creates a new user"""
-    user = User.query.filter_by(email=data["email"]).first()
+    user: User | None = User.query.filter_by(email=data["email"]).first()
     if user:
         raise BadRequest("User already exists. Please Log in.")
 
-    owner_role = Role.query.filter_by(
+    owner_role: Role | None = Role.query.filter_by(
         name="Owner"
     ).first()  # All users created are owners...for now
+    if owner_role is None:
+        raise NotFound("Unable to find the role")
     new_user = User(
         public_id=str(uuid.uuid4()),
         email=data["email"],
@@ -92,7 +94,7 @@ def get_all_users() -> list[User]:
 def get_a_user(public_id) -> User | None:
     """Retrieves a user via its public id"""
     current_app.logger.info(f"Calling get a user with public_id {public_id}")
-    user = User.query.filter_by(public_id=public_id).first()
+    user: User | None = User.query.filter_by(public_id=public_id).first()
     return user
 
 

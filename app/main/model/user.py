@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 import re
-from datetime import timedelta, datetime, timezone
+from datetime import date, timedelta, datetime, timezone
 from typing import Optional
 import jwt
 from sqlalchemy.orm import relationship, Mapped
@@ -28,7 +28,7 @@ class User(BaseClass):
     password_hash: Mapped[str] = db.Column(db.String(100))
     first_name: Mapped[str] = db.Column(db.String(100), nullable=True)
     last_name: Mapped[str] = db.Column(db.String(100), nullable=True)
-    date_of_birth: Mapped[Optional[datetime]] = db.Column(db.DateTime, nullable=True)
+    date_of_birth: Mapped[Optional[date]] = db.Column(db.DateTime, nullable=True)
     roles = relationship(
         "Role", secondary="user_roles", backref=db.backref("user", lazy="dynamic")
     )
@@ -39,12 +39,12 @@ class User(BaseClass):
         raise AttributeError("password: write-only field")
 
     @password.setter
-    def password(self, password):
+    def password(self, password) -> None:
         self.password_hash = flask_bcrypt.generate_password_hash(password).decode(
             "utf-8"
         )
 
-    def check_password(self, password):
+    def check_password(self, password) -> bool:
         """Checks user password"""
         return flask_bcrypt.check_password_hash(self.password_hash, password)
 

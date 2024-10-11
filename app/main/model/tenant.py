@@ -30,7 +30,7 @@ class TitleEnum(enum.Enum):
     MX = 11, "Mx"
 
     @classmethod
-    def has_key(cls, name):
+    def has_key(cls, name) -> bool:
         """Checks name is in enum"""
         return name in cls.__members__  # solution above 1
 

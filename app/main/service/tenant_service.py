@@ -3,6 +3,7 @@
 from datetime import datetime as dt
 from http import HTTPStatus
 from sqlite3 import IntegrityError
+from typing import List
 
 from bleach import clean
 from sqlalchemy import update
@@ -21,14 +22,14 @@ from app.main.model.tenant import (
 )
 
 
-def get_all_tenants_for_property(portfolio_id, property_id):
+def get_all_tenants_for_property(portfolio_id, property_id) -> List[Tenant]:
     """Gets all the tenants for a property"""
     portfolio = Portfolio.query.filter_by(id=portfolio_id).one()
     if portfolio is None:
         raise BadRequest("No Portfolio found")
 
     if property_id in [prop.id for prop in portfolio.properties]:
-        tenants = Tenant.query.filter_by(property_id=property_id).all()
+        tenants: List[Tenant] = Tenant.query.filter_by(property_id=property_id).all()
         return tenants
     else:
         raise BadRequest("Property id does't exist against this Portfolio.")
@@ -39,7 +40,7 @@ def update_tenant(property_id, tenant_id, data):
     if int(data["id"]) != tenant_id:
         raise BadRequest("ID's do not match.")
 
-    tenant = (
+    tenant: Tenant | None = (
         Tenant.query.filter_by(id=data["id"])
         .filter(Tenant.property_id == property_id)
         .first()
@@ -84,7 +85,7 @@ def delete_tenant(property_id, tenant_id):
 
 def save_new_tenant(portfolio_id, property_id, data):
     """Creates a new tenant against the supplied portfolio and property"""
-    property = Property.query.filter_by(id=property_id).first()
+    property: Property | None = Property.query.filter_by(id=property_id).first()
     if property is None:
         raise NotFound()
 
@@ -101,7 +102,7 @@ def save_new_tenant(portfolio_id, property_id, data):
     if existing_tenant is not None:
         raise BadRequest("Tenant already exists at this property")
 
-    title = TitleEnum[data["title"]]
+    title: TitleEnum = TitleEnum[data["title"]]
     new_tenant = Tenant(
         title=title,
         first_name=clean(data.get("first_name")),
@@ -131,12 +132,11 @@ def save_new_tenant(portfolio_id, property_id, data):
 
 def get_tenant_by_id(portfolio_id: int, property_id: int, tenant_id: int):
     """Returns a tenant by supplied id"""
-    tenant = Tenant.query.filter(
+    tenant: Tenant | None = Tenant.query.filter(
         Tenant.property_id == property_id, Tenant.id == tenant_id
     ).first()
     if tenant is None:
         raise NotFound("Tenant not found with id")
-        # return "Tenant not found with id", HTTPStatus.NOT_FOUND
     if tenant.property.portfolio_id != portfolio_id:
         raise BadRequest("Issue with property portfolio supplied.")
 
@@ -191,7 +191,7 @@ def add_tenant_document(
         raise BadRequest("Details supplied were incorrect.")
 
 
-def get_tenant_documents(tenant_id):
+def get_tenant_documents(tenant_id) -> List[TenantDocument]:
     """Retrieves all documents for the tenant"""
 
     tenant_docs = TenantDocument.query.filter_by(tenant_id=tenant_id).all()

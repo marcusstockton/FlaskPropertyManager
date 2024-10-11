@@ -2,13 +2,14 @@
 
 import os
 import unittest
+from flask import Flask
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
 from app import blueprint
 from app.main import create_app, db
 from seeder import seed_data
 
-app = create_app(os.getenv("PROPERTYMANAGER_ENV") or "dev")
+app: Flask = create_app(os.getenv("PROPERTYMANAGER_ENV") or "dev")
 app.register_blueprint(blueprint)
 app.app_context().push()
 migrate = Migrate(app, db)
@@ -16,7 +17,7 @@ ma = Marshmallow(app)
 
 
 @app.cli.command()
-def run():
+def run() -> None:
     """Command to run the app."""
     app.logger.info("run called")
     app.run(debug=True)
@@ -35,7 +36,7 @@ def test():
 
 
 @app.cli.command()
-def seed():
+def seed() -> None:
     """Reseeds the database with new data"""
     seed_data(db)
 

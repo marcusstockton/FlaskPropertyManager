@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from typing import List
 
 from app.main import db
 from app.main.model.portfolio import Portfolio
@@ -27,7 +28,9 @@ def create_owner_user() -> None:
 class TestPortfolioServiceBlueprint(BaseTestCase):
     """Test class for Portfolio services"""
 
-    def test_get_all_portfolios_for_user_returns_all_portfolios_for_admin_user(self):
+    def test_get_all_portfolios_for_user_returns_all_portfolios_for_admin_user(
+        self,
+    ) -> None:
         """Tests that the admin user can see all portfolios"""
 
         admin_user = db.session.query(User).filter_by(email="admin@user.com").scalar()
@@ -42,7 +45,9 @@ class TestPortfolioServiceBlueprint(BaseTestCase):
         results = get_all_portfolios_for_user(admin_user)
         self.assertEqual(3, len(results))
 
-    def test_get_all_portfolios_for_user_returns_portfolios_for_owner_user(self):
+    def test_get_all_portfolios_for_user_returns_portfolios_for_owner_user(
+        self,
+    ) -> None:
         """Tests that the portfolio service correctly returns data for the owner user"""
 
         admin_user = db.session.query(User).filter_by(email="admin@user.com").scalar()
@@ -54,10 +59,10 @@ class TestPortfolioServiceBlueprint(BaseTestCase):
         db.session.add(Portfolio(name="Test Portfolio 3", owner=owner_user))
         db.session.commit()
 
-        results = get_all_portfolios_for_user(owner_user)
+        results: List[Portfolio] = get_all_portfolios_for_user(owner_user)
         self.assertEqual(1, len(results))
 
-    def test_get_portfolio_by_id_returns_correct_portfolio(self):
+    def test_get_portfolio_by_id_returns_correct_portfolio(self) -> None:
         """Tests that the get_portfolio_by_id service returns the correct porfolio"""
         create_owner_user()
         owner_user = db.session.query(User).filter_by(email="user@testing.com").scalar()
@@ -70,10 +75,10 @@ class TestPortfolioServiceBlueprint(BaseTestCase):
             db.session.query(Portfolio.id).filter_by(name="Portfolio One").scalar()
         )
 
-        result = get_portfolio_by_id(owner_user.id, portfolio_id=portfolio_1)
+        result: Portfolio = get_portfolio_by_id(owner_user.id, portfolio_id=portfolio_1)
         self.assertEqual("Portfolio One", result.name)
 
-    def test_get_portfolio_by_id_handles_incorrect_user(self):
+    def test_get_portfolio_by_id_handles_incorrect_user(self) -> None:
         """Tests that the get_portfolio_by_id service returns the correct porfolio"""
         create_owner_user()
         owner_user = db.session.query(User).filter_by(email="user@testing.com").scalar()
