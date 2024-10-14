@@ -76,7 +76,7 @@ def delete_user(user_id):
     try:
         db.session.delete(obj)
         db.session.commit()
-        response_object = {
+        response_object: dict[str, str] = {
             "status": "success",
             "message": f"Successfully deleted user {user_id}",
         }
@@ -148,7 +148,7 @@ def reset_user_password(auth_token: str, new_password: str) -> User | None:
         raise Exception from e
 
 
-def save_changes(data):
+def save_changes(data) -> None:
     """Saves changes"""
     db.session.add(data)
     db.session.commit()

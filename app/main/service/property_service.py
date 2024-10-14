@@ -29,7 +29,7 @@ def get_all_properties_for_portfolio(portfolio_id) -> List[Property]:
 
 def save_new_property(portfolio_id, data):
     """Adds new property to portfolio"""
-    portfolio = Portfolio.query.filter_by(id=portfolio_id).first()
+    portfolio: Portfolio | None = Portfolio.query.filter_by(id=portfolio_id).first()
 
     if portfolio is None:
         current_app.logger.error("No portfolio found portfolio_id %s", portfolio_id)
@@ -103,7 +103,7 @@ def get_property_by_id(portfolio_id, property_id) -> Property:
 def add_images_to_property(portfolio_id, property_id, images):
     """Adds image(s) to property"""
     try:
-        property_obj = Property.query.filter_by(
+        property_obj: Property = Property.query.filter_by(
             portfolio_id=portfolio_id, id=property_id
         ).one()
     except MultipleResultsFound as err:
@@ -126,13 +126,13 @@ def add_images_to_property(portfolio_id, property_id, images):
     return property_obj, HTTPStatus.CREATED
 
 
-def save_changes(data):
+def save_changes(data) -> None:
     """Save Changes"""
     db.session.add(data)
     db.session.commit()
 
 
-def save_all_changes(data):
+def save_all_changes(data) -> None:
     """Save all Changes"""
     db.session.add_all(data)
     db.session.commit()

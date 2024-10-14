@@ -3,16 +3,16 @@
 import os
 
 import requests
-from flask import current_app
+from flask import Response, current_app
 
 from flask import make_response
-from flask_restx import Resource
+from flask_restx import Namespace, Resource
 
 from ..util.decorator import token_required
 from ..util.dto.address_dto import AddressDto
 from ...main import cache
 
-api = AddressDto.api
+api: Namespace = AddressDto.api
 
 
 @api.route("/get-auto-suggestion/<search>", methods=["GET"])
@@ -24,9 +24,11 @@ class AddressSearchList(Resource):
     @api.doc("search for address by postcode")
     def get(
         self, search
+    ) -> (
+        Response
     ):  # TODO - Move this into a service. Also, is this the best implementation?
         """Calls off to hereapi to get location details"""
-        _apiKey = os.getenv("HERE_Maps_API_Key")
+        _apiKey: str | None = os.getenv("HERE_Maps_API_Key")
         _ukLatLong = "55.3781,3.4360"
         _countryCode = "GBP"
 
@@ -36,7 +38,7 @@ class AddressSearchList(Resource):
         )
         current_app.logger.debug(f"{AddressSearchList.__name__} calling {url}")
         try:
-            r = requests.get(url=url, timeout=15)
+            r: requests.Response = requests.get(url=url, timeout=15)
             data = r.json()
             return make_response(data, r.status_code)
         except requests.HTTPError as err:

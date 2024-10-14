@@ -26,7 +26,9 @@ def run() -> None:
 @app.cli.command()
 def test():
     """Runs the unit tests."""
-    tests = unittest.TestLoader().discover("app/test", pattern="test*.py")
+    tests: unittest.TestSuite = unittest.TestLoader().discover(
+        "app/test", pattern="test*.py"
+    )
     result = unittest.TextTestRunner(verbosity=2).run(
         tests
     )  # 0 (quiet), 1 (default), 2 (verbose)

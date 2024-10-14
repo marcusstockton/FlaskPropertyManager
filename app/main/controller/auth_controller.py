@@ -3,8 +3,9 @@
 from datetime import datetime
 from flask import current_app as app
 from flask import request
-from flask_restx import Resource
+from flask_restx import Model, Namespace, OrderedModel, Resource
 from werkzeug.exceptions import NotFound, BadRequest
+from app.main.model.user import User
 from app.main.service.auth_helper import Auth
 from app.main.service.user_service import (
     reset_user_password,
@@ -13,10 +14,10 @@ from app.main.service.user_service import (
 from ..util.dto.auth_dto import AuthDto
 from ..service import mail_service
 
-api = AuthDto.api
-user_auth = AuthDto.user_auth
-forgotten_password = AuthDto.forgotten_password
-reset_password = AuthDto.reset_password
+api: Namespace = AuthDto.api
+user_auth: Model | OrderedModel = AuthDto.user_auth
+forgotten_password: Model | OrderedModel = AuthDto.forgotten_password
+reset_password: Model | OrderedModel = AuthDto.reset_password
 
 
 @api.route("/login")
@@ -62,12 +63,12 @@ class ForgotPassword(Resource):
         """Function for sending out a password reset email"""
         post_data = request.json
 
-        dob = datetime.strptime(post_data["date_of_birth"], "%Y-%m-%d")
-        user = forgotten_password_user_lookup(post_data["email"], dob)
+        dob: datetime = datetime.strptime(post_data["date_of_birth"], "%Y-%m-%d")
+        user: User = forgotten_password_user_lookup(post_data["email"], dob)
         if user:
-            token = user.encode_auth_token(user.id, 5)
+            token: str = user.encode_auth_token(user.id, 5)
 
-            url_reset = request.host + "/Auth/" + "password-reset" + "/" + token
+            url_reset: str = request.host + "/Auth/" + "password-reset" + "/" + token
             mail_service.send_email(
                 post_data["email"],
                 "Password Reset",
@@ -98,7 +99,7 @@ class ResetPassword(Resource):
             if not reset_token or not password:
                 raise BadRequest()
 
-            user = reset_user_password(reset_token, password)
+            user: User | None = reset_user_password(reset_token, password)
             if user:
                 mail_service.send_email(
                     user.email,

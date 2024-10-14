@@ -16,7 +16,7 @@ from manage import app
 
 def create_admin_user() -> str:
     """Creates an admin user and returns the auth token"""
-    datetime_now = datetime.now(timezone.utc)
+    datetime_now: datetime = datetime.now(timezone.utc)
     user = User(email="admin@testing.com", registered_on=datetime_now, admin=True)
     user.password = "test"
     db.session.add(user)
@@ -29,7 +29,7 @@ def create_admin_user() -> str:
 
 def create_owner_user() -> str:
     """Creates a non-admin user and returns the auth token"""
-    datetime_now = datetime.now(timezone.utc)
+    datetime_now: datetime = datetime.now(timezone.utc)
     user = User(email="user@testing.com", registered_on=datetime_now, admin=False)
     user.password = "test"
     db.session.add(user)
@@ -46,8 +46,8 @@ class TestPortfolioBlueprint(BaseTestCase):
     @patch("app.main.controller.portfolio_controller.get_all_portfolios_for_user")
     def test_users_can_only_see_their_own_portfolios(self, mock_portfolios) -> None:
         """Checks that users can only see their own portfolios"""
-        access_token = create_admin_user()
-        headers = {
+        access_token: str = create_admin_user()
+        headers: dict[str, str] = {
             "Access-Control-Allow-Origin": "*",
             "Content-Type": "application/json",
             "Authorization": access_token,
@@ -66,8 +66,8 @@ class TestPortfolioBlueprint(BaseTestCase):
     @patch("app.main.controller.portfolio_controller.get_portfolio_by_id")
     def test_correct_portfolio_is_returned_for_id(self, mock_portfolios) -> None:
         """Tests that the correct portfolio is returned"""
-        access_token = create_admin_user()
-        headers = {
+        access_token: str = create_admin_user()
+        headers: dict[str, str] = {
             "Access-Control-Allow-Origin": "*",
             "Content-Type": "application/json",
             "Authorization": access_token,
@@ -81,12 +81,12 @@ class TestPortfolioBlueprint(BaseTestCase):
             response: TestResponse = client.get("/portfolio/1", headers=headers)
             data = response.get_json()
             self.assertEqual("Test Portfolio One", data[0].get("name"))
-            self.assertEqual("1", data[0].get("id"))
+            self.assertEqual(1, data[0].get("id"))
 
     def test_portfolio_is_not_returned_for_non_owner_user_id(self) -> None:
         """Unit test to test that users cannot access other user records"""
-        access_token = create_owner_user()
-        headers = {
+        access_token: str = create_owner_user()
+        headers: dict[str, str] = {
             "Access-Control-Allow-Origin": "*",
             "Content-Type": "application/json",
             "Authorization": access_token,
@@ -101,14 +101,14 @@ class TestPortfolioBlueprint(BaseTestCase):
 
     def test_update_portfolio_works_with_correct_data_and_user(self) -> None:
         """Unit test to made sure correct user returns correct data"""
-        access_token = create_owner_user()
-        headers = {
+        access_token: str = create_owner_user()
+        headers: dict[str, str] = {
             "Access-Control-Allow-Origin": "*",
             "Content-Type": "application/json",
             "Authorization": access_token,
         }
 
-        dict_data = {"id": "1", "name": "Updated Test 1"}
+        dict_data: dict[str, str] = {"id": "1", "name": "Updated Test 1"}
         with patch(
             "app.main.controller.portfolio_controller.update_portfolio"
         ) as update_patch:
@@ -126,8 +126,8 @@ class TestPortfolioBlueprint(BaseTestCase):
 
     def test_update_portfolio_fails_if_incorrect_data_used(self) -> None:
         """Handle invalid user updating portfolio"""
-        access_token = create_owner_user()
-        headers = {
+        access_token: str = create_owner_user()
+        headers: dict[str, str] = {
             "Access-Control-Allow-Origin": "*",
             "Content-Type": "application/json",
             "Authorization": access_token,
@@ -136,7 +136,7 @@ class TestPortfolioBlueprint(BaseTestCase):
             "app.main.controller.portfolio_controller.update_portfolio"
         ) as update_patch:
             update_patch.side_effect = NotFound()
-            dict_data = {"id": "2", "name": "Updated Test 1"}
+            dict_data: dict[str, str] = {"id": "2", "name": "Updated Test 1"}
             with app.test_client() as client:
                 response: TestResponse = client.put(
                     "/portfolio/2",
@@ -149,8 +149,8 @@ class TestPortfolioBlueprint(BaseTestCase):
         self,
     ) -> None:
         """Tests that get portfolio by id returns portfolio and properties"""
-        access_token = create_owner_user()
-        headers = {
+        access_token: str = create_owner_user()
+        headers: dict[str, str] = {
             "Access-Control-Allow-Origin": "*",
             "Content-Type": "application/json",
             "Authorization": access_token,
@@ -170,10 +170,10 @@ class TestPortfolioBlueprint(BaseTestCase):
 
     def test_create_portfolio_with_xss_input_is_sanitized(self) -> None:
         """Tests that adding potenially dangerous xss script into the name will get sanitised"""
-        new_portfolio = {"name": "<script>alert();</script>"}
+        new_portfolio: dict[str, str] = {"name": "<script>alert();</script>"}
 
-        access_token = create_owner_user()
-        headers = {
+        access_token: str = create_owner_user()
+        headers: dict[str, str] = {
             "Access-Control-Allow-Origin": "*",
             "Content-Type": "application/json",
             "Authorization": access_token,
@@ -199,10 +199,10 @@ class TestPortfolioBlueprint(BaseTestCase):
 
     def test_create_portfolio_with_normal_input_is_saved_correctly(self) -> None:
         """Tests that adding non xss text into the name will work"""
-        new_portfolio = {"name": "Testing Portfolio Name"}
+        new_portfolio: dict[str, str] = {"name": "Testing Portfolio Name"}
 
-        access_token = create_owner_user()
-        headers = {
+        access_token: str = create_owner_user()
+        headers: dict[str, str] = {
             "Access-Control-Allow-Origin": "*",
             "Content-Type": "application/json",
             "Authorization": access_token,

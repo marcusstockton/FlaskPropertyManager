@@ -1,10 +1,14 @@
 """Tenant Controller API Routes"""
 
 from http import HTTPStatus
+from typing import List
 from flask import current_app as app
 from flask import request
-from flask_restx import Resource, abort
+from flask_restx import Model, Namespace, OrderedModel, Resource, abort
+from flask_restx.reqparse import RequestParser
 from werkzeug.datastructures import FileStorage
+
+from app.main.model.tenant import Tenant
 
 from ..service.tenant_service import (
     add_tenant_document,
@@ -19,14 +23,14 @@ from ..service.tenant_service import (
 from ..util.decorator import token_required
 from ..util.dto.tenant_dto import TenantDto
 
-api = TenantDto.api
-_tenant = TenantDto.tenant
-_tenant_list = TenantDto.tenant_list
-_tenant_create = TenantDto.tenant_create
-_tenant_update = TenantDto.tenant_update
-_tenant_documents = TenantDto.tenant_documents
+api: Namespace = TenantDto.api
+_tenant: Model | OrderedModel = TenantDto.tenant
+_tenant_list: Model | OrderedModel = TenantDto.tenant_list
+_tenant_create: Model | OrderedModel = TenantDto.tenant_create
+_tenant_update: Model | OrderedModel = TenantDto.tenant_update
+_tenant_documents: Model | OrderedModel = TenantDto.tenant_documents
 
-upload_parser = api.parser()
+upload_parser: RequestParser = api.parser()
 upload_parser.add_argument(
     "image",
     location="files",
@@ -34,7 +38,7 @@ upload_parser.add_argument(
     required=True,
     help="Image file cannot empty",
 )
-doc_upload_parser = api.parser()
+doc_upload_parser: RequestParser = api.parser()
 doc_upload_parser.add_argument("document_type_id", type=int, required=True)
 doc_upload_parser.add_argument(
     "file",
@@ -52,7 +56,7 @@ class TenantList(Resource):
     @token_required
     @api.doc("list_of_tenants")
     @api.marshal_list_with(_tenant_list)
-    def get(self, portfolio_id, property_id):
+    def get(self, portfolio_id, property_id) -> List[Tenant]:
         """Get all tenants for the property"""
         app.logger.info(f"Getting all tenants for propertyId {property_id}")
         return get_all_tenants_for_property(portfolio_id, property_id)
@@ -154,14 +158,18 @@ class TenantDocument(Resource):
     """Tenant Documents API endpoints"""
 
     @api.expect(doc_upload_parser)
-    def post(self, portfolio_id:int, property_id:int, tenant_id: int):
+    def post(self, portfolio_id: int, property_id: int, tenant_id: int):
         args = doc_upload_parser.parse_args()
         doc_data = args["file"]
         print(type(doc_data))
         doc_type_id = args["document_type_id"]
-        app.logger.info(f"file data received: name: {doc_data.filename}, ext:{doc_data.content_type.rsplit("/")[1]}, tenant_id: {tenant_id}")
+        app.logger.info(
+            f"file data received: name: {doc_data.filename}, ext:{doc_data.content_type.rsplit("/")[1]}, tenant_id: {tenant_id}"
+        )
 
-        return add_tenant_document(portfolio_id, property_id, tenant_id, doc_type_id, doc_data)
+        return add_tenant_document(
+            portfolio_id, property_id, tenant_id, doc_type_id, doc_data
+        )
 
     @api.marshal_list_with(_tenant_documents)
     def get(self, portfolio_id: int, property_id: int, tenant_id):

@@ -5,7 +5,7 @@ from typing import List
 
 
 from flask import current_app
-from sqlalchemy import update
+from sqlalchemy import Update, update
 from sqlalchemy.exc import (
     IntegrityError,
     NoResultFound,
@@ -56,7 +56,9 @@ def get_portfolio_by_id(user_id: int, portfolio_id: int) -> Portfolio:
         raise NotFound(error_message) from err
 
     except MultipleResultsFound as err:
-        error = f"Multiple portfolio's not found for userid {user_id} and portfolio_id {portfolio_id}. Error: {err}"
+        error: str = (
+            f"Multiple portfolio's not found for userid {user_id} and portfolio_id {portfolio_id}. Error: {err}"
+        )
         current_app.logger.error(error)
         raise BadRequest(error) from err
 
@@ -65,7 +67,7 @@ def save_new_portfolio(data, user_id) -> Portfolio:
     """Creates a new Portfolio"""
     sanitised_name: str = clean(data["name"])
     current_app.logger.info(f"Adding portfolio {sanitised_name}")
-    portfolio = (
+    portfolio: Portfolio | None = (
         db.session.query(Portfolio.id)
         .filter_by(name=sanitised_name, owner_id=user_id)
         .scalar()
@@ -87,13 +89,15 @@ def update_portfolio(portfolio_id: int, data: dict) -> Portfolio:
     """Update a portfolio"""
     if portfolio_id is not data["id"]:
         raise BadRequest("Invalid Request. Please check your data")
-    portfolio_query = Portfolio.query.filter_by(id=portfolio_id).one()
-    sanitised_name = clean(data["name"])
-    data["name"] = sanitised_name
+    portfolio_query: Portfolio | None = Portfolio.query.filter_by(id=portfolio_id).one()
     if not portfolio_query:
         raise NotFound("Portfolio not found.")
     try:
-        stmt = update(Portfolio).where(Portfolio.id == portfolio_id).values(data)
+        sanitised_name: str = clean(data["name"])
+        data["name"] = sanitised_name
+        stmt: Update = (
+            update(Portfolio).where(Portfolio.id == portfolio_id).values(data)
+        )
         db.session.execute(stmt)
         db.session.commit()
         return portfolio_query
@@ -105,7 +109,9 @@ def update_portfolio(portfolio_id: int, data: dict) -> Portfolio:
 
 def delete_portfolio_by_id(user, portfolio_id):
     """Deletes the Portfolio and related data"""
-    portfolio = db.session.query(Portfolio).filter_by(id=portfolio_id).scalar()
+    portfolio: Portfolio | None = (
+        db.session.query(Portfolio).filter_by(id=portfolio_id).scalar()
+    )
     if portfolio is None:
         raise NotFound("Portfolio not found")
     if portfolio.owner_id != user.id:

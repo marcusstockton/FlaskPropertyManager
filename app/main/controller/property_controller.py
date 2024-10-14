@@ -3,11 +3,14 @@
 from collections import namedtuple
 
 from http import HTTPStatus
+from typing import List
 from flask import request
 from flask import current_app as app
-from flask_restx import Resource, abort, reqparse
+from flask_restx import Namespace, OrderedModel, Resource, abort, reqparse
 from werkzeug.datastructures import FileStorage
 from werkzeug.exceptions import BadRequest
+
+from app.main.model.property import Property
 
 
 from ..service.property_service import (
@@ -19,10 +22,10 @@ from ..service.property_service import (
 from ..util.decorator import token_required
 from ..util.dto.property_dto import PropertyDto
 
-api = PropertyDto.api
-_property = PropertyDto.property
-_property_list = PropertyDto.property_list
-_property_create = PropertyDto.property_create
+api: Namespace = PropertyDto.api
+_property: reqparse.Model | OrderedModel = PropertyDto.property
+_property_list: reqparse.Model | OrderedModel = PropertyDto.property_list
+_property_create: reqparse.Model | OrderedModel = PropertyDto.property_create
 
 upload_parser = reqparse.RequestParser()
 upload_parser.add_argument(
@@ -37,7 +40,7 @@ class PropertyList(Resource):
     @token_required
     @api.doc("list_of_properties")
     @api.marshal_list_with(_property_list)
-    def get(self, portfolio_id):
+    def get(self, portfolio_id) -> List[Property]:
         """Get all properties for the portfolio"""
         return get_all_properties_for_portfolio(portfolio_id)
 
@@ -58,7 +61,7 @@ class PropertyItem(Resource):
     @token_required
     @api.doc("property details")
     @api.marshal_list_with(_property)
-    def get(self, portfolio_id, property_id):
+    def get(self, portfolio_id, property_id) -> Property:
         """Gets the property by id."""
         return get_property_by_id(portfolio_id, property_id)
 
@@ -91,7 +94,7 @@ class PropertyImage(Resource):
     def post(self, portfolio_id, property_id):
         """Add images of property."""
 
-        args = upload_parser.parse_args()
+        args: reqparse.ParseResult = upload_parser.parse_args()
         images = args["images"]
         ImageTuple = namedtuple("ImageTuple", ["file_name", "image"])
         if images:

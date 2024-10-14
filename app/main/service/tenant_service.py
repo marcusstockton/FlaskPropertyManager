@@ -6,7 +6,7 @@ from sqlite3 import IntegrityError
 from typing import List
 
 from bleach import clean
-from sqlalchemy import update
+from sqlalchemy import Update, update
 from werkzeug.exceptions import NotFound, BadRequest
 from werkzeug.utils import secure_filename
 
@@ -24,7 +24,7 @@ from app.main.model.tenant import (
 
 def get_all_tenants_for_property(portfolio_id, property_id) -> List[Tenant]:
     """Gets all the tenants for a property"""
-    portfolio = Portfolio.query.filter_by(id=portfolio_id).one()
+    portfolio: Portfolio | None = Portfolio.query.filter_by(id=portfolio_id).one()
     if portfolio is None:
         raise BadRequest("No Portfolio found")
 
@@ -55,7 +55,7 @@ def update_tenant(property_id, tenant_id, data):
             data["tenancy_end_date"], "%Y-%m-%d"
         ).date()
         try:
-            stmt = update(Tenant).where(Tenant.id == tenant_id).values(data)
+            stmt: Update = update(Tenant).where(Tenant.id == tenant_id).values(data)
             db.session.execute(stmt)
             db.session.commit()
             response_object = {
@@ -130,7 +130,7 @@ def save_new_tenant(portfolio_id, property_id, data):
     return response_object, HTTPStatus.CREATED
 
 
-def get_tenant_by_id(portfolio_id: int, property_id: int, tenant_id: int):
+def get_tenant_by_id(portfolio_id: int, property_id: int, tenant_id: int) -> Tenant:
     """Returns a tenant by supplied id"""
     tenant: Tenant | None = Tenant.query.filter(
         Tenant.property_id == property_id, Tenant.id == tenant_id
@@ -194,7 +194,9 @@ def add_tenant_document(
 def get_tenant_documents(tenant_id) -> List[TenantDocument]:
     """Retrieves all documents for the tenant"""
 
-    tenant_docs = TenantDocument.query.filter_by(tenant_id=tenant_id).all()
+    tenant_docs: List[TenantDocument] | None = TenantDocument.query.filter_by(
+        tenant_id=tenant_id
+    ).all()
     if tenant_docs is None:
         raise NotFound(f"Tenant documents not found with id {tenant_id}")
 

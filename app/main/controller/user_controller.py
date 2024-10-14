@@ -2,7 +2,7 @@
 
 from flask import current_app as app
 from flask import request
-from flask_restx import Resource
+from flask_restx import Model, Namespace, OrderedModel, Resource
 
 from app.main.model.user import User
 from app.main.util.decorator import token_required, admin_token_required
@@ -15,10 +15,10 @@ from ..service.user_service import (
 )
 from ..util.dto.user_dto import UserDto
 
-api = UserDto.api
-_user = UserDto.user
-_user_create = UserDto.user_create
-_user_details = UserDto.user_details
+api: Namespace = UserDto.api
+_user: Model | OrderedModel = UserDto.user
+_user_create: Model | OrderedModel = UserDto.user_create
+_user_details: Model | OrderedModel = UserDto.user_details
 
 
 @api.route("/")
@@ -28,7 +28,7 @@ class UserList(Resource):
     @admin_token_required
     @api.doc("list_of_registered_users")
     @api.marshal_list_with(_user)
-    def get(self):
+    def get(self) -> list[User]:
         """List all registered users"""
         app.logger.info("Getting all registered users")
         return get_all_users()
@@ -54,7 +54,7 @@ class UserItem(Resource):
     @token_required
     @api.doc("get a user")
     @api.marshal_with(_user_details)
-    def get(self, public_id):
+    def get(self, public_id) -> User | None:
         """get a user given its identifier"""
         app.logger.info(f"Finding user with public_id {public_id}")
         user: User | None = get_a_user(public_id)

@@ -55,7 +55,7 @@ class Auth:
             resp = User.decode_auth_token(auth_token)
             if not isinstance(resp, str):
                 app.logger.info(f"Auth token {auth_token} decoded finding user {resp}")
-                user = User.query.filter_by(id=resp).first()
+                user: User | None = User.query.filter_by(id=resp).first()
                 if user is None:
                     raise NotFound(user)
                 app.logger.info("User found...")
@@ -82,6 +82,6 @@ class Auth:
         if auth_token:
             resp = User.decode_auth_token(auth_token)
             if not isinstance(resp, str):
-                user = User.query.filter_by(id=resp).first()
+                user: User | None = User.query.filter_by(id=resp).first()
                 if user:
                     return user
