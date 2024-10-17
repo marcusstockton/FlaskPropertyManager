@@ -3,7 +3,6 @@
 from http import HTTPStatus
 from typing import List
 from flask import current_app as app
-from flask import request
 from flask_restx import Model, Namespace, OrderedModel, Resource, abort
 from flask_restx.reqparse import RequestParser
 from werkzeug.datastructures import FileStorage
@@ -75,7 +74,7 @@ class TenantList(Resource):
     @api.marshal_with(_tenant_create)
     def post(self, portfolio_id, property_id):
         """Creates a new Tenant"""
-        data = request.get_json(force=True)
+        data = api.payload
         app.logger.info(f"Adding new tenant {data['email_address']} to {property_id}")
         return save_new_tenant(portfolio_id, property_id, data)
 
@@ -114,13 +113,13 @@ class TenantItem(Resource):
         responses={403: "Not Authorized", 400: "Bad Request", 204: "Updated"},
     )
     @api.expect(_tenant_update, validate=True)
-    def put(self, portfolio_id, property_id, tenant_id):
+    def put(self, portfolio_id: int, property_id: int, tenant_id: int):
         """Update a tenant details"""
-        data = request.json
+        data = api.payload
         app.logger.info(
             f"Updating tenant id {tenant_id} for property {property_id} and portfolio {portfolio_id}"
         )
-        return update_tenant(property_id, tenant_id, data)
+        return update_tenant(portfolio_id, property_id, tenant_id, data)
 
 
 @api.route("/<int:tenant_id>/images")

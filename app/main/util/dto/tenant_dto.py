@@ -43,17 +43,10 @@ class TenantDto:
     """Flask-Restx Tenant related operations."""
 
     api = Namespace("Tenant", description="Tenant related operations")
-
-    # colors_api_model = api.schema_model('Titles', {
-    #     'enum':
-    #         ['black', 'white', 'red', 'green', 'blue'],
-    #     'type': 'string'
-    # })
-
     tenant_notes = api.model(
         "TenantNote",
         {
-            "id": fields.String(required=True, description="id"),
+            "id": fields.Integer(required=True, description="id"),
             "created_date": fields.DateTime(required=False, description="date created"),
             "updated_date": fields.DateTime(
                 required=False, description="date last updated"
@@ -65,7 +58,7 @@ class TenantDto:
     tenant_profile = api.model(
         "TenantProfile",
         {
-            "id": fields.String(required=True, description="id"),
+            "id": fields.Integer(required=True, description="id"),
             "created_date": fields.DateTime(required=False, description="date created"),
             "updated_date": fields.DateTime(
                 required=False, description="date last updated"
@@ -84,7 +77,7 @@ class TenantDto:
     tenant = api.model(
         "Tenant",
         {
-            "id": fields.String(required=True, description="id"),
+            "id": fields.Integer(required=True, description="id"),
             "title": fields.String(
                 required=False,
                 description="Title",
@@ -105,6 +98,11 @@ class TenantDto:
             "tenancy_end_date": fields.Date(
                 required=True, description="tenancy end date"
             ),
+            "created_date": fields.DateTime(required=False, description="date created"),
+            "updated_date": fields.DateTime(
+                required=False, description="date last updated"
+            ),
+            "age": CalcuateAge(attribute="date_of_birth"),
             "profile_pic": fields.List(
                 fields.Nested(tenant_profile),
                 required=False,
@@ -113,18 +111,13 @@ class TenantDto:
             "notes": fields.List(
                 fields.Nested(tenant_notes), required=False, description="tenant notes"
             ),
-            "created_date": fields.DateTime(required=False, description="date created"),
-            "updated_date": fields.DateTime(
-                required=False, description="date last updated"
-            ),
-            "age": CalcuateAge(attribute="date_of_birth"),
         },
     )
 
     tenant_list = api.model(
         "Tenant",
         {
-            "id": fields.String(required=True, description="id"),
+            "id": fields.Integer(required=True, description="id"),
             "title": fields.String(
                 required=False,
                 description="title",
@@ -178,7 +171,7 @@ class TenantDto:
     tenant_update = api.model(
         "Tenant",
         {
-            "id": fields.String(required=True, description="id"),
+            "id": fields.Integer(required=True, description="id"),
             "title": fields.String(
                 required=False,
                 description="title",
@@ -196,7 +189,7 @@ class TenantDto:
                 required=True, description="tenancy start date"
             ),
             "tenancy_end_date": fields.Date(
-                required=True, description="tenancy end date"
+                required=False, description="tenancy end date"
             ),
         },
     )

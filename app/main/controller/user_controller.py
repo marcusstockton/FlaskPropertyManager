@@ -39,7 +39,7 @@ class UserList(Resource):
     @api.expect(_user_create, validate=True)
     def post(self):
         """Creates a new User"""
-        data = request.get_json(force=True)
+        data = api.payload
         app.logger.info(f"Creating a new user for {data['username']}")
         return save_new_user(data=data)
 
@@ -67,7 +67,7 @@ class UserItem(Resource):
     @api.expect(_user_details, validate=True)
     def put(self, public_id):
         """update a user"""
-        data = request.get_json(force=True)
+        data = api.payload
         app.logger.info(
             f"Updating user with public_id {public_id}, payload received {data}"
         )

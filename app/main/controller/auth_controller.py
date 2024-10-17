@@ -30,8 +30,8 @@ class UserLogin(Resource):
     def post(self):
         """Logs a User in"""
         # get the post data
-        app.logger.info(f"Received login details for  {request.json}")
-        post_data = request.json
+        app.logger.info(f"Received login details for  {api.payload}")
+        post_data = api.payload
 
         return Auth.login_user(data=post_data)
 
@@ -61,7 +61,7 @@ class ForgotPassword(Resource):
     @api.expect(forgotten_password, validate=True)
     def post(self):
         """Function for sending out a password reset email"""
-        post_data = request.json
+        post_data = api.payload
 
         dob: datetime = datetime.strptime(post_data["date_of_birth"], "%Y-%m-%d")
         user: User = forgotten_password_user_lookup(post_data["email"], dob)
@@ -91,7 +91,7 @@ class ResetPassword(Resource):
         """Function to update the users password"""
         try:
 
-            post_data = request.json
+            post_data = api.payload
 
             reset_token = post_data["token"]
             password = post_data["password"]

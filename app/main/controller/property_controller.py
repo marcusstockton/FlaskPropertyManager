@@ -11,6 +11,8 @@ from werkzeug.datastructures import FileStorage
 from werkzeug.exceptions import BadRequest
 
 from app.main.model.property import Property
+from app.main.model.user import User
+from app.main.service.auth_helper import Auth
 
 
 from ..service.property_service import (
@@ -42,7 +44,8 @@ class PropertyList(Resource):
     @api.marshal_list_with(_property_list)
     def get(self, portfolio_id) -> List[Property]:
         """Get all properties for the portfolio"""
-        return get_all_properties_for_portfolio(portfolio_id)
+        user: User | None = Auth.get_logged_in_user_object(request)
+        return get_all_properties_for_portfolio(user, portfolio_id)
 
     @token_required
     @api.response(201, "Property successfully created.")
@@ -50,7 +53,7 @@ class PropertyList(Resource):
     @api.expect(_property_create, validate=True)
     def post(self, portfolio_id):
         """Creates a new Property"""
-        data = request.json
+        data = api.payload
         return save_new_property(portfolio_id, data=data)
 
 
@@ -63,7 +66,10 @@ class PropertyItem(Resource):
     @api.marshal_list_with(_property)
     def get(self, portfolio_id, property_id) -> Property:
         """Gets the property by id."""
-        return get_property_by_id(portfolio_id, property_id)
+        user: User | None = Auth.get_logged_in_user_object(request)
+        if user:
+            return get_property_by_id(user, portfolio_id, property_id)
+        raise BadRequest("User not found")
 
     @token_required
     @api.doc("update property")
@@ -71,7 +77,7 @@ class PropertyItem(Resource):
     def put(self, portfolio_id, property_id):
         """Updates the property"""
         app.logger.info(f"Updating property {property_id} for portfolio {portfolio_id}")
-        data = request.get_json(force=True)
+        data = api.payload
         pass
 
     @token_required
@@ -79,7 +85,7 @@ class PropertyItem(Resource):
     def delete(self, property_id):
         """Deletes a property"""
         app.logger.info(f"Deleting property {property_id}")
-        data = request.get_json(force=True)
+        data = api.payload
         pass
 
 

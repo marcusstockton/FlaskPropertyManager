@@ -29,7 +29,7 @@ def test():
     tests: unittest.TestSuite = unittest.TestLoader().discover(
         "app/test", pattern="test*.py"
     )
-    result = unittest.TextTestRunner(verbosity=2).run(
+    result = unittest.TextTestRunner(verbosity=0).run(
         tests
     )  # 0 (quiet), 1 (default), 2 (verbose)
     if result.wasSuccessful():

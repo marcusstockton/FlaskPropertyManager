@@ -35,15 +35,16 @@ def get_all_tenants_for_property(portfolio_id, property_id) -> List[Tenant]:
         raise BadRequest("Property id does't exist against this Portfolio.")
 
 
-def update_tenant(property_id, tenant_id, data):
+def update_tenant(portfolio_id: int, property_id: int, tenant_id: int, data: dict):
     """Updates a tenent record"""
-    if int(data["id"]) != tenant_id:
+    if data["id"] != tenant_id:
         raise BadRequest("ID's do not match.")
 
     tenant: Tenant | None = (
         Tenant.query.filter_by(id=data["id"])
         .filter(Tenant.property_id == property_id)
-        .first()
+        .filter(Portfolio.id == portfolio_id)
+        .one()
     )
 
     if tenant is not None:
@@ -51,9 +52,10 @@ def update_tenant(property_id, tenant_id, data):
         data["tenancy_start_date"] = dt.strptime(
             data["tenancy_start_date"], "%Y-%m-%d"
         ).date()
-        data["tenancy_end_date"] = dt.strptime(
-            data["tenancy_end_date"], "%Y-%m-%d"
-        ).date()
+        if "tenancy_end_date" in data:
+            data["tenancy_end_date"] = dt.strptime(
+                data["tenancy_end_date"], "%Y-%m-%d"
+            ).date()
         try:
             stmt: Update = update(Tenant).where(Tenant.id == tenant_id).values(data)
             db.session.execute(stmt)

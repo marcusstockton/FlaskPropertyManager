@@ -2,10 +2,11 @@
 
 import datetime
 from http import HTTPStatus
-from typing import List
+from typing import List, Tuple
 
 from bleach import clean
 from flask import current_app
+from sqlalchemy import Row
 from sqlalchemy.orm import lazyload
 from sqlalchemy.exc import MultipleResultsFound, NoResultFound
 from werkzeug.exceptions import NotFound, InternalServerError, BadRequest
@@ -17,11 +18,18 @@ from app.main.model.property import Property
 from app.main.model.property_image import PropertyImages
 
 
-def get_all_properties_for_portfolio(portfolio_id) -> List[Property]:
+def get_all_properties_for_portfolio(user, portfolio_id) -> List[Property]:
     """Gets all properties for the portfolio id"""
     current_app.logger.info("Getting all properties for portfolio_id %s", portfolio_id)
+    if user.admin:
+        return (
+            Property.query.options(lazyload(Property.tenants))
+            .filter_by(portfolio_id=portfolio_id)
+            .all()
+        )
     return (
         Property.query.options(lazyload(Property.tenants))
+        .filter(Portfolio.owner == user)
         .filter_by(portfolio_id=portfolio_id)
         .all()
     )
@@ -69,7 +77,7 @@ def save_new_property(portfolio_id, data):
             raise InternalServerError(f"Unable to save new Property. {ex}") from ex
 
 
-def get_property_by_id(portfolio_id, property_id) -> Property:
+def get_property_by_id(user, portfolio_id, property_id) -> Property:
     """Gets a property by its ID"""
     try:
         current_app.logger.info(
@@ -77,7 +85,20 @@ def get_property_by_id(portfolio_id, property_id) -> Property:
             portfolio_id,
             property_id,
         )
-        return Property.query.filter_by(portfolio_id=portfolio_id, id=property_id).one()
+        if user.admin:
+            return Property.query.filter_by(
+                portfolio_id=portfolio_id, id=property_id
+            ).one()
+        else:
+            query = (
+                db.session.query(Property)
+                .filter(Portfolio.owner == user)
+                .filter(Portfolio.id == portfolio_id)
+                .filter(Property.id == property_id)
+                .one()
+            )
+            return query
+
     except MultipleResultsFound as err:
         current_app.logger.error(
             "Multiple properties found... portfolio_id %s property_id %s",
@@ -86,17 +107,18 @@ def get_property_by_id(portfolio_id, property_id) -> Property:
         )
         print(err)
         raise BadRequest(
-            f"Multiple properties found... portfolio_id {portfolio_id} property_id {property_id}"
+            f"Multiple properties found... portfolio_id {portfolio_id}, property_id {property_id}"
         ) from err
     except NoResultFound as err:
         current_app.logger.error(
-            "No properties found with portfolio_id %s property_id %s",
+            "No properties found with portfolio_id %s, property_id %s, user_id %s",
             portfolio_id,
             property_id,
+            user.id,
         )
         print(err)
         raise NotFound(
-            f"No properties found with portfolio_id {portfolio_id} property_id {property_id}"
+            f"No properties found with portfolio_id {portfolio_id}, property_id {property_id}, user_id {user.id}"
         ) from err
 
 
