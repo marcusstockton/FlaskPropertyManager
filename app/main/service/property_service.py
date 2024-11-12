@@ -2,11 +2,10 @@
 
 import datetime
 from http import HTTPStatus
-from typing import List, Tuple
+from typing import List
 
 from bleach import clean
 from flask import current_app
-from sqlalchemy import Row
 from sqlalchemy.orm import lazyload
 from sqlalchemy.exc import MultipleResultsFound, NoResultFound
 from werkzeug.exceptions import NotFound, InternalServerError, BadRequest

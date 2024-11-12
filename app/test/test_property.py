@@ -1,4 +1,4 @@
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta
 import json
 from app.main import db
 from app.main.model import address, property
@@ -18,6 +18,8 @@ def create_owner_user() -> str:
 
 
 class TestPropertyBlueprint(BaseTestCase):
+    """Property Unit tests"""
+
     def test_correct_properties_are_loaded_for_portfolio(self):
         self.create_data()
 
@@ -44,7 +46,8 @@ class TestPropertyBlueprint(BaseTestCase):
     #
     @staticmethod
     def create_data():
-        date = datetime.now()
+        """Creates some test data for these tests"""
+        date: datetime = datetime.now()
         date -= timedelta(6 * 30)  # date 6 months ago.
         user_1 = User(
             email="test@test.com",

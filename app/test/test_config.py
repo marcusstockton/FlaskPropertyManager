@@ -17,7 +17,7 @@ class TestDevelopmentConfig(TestCase):
         return app
 
     def test_app_is_development(self) -> None:
-        self.assertFalse(app.config["SECRET_KEY"] is "my_precious")
+        self.assertFalse(app.config["SECRET_KEY"] == "my_precious")
         self.assertTrue(app.config["DEBUG"] is True)
         self.assertFalse(current_app is None)
 
@@ -30,7 +30,7 @@ class TestTestingConfig(TestCase):
         return app
 
     def test_app_is_testing(self) -> None:
-        self.assertFalse(app.config["SECRET_KEY"] is "my_precious")
+        self.assertFalse(app.config["SECRET_KEY"] == "my_precious")
         self.assertTrue(app.config["DEBUG"])
         self.assertTrue(app.config["TESTING"])
         self.assertTrue(
