@@ -47,7 +47,6 @@ test
 
 ## Idea's
 
-* Add error logging to a mongodb database
 * Add caching to auto-completes (AddressSearchList)
 * Remove Flask-Caching and add in redis caching
 

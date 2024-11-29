@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM python:3.12-alpine as base
+FROM python:3.13-alpine as base
 
 ENV FLASK_APP=manage.py
 ENV PYTHONDONTWRITEBYTECODE=1
