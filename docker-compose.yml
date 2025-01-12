@@ -29,7 +29,7 @@ services:
     container_name: flask-app
     build: 
       context: .
-      dockerfile: /Dockerfile
+      dockerfile: Dockerfile
       target: debugger # only for dev
       #target: primary # for prod
     ports:

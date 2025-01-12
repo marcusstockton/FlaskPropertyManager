@@ -72,7 +72,7 @@ class User(BaseClass):
             payload = {
                 "exp": datetime.now(timezone.utc) + timedelta(minutes=expires_mins),
                 "iat": datetime.now(timezone.utc),
-                "sub": user_id,
+                "sub": str(user_id),
                 "username": username,
             }
             return jwt.encode(payload, key, algorithm="HS256")
@@ -95,11 +95,13 @@ class User(BaseClass):
             if is_blacklisted_token:
                 return "Token blacklisted. Please log in again."
             else:
-                return payload["sub"]
+                return int(payload["sub"])
         except jwt.ExpiredSignatureError:
             return "Signature expired. Please log in again."
-        except jwt.InvalidTokenError:
+        except jwt.InvalidTokenError as e:
             return "Invalid token. Please log in again."
+        except Exception as e:
+            return repr(e)
 
 
 @dataclass
