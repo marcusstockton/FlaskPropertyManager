@@ -58,6 +58,7 @@ test
 ``docker compose build`` # builds all images\
 ``docker compose build flask_app`` # Builds specific image\
 ``docker compose up -d`` # runs all images in detached mode\
+``docker compose up -d --build``
 ``docker compose up -d flask_app`` # runs one particular image in detached mode
 
 ### Debugging against a docker container
@@ -66,3 +67,8 @@ Firstly, make sure docker desktop is running.\
 Then you'll want to build the latest images (assuming something has changed since last time) and run them up\
 Then, once both images are up and running, you can just hit the debug in vs code choosing the Python Debugger: Remote Attach option.\
 Should get a blue bar along the bottom in vs code - should be good to go!\
+
+
+### Ideas
+Add deposit scheme for tenants - scheme, amount
+When in rent paid, keep track of payments
