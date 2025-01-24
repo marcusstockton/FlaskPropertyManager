@@ -41,7 +41,7 @@ services:
       flask_db:
         condition: service_healthy
     environment:
-      - PROPERTYMANAGER_ENV=dev
+      - PROPERTYMANAGER_ENV=dev # prod, dev, test
       - DATABASE_URL=postgresql://postgres:postgres@flask_db:5432/postgres
     mem_limit: 512m
     mem_reservation: 128M

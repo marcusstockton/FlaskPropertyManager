@@ -18,7 +18,7 @@ class DevelopmentConfig(Config):
 
     DEBUG = True
     backupdb = "sqlite:///" + os.path.join(
-        basedir, "flask_PropertyManager_test.db?check_same_thread=False"
+        basedir, "flask_PropertyManager_main.db?check_same_thread=False"
     )
     SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL") or backupdb
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -42,7 +42,7 @@ class ProductionConfig(Config):
 
     DEBUG = False
     backupdb = "sqlite:///" + os.path.join(
-        basedir, "flask_PropertyManager_test.db?check_same_thread=False"
+        basedir, "flask_PropertyManager_main.db?check_same_thread=False"
     )
     SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL") or backupdb
 

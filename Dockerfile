@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM python:3.13-alpine as base
+FROM python:3.13-alpine AS base
 
 ENV FLASK_APP=manage.py
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -22,7 +22,7 @@ COPY . /app
 ##############
 ## Debugger ##
 ##############
-FROM base as debugger
+FROM base AS debugger
 RUN pip install debugpy
 
 ENTRYPOINT [ "python", "-m", "debugpy", "--wait-for-client", "--listen", "0.0.0.0:5678", "-m", "flask", "run", "-h", "0.0.0.0", "-p", "5000" ]
@@ -30,5 +30,5 @@ ENTRYPOINT [ "python", "-m", "debugpy", "--wait-for-client", "--listen", "0.0.0.
 #############
 ## Primary ##
 #############
-FROM base as primary
+FROM base AS primary
 CMD ["gunicorn", "--bind", "0.0.0.0:5000", "manage:app"]
