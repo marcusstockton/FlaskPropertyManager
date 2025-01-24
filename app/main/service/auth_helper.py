@@ -53,7 +53,8 @@ class Auth:
                 f"Auth token received {auth_token} decoding and checking..."
             )
             resp = User.decode_auth_token(auth_token)
-            if not isinstance(resp, str):
+            # int means a username, a string means an error
+            if isinstance(resp, int):
                 app.logger.info(f"Auth token {auth_token} decoded finding user {resp}")
                 user: User | None = User.query.filter_by(id=resp).first()
                 if user is None:
@@ -81,7 +82,7 @@ class Auth:
         auth_token = request.headers.get("Authorization")
         if auth_token:
             resp = User.decode_auth_token(auth_token)
-            if not isinstance(resp, str):
+            if isinstance(resp, int):
                 user: User | None = User.query.filter_by(id=resp).first()
                 if user:
                     return user
