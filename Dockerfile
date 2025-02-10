@@ -12,12 +12,17 @@ COPY ./requirements.txt /app/requirements.txt
 
 WORKDIR /app
 
-RUN pip install --upgrade -r requirements.txt
-#--no-cache-dir #add back in to line above?
+RUN pip install --upgrade -r requirements.txt --no-cache-dir
 COPY . /app
 
 # EXPOSE 5000
 # EXPOSE 5678
+
+######################
+## Apply Migrations ##
+######################
+FROM base as migraions
+RUN python manage.py db upgrade
 
 ##############
 ## Debugger ##
