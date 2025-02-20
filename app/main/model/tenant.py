@@ -6,6 +6,7 @@ from datetime import datetime
 from typing import Optional
 from sqlalchemy import LargeBinary
 from sqlalchemy.orm import Mapped
+from sqlalchemy.orm.relationships import RelationshipProperty
 from sqlalchemy_utils import EmailType
 from app.main.model.base import BaseClass
 
@@ -57,11 +58,13 @@ class Tenant(BaseClass):
     tenancy_start_date: Mapped[datetime] = db.Column(db.Date, nullable=False)
     tenancy_end_date: Mapped[Optional[datetime]] = db.Column(db.Date, nullable=True)
     smoker: Mapped[bool] = db.Column(db.Boolean, nullable=False, default=False)
-    profile_pic = db.relationship(
+    profile_pic: RelationshipProperty["TenantProfile"] = db.relationship(
         "TenantProfile", back_populates="tenant", uselist=False
     )  # uselist demotes a 1:1 relationship
-    notes = db.relationship("TenantNote")
-    documents = db.relationship("TenantDocument")
+    notes: RelationshipProperty["TenantNote"] = db.relationship("TenantNote")
+    documents: RelationshipProperty["TenantDocument"] = db.relationship(
+        "TenantDocument"
+    )
 
 
 @dataclass

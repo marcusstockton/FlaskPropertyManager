@@ -9,7 +9,7 @@ from app import blueprint
 from app.main import create_app, db
 from seeder import seed_data
 
-app: Flask = create_app(os.getenv("PROPERTYMANAGER_ENV") or "dev")
+app: Flask = create_app(os.getenv("PROPERTYMANAGER_ENV") or "local")
 app.register_blueprint(blueprint)
 app.app_context().push()
 migrate = Migrate(app, db)

@@ -26,7 +26,8 @@ https://www.freecodecamp.org/news/structuring-a-flask-restplus-web-service-for-p
 
 ### Seeding
 
-    sudo python manage.py seed || flask seed
+    sudo python manage.py seed
+    flask --app manage.py seed
 
 ### Shell
 

@@ -42,7 +42,7 @@
             "module": "flask",
             "env": {
                 "FLASK_APP": "manage.py",
-                "FLASK_ENV": "development"
+                "FLASK_ENV": "local"
             },
             "args": [
                 "run",
