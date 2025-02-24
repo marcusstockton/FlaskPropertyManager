@@ -3,13 +3,10 @@
 from dataclasses import dataclass
 from datetime import datetime
 from typing import List, Optional
-from sqlalchemy import DateTime, Float, Integer
+from sqlalchemy import DateTime, Float, ForeignKey, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.main.model.base import BaseClass
-
-
-from .. import db
 
 
 @dataclass
@@ -18,7 +15,7 @@ class Property(BaseClass):
 
     __tablename__ = "property"
     portfolio_id: Mapped[int] = mapped_column(
-        Integer, db.ForeignKey("portfolio.id", ondelete="cascade")
+        Integer, ForeignKey("portfolio.id", ondelete="cascade")
     )
     purchase_price: Mapped[float] = mapped_column(Float(precision=10), nullable=True)
     purchase_date: Mapped[datetime] = mapped_column(DateTime, nullable=True)

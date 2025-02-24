@@ -5,7 +5,8 @@ import re
 from datetime import date, timedelta, datetime, timezone
 from typing import Optional
 import jwt
-from sqlalchemy.orm import relationship, Mapped
+from sqlalchemy import Boolean, DateTime, String
+from sqlalchemy.orm import relationship, Mapped, mapped_column
 from app.main.model.base import BaseClass
 from sqlalchemy_utils import EmailType
 
@@ -20,15 +21,15 @@ class User(BaseClass):
 
     __tablename__ = "user"
 
-    email: Mapped[str] = db.Column(EmailType, unique=True, nullable=False, index=True)
-    registered_on: Mapped[datetime] = db.Column(db.DateTime, nullable=False)
-    admin: Mapped[bool] = db.Column(db.Boolean, nullable=False, default=False)
-    public_id: Mapped[str] = db.Column(db.String(100), unique=True, index=True)
-    username: Mapped[str] = db.Column(db.String(50), unique=True, index=True)
-    password_hash: Mapped[str] = db.Column(db.String(100))
-    first_name: Mapped[str] = db.Column(db.String(100), nullable=True)
-    last_name: Mapped[str] = db.Column(db.String(100), nullable=True)
-    date_of_birth: Mapped[Optional[date]] = db.Column(db.DateTime, nullable=True)
+    email: Mapped[str] = mapped_column(EmailType, unique=True, nullable=False, index=True)
+    registered_on: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    admin: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    public_id: Mapped[str] = mapped_column(String(100), unique=True, index=True)
+    username: Mapped[str] = mapped_column(String(50), unique=True, index=True)
+    password_hash: Mapped[str] = mapped_column(String(100))
+    first_name: Mapped[str] = mapped_column(String(100), nullable=True)
+    last_name: Mapped[str] = mapped_column(String(100), nullable=True)
+    date_of_birth: Mapped[Optional[date]] = mapped_column(DateTime, nullable=True)
     roles = relationship(
         "Role", secondary="user_roles", backref=db.backref("user", lazy="dynamic")
     )

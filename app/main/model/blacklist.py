@@ -2,8 +2,10 @@
 
 from dataclasses import dataclass
 from datetime import datetime
+
+from sqlalchemy import DateTime, Integer, String
 from .. import db
-from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import Mapped, mapped_column
 
 
 @dataclass
@@ -12,9 +14,9 @@ class BlacklistToken(db.Model):
 
     __tablename__ = "blacklist_tokens"
 
-    id: Mapped[int] = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    token: Mapped[str] = db.Column(db.String(500), unique=True, nullable=False)
-    blacklisted_on: Mapped[datetime] = db.Column(db.DateTime, nullable=False)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    token: Mapped[str] = mapped_column(String(500), unique=True, nullable=False)
+    blacklisted_on: Mapped[datetime] = mapped_column(DateTime, nullable=False)
 
     def __init__(self, token):
         self.token = token
