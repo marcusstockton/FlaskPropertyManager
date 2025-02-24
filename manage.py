@@ -1,4 +1,4 @@
-""" Entry point for the flask app."""
+"""Entry point for the flask app."""
 
 import os
 import unittest

@@ -21,7 +21,9 @@ class User(BaseClass):
 
     __tablename__ = "user"
 
-    email: Mapped[str] = mapped_column(EmailType, unique=True, nullable=False, index=True)
+    email: Mapped[str] = mapped_column(
+        EmailType, unique=True, nullable=False, index=True
+    )
     registered_on: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     admin: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     public_id: Mapped[str] = mapped_column(String(100), unique=True, index=True)

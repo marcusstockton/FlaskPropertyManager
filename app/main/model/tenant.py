@@ -61,9 +61,7 @@ class Tenant(BaseClass):
         "TenantProfile", back_populates="tenant", uselist=False
     )  # uselist demotes a 1:1 relationship
     notes: Mapped[List["TenantNote"]] = relationship("TenantNote")
-    documents: Mapped[List["TenantDocument"]] = relationship(
-        "TenantDocument"
-    )
+    documents: Mapped[List["TenantDocument"]] = relationship("TenantDocument")
 
 
 @dataclass
@@ -92,7 +90,9 @@ class DocumentType(BaseClass):
     __tablename__ = "document-type"
     description: Mapped[str] = mapped_column(String(100))
     expiry: Mapped[Optional[datetime]] = mapped_column(Date)
-    document: Mapped["TenantDocument"] = relationship("TenantDocument", back_populates="document_type")
+    document: Mapped["TenantDocument"] = relationship(
+        "TenantDocument", back_populates="document_type"
+    )
 
 
 @dataclass
@@ -105,7 +105,5 @@ class TenantDocument(BaseClass):
     document_blob: Mapped[LargeBinary] = mapped_column(LargeBinary)
     file_name: Mapped[str] = mapped_column(String(100))
     file_ext: Mapped[set] = mapped_column(String(4))
-    document_type_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey(DocumentType.id)
-    )
+    document_type_id: Mapped[int] = mapped_column(Integer, ForeignKey(DocumentType.id))
     document_type: Mapped["DocumentType"] = relationship("DocumentType")
