@@ -21,16 +21,16 @@ COPY . /app
 ######################
 ## Apply Migrations ##
 ######################
-FROM base as migraions
+FROM base AS migraions
 RUN python manage.py db upgrade
 
 ##############
 ## Debugger ##
 ##############
-FROM base AS debugger
-RUN pip install debugpy
+# FROM base AS debugger
+# RUN pip install debugpy
 
-ENTRYPOINT [ "python", "-m", "debugpy", "--wait-for-client", "--listen", "0.0.0.0:5678", "-m", "flask", "run", "-h", "0.0.0.0", "-p", "5000" ]
+# ENTRYPOINT [ "python", "-m", "debugpy", "--wait-for-client", "--listen", "0.0.0.0:5678", "-m", "flask", "run", "-h", "0.0.0.0", "-p", "5000" ]
 
 #############
 ## Primary ##

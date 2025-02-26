@@ -8,6 +8,7 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
       - PGUSER=postgres
+      - PGPORT=5433
     shm_size: 128mb
     healthcheck:
       test: ["CMD", "pg_isready", "-q", "-d", "postgres", "-U", "postgres"]
@@ -20,7 +21,7 @@ services:
     cpus: "0.5"
     cpuset: "1"
     ports:
-      - "5432:5432"
+      - "5433:5433"
     volumes:
       - pgdata:/var/lib/postgresql/data
 
@@ -30,11 +31,11 @@ services:
     build: 
       context: .
       dockerfile: Dockerfile
-      target: debugger # only for dev
-      #target: primary # for prod
+      #target: debugger # only for dev
+      target: primary # for prod
     ports:
        - 5000:5000
-       - 5678:5678 # only for dev
+       #- 5678:5678 # only for dev
     volumes:
       - .:/app/
     depends_on:
@@ -42,7 +43,7 @@ services:
         condition: service_healthy
     environment:
       - PROPERTYMANAGER_ENV=dev # prod, dev, test
-      - DATABASE_URL=postgresql://postgres:postgres@flask_db:5432/postgres
+      - DATABASE_URL=postgresql://postgres:postgres@flask_db:5433/postgres
     mem_limit: 512m
     mem_reservation: 128M
     memswap_limit: 1g
