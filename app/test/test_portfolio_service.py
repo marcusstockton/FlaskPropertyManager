@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 from typing import List
+import uuid
 
 from app.main import db
 from app.main.model.portfolio import Portfolio
@@ -19,7 +20,12 @@ from manage import app
 def create_owner_user() -> None:
     """Creates a non-admin user and returns the auth token"""
     datetime_now = datetime.now(timezone.utc)
-    user = User(email="user@testing.com", registered_on=datetime_now, admin=False)
+    user = User(
+        email="user@testing.com",
+        username="user@testing.com",
+        registered_on=datetime_now, 
+        admin=False,
+        public_id=str(uuid.uuid4()))
     user.password = "test"
     db.session.add(user)
     db.session.commit()

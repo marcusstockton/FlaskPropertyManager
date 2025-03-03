@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 import json
 from unittest.mock import patch
+import uuid
 from werkzeug.exceptions import NotFound
 from werkzeug.test import TestResponse
 
@@ -17,7 +18,12 @@ from manage import app
 def create_admin_user() -> str:
     """Creates an admin user and returns the auth token"""
     datetime_now: datetime = datetime.now(timezone.utc)
-    user = User(email="admin@testing.com", registered_on=datetime_now, admin=True)
+    user = User(
+        email="admin@testing.com",
+        username="admin@testing.com", 
+        registered_on=datetime_now, 
+        public_id=str(uuid.uuid4())
+        admin=True)
     user.password = "test"
     db.session.add(user)
     db.session.commit()
@@ -30,7 +36,12 @@ def create_admin_user() -> str:
 def create_owner_user() -> str:
     """Creates a non-admin user and returns the auth token"""
     datetime_now: datetime = datetime.now(timezone.utc)
-    user = User(email="user@testing.com", registered_on=datetime_now, admin=False)
+    user = User(
+        email="user@testing.com", 
+        username="user@testing.com",
+        registered_on=datetime_now, 
+        admin=False,
+        public_id=str(uuid.uuid4()))
     user.password = "test"
     db.session.add(user)
     db.session.commit()

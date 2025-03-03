@@ -1,5 +1,7 @@
 from datetime import datetime, timedelta
 import json
+from unittest.mock import patch
+import uuid
 from app.main import db
 from app.main.model import address, property
 from app.main.model.portfolio import Portfolio
@@ -29,19 +31,23 @@ class TestPropertyBlueprint(BaseTestCase):
             "Content-Type": "application/json",
             "Authorization": access_token,
         }
+        with patch(
+            "app.main.controller.property_controller.get_all_properties_for_portfolio"
+        ) as mock_get_portfolio_by_id:
+            mock_get_portfolio_by_id.return_value = property.Property.query.filter_by(portfolio_id=1).all()
+            with app.test_client() as client:
 
-        with app.test_client() as client:
-            response = client.get("/portfolio/1/property/", headers=headers)
-            print(response)
-            self.assert200(response)
-            data = json.loads(response.get_data(as_text=True))
-            self.assertEqual(2, len(data))
+                response = client.get("/portfolio/1/property/", headers=headers)
+                print(response)
+                self.assert200(response)
+                data = json.loads(response.get_data(as_text=True))
+                self.assertEqual(2, len(data))
 
-            # response = client.get("/portfolio/2/property/", headers=headers)
-            # print(response)
-            # self.assert404(response)
-            # data = json.loads(response.get_data(as_text=True))
-            # self.assertEqual(0, len(data))
+                # response = client.get("/portfolio/2/property/", headers=headers)
+                # print(response)
+                # self.assert404(response)
+                # data = json.loads(response.get_data(as_text=True))
+                # self.assertEqual(0, len(data))
 
     #
     @staticmethod
@@ -51,6 +57,7 @@ class TestPropertyBlueprint(BaseTestCase):
         date -= timedelta(6 * 30)  # date 6 months ago.
         user_1 = User(
             email="test@test.com",
+            public_id=str(uuid.uuid4()),
             first_name="Foo",
             registered_on=date,
             last_name="Bar",
@@ -62,6 +69,7 @@ class TestPropertyBlueprint(BaseTestCase):
 
         user_2 = User(
             email="test2@test.com",
+            public_id=str(uuid.uuid4()),
             first_name="Fizz",
             registered_on=date,
             last_name="Buzz",
