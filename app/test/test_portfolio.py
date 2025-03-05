@@ -22,7 +22,7 @@ def create_admin_user() -> str:
         email="admin@testing.com",
         username="admin@testing.com", 
         registered_on=datetime_now, 
-        public_id=str(uuid.uuid4())
+        public_id=str(uuid.uuid4()),
         admin=True)
     user.password = "test"
     db.session.add(user)

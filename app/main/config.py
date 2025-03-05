@@ -42,10 +42,10 @@ class TestingConfig(Config):
 
     DEBUG = True
     TESTING = True
-    #SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
-    SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(
-        basedir, "flask_PropertyManager_test.db?check_same_thread=False"
-    )
+    SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
+    # SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(
+    #     basedir, "flask_PropertyManager_test.db?check_same_thread=False"
+    # )
     PRESERVE_CONTEXT_ON_EXCEPTION = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 

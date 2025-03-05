@@ -33,13 +33,7 @@ class TestTestingConfig(TestCase):
         self.assertFalse(app.config["SECRET_KEY"] == "my_precious")
         self.assertTrue(app.config["DEBUG"])
         self.assertTrue(app.config["TESTING"])
-        self.assertTrue(
-            app.config["SQLALCHEMY_DATABASE_URI"]
-            == "sqlite:///"
-            + os.path.join(
-                basedir, "flask_PropertyManager_test.db?check_same_thread=False"
-            )
-        )
+        self.assertTrue(app.config["SQLALCHEMY_DATABASE_URI"] == "sqlite:///:memory:")
 
 
 class TestProductionConfig(TestCase):
