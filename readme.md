@@ -69,7 +69,7 @@ Then you'll want to build the latest images (assuming something has changed sinc
 Then, once both images are up and running, you can just hit the debug in vs code choosing the Python Debugger: Remote Attach option.\
 Should get a blue bar along the bottom in vs code - should be good to go!\
 
-
 ### Ideas
+
 Add deposit scheme for tenants - scheme, amount
 When in rent paid, keep track of payments

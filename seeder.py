@@ -1,11 +1,9 @@
 import base64
 import random
 import uuid
-from datetime import datetime, timedelta
-
+from datetime import datetime
 from faker import Faker
 from flask import current_app
-
 from app.main.model import user, portfolio, property, address, tenant
 from app.main.model.property_image import PropertyImages
 
@@ -171,11 +169,18 @@ def seed_data(db) -> None:
 
     # Get all user.id's for users with an owner role
     user_ids: list[int] = [
-        value
-        for value, in db.session.query(user.User.id)
-        .filter(user.User.roles.any(user.Role.name == "Owner"))
+        user.id
+        for user in db.session.query(user.User)
+        .join(user.User.roles)
+        .filter(user.Role.name == "Owner")
         .all()
     ]
+    # user_ids: list[int] = [
+    #     value
+    #     for value, in db.session.query(user.User.id)
+    #     .filter(user.User.roles.any(user.Role.name == "Owner"))
+    #     .all()
+    # ]
 
     portfolio_list = []
     for _ in range(8):
@@ -199,8 +204,12 @@ def seed_data(db) -> None:
             x.properties.append(
                 property.Property(
                     purchase_price=random.randrange(95000, 200000, 1075),
-                    purchase_date=purchase_date,
-                    sold_date=sold_date_or_null,
+                    purchase_date=datetime.combine(purchase_date, datetime.min.time()),
+                    sold_date=(
+                        datetime.combine(sold_date_or_null, datetime.min.time())
+                        if sold_date_or_null
+                        else None
+                    ),
                     monthly_rental_price=random.randrange(575, 1000, 100),
                     address=address.Address(
                         line_1=fake.building_number(),
@@ -226,28 +235,35 @@ def seed_data(db) -> None:
     for po in portfolio_list:
         for pr in po.properties:
             for _ in range(random.randint(3, 7)):
-                firstName = fake.first_name_male()
-                lastName = fake.last_name_male()
-                startDate = fake.date_this_decade()
+                first_name: str = fake.first_name_male()
+                last_name: str = fake.last_name_male()
+                start_date = fake.date_this_decade()
                 null_end_date = (
-                    fake.date_between_dates(startDate)
+                    fake.date_between_dates(start_date)
                     if random.randint(1, 10) > 5
                     else None
                 )
                 pr.tenants.append(
                     tenant.Tenant(
                         title=tenant.TitleEnum.MR,
-                        first_name=firstName,
-                        last_name=lastName,
-                        email_address=f"{firstName}.{lastName}@{fake.domain_name()}",
+                        first_name=first_name,
+                        last_name=last_name,
+                        email_address=f"{first_name}.{last_name}@{fake.domain_name()}",
                         phone_number=fake.phone_number(),
                         smoker=fake.pybool(),
-                        date_of_birth=fake.date_of_birth(
-                            minimum_age=15, maximum_age=65
+                        date_of_birth=datetime.combine(
+                            fake.date_of_birth(minimum_age=15, maximum_age=65),
+                            datetime.min.time(),
                         ),
                         job_title=fake.job(),
-                        tenancy_start_date=startDate,
-                        tenancy_end_date=null_end_date,
+                        tenancy_start_date=datetime.combine(
+                            start_date, datetime.min.time()
+                        ),
+                        tenancy_end_date=(
+                            datetime.combine(null_end_date, datetime.min.time())
+                            if null_end_date
+                            else None
+                        ),
                         profile_pic=tenant.TenantProfile(
                             image=base_64_images[random.randint(0, 11)]
                         ),
