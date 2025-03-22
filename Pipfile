@@ -23,7 +23,7 @@ requests = "==2.32.3"
 sqlalchemy-utils = "==0.41.2"
 sqlalchemy = "==2.0.30"
 werkzeug = "==3.0.6"
-gunicorn = "==22.0.0"
+gunicorn = "==23.0.0"
 
 [dev-packages]
 
