@@ -71,7 +71,7 @@ class PortfolioItem(Resource):
         if user is None:
             raise NotFound(user)
         app.logger.info(f"Finding Portfolio by Id {portfolio_id} for {user.username}")
-        return get_portfolio_by_id(user.id, portfolio_id)
+        return get_portfolio_by_id(user, portfolio_id)
 
     @token_required
     @api.doc("update a portfolio")
@@ -91,4 +91,6 @@ class PortfolioItem(Resource):
     def delete(self, portfolio_id):
         """Deletes a portfolio"""
         user: User | None = Auth.get_logged_in_user_object(request)
+        if user is None:
+            raise NotFound(user)
         return delete_portfolio_by_id(user, portfolio_id)

@@ -11,9 +11,10 @@ from seeder import seed_data
 
 app: Flask = create_app(os.getenv("PROPERTYMANAGER_ENV") or "local")
 app.register_blueprint(blueprint)
-app.app_context().push()
-migrate = Migrate(app, db)
-ma = Marshmallow(app)
+
+with app.app_context():
+    migrate = Migrate(app, db)
+    ma = Marshmallow(app)
 
 
 @app.cli.command()
@@ -24,7 +25,7 @@ def run() -> None:
 
 
 @app.cli.command()
-def test():
+def test() -> int:
     """Runs the unit tests."""
     tests: unittest.TestSuite = unittest.TestLoader().discover(
         "app/test", pattern="test*.py"

@@ -6,22 +6,17 @@ ENV FLASK_APP=manage.py
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-ADD . /app
-
-COPY ./requirements.txt /app/requirements.txt
-
 WORKDIR /app
 
-RUN pip install --upgrade -r requirements.txt --no-cache-dir
 COPY . /app
+COPY ./requirements.txt /app/requirements.txt
 
-# EXPOSE 5000
-# EXPOSE 5678
+RUN pip install --upgrade -r requirements.txt --no-cache-dir
 
 ######################
 ## Apply Migrations ##
 ######################
-FROM base AS migraions
+FROM base AS migrations
 RUN python manage.py db upgrade
 
 ##############
@@ -29,7 +24,6 @@ RUN python manage.py db upgrade
 ##############
 # FROM base AS debugger
 # RUN pip install debugpy
-
 # ENTRYPOINT [ "python", "-m", "debugpy", "--wait-for-client", "--listen", "0.0.0.0:5678", "-m", "flask", "run", "-h", "0.0.0.0", "-p", "5000" ]
 
 #############
