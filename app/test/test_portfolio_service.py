@@ -17,30 +17,29 @@ from werkzeug.exceptions import NotFound
 from manage import app
 
 
-def create_owner_user() -> None:
-    """Creates a non-admin user and returns the auth token"""
+def create_user(email: str, username: str, admin: bool = False, password: str = "test") -> None:
+    """Creates a user with the given details."""
     datetime_now = datetime.now(timezone.utc)
     user = User(
-        email="user@testing.com",
-        username="user@testing.com",
-        registered_on=datetime_now, 
-        admin=False,
-        public_id=str(uuid.uuid4()))
-    user.password = "test"
+        email=email,
+        username=username,
+        registered_on=datetime_now,
+        admin=admin,
+        public_id=str(uuid.uuid4()),
+    )
+    user.password = password
     db.session.add(user)
     db.session.commit()
 
-def create_owner_user_2() -> None:
-    """Creates a non-admin user and returns the auth token"""
-    datetime_now = datetime.now(timezone.utc)
-    user = User(
-        email="user2@testing.com",
-        username="user2@testing.com",
-        registered_on=datetime_now, 
-        admin=False,
-        public_id=str(uuid.uuid4()))
-    user.password = "test"
-    db.session.add(user)
+
+def create_owner_user() -> None:
+    """Creates a non-admin user with predefined details."""
+    create_user(email="user@testing.com", username="user@testing.com", admin=False, password="test")
+
+
+def create_portfolio(name: str, owner: User) -> None:
+    """Helper function to create a portfolio for a given user."""
+    db.session.add(Portfolio(name=name, owner=owner))
     db.session.commit()
 
 
@@ -56,13 +55,12 @@ class TestPortfolioServiceBlueprint(BaseTestCase):
         create_owner_user()
 
         owner_user = db.session.query(User).filter_by(email="user@testing.com").scalar()
-        db.session.add(Portfolio(name="Test Portfolio", owner=admin_user))
-        db.session.add(Portfolio(name="Test Portfolio2", owner=admin_user))
-        db.session.add(Portfolio(name="Test Portfolio 3", owner=owner_user))
-        db.session.commit()
+        create_portfolio("Test Portfolio", admin_user)
+        create_portfolio("Test Portfolio2", admin_user)
+        create_portfolio("Test Portfolio 3", owner_user)
 
         results = get_all_portfolios_for_user(admin_user)
-        self.assertEqual(3, len(results))
+        self.assertEqual(3, len(results), "Admin user should see all portfolios")
 
     def test_get_all_portfolios_for_user_returns_portfolios_for_owner_user(
         self,
@@ -73,44 +71,48 @@ class TestPortfolioServiceBlueprint(BaseTestCase):
         create_owner_user()
 
         owner_user = db.session.query(User).filter_by(email="user@testing.com").scalar()
-        db.session.add(Portfolio(name="Test Portfolio", owner=admin_user))
-        db.session.add(Portfolio(name="Test Portfolio2", owner=admin_user))
-        db.session.add(Portfolio(name="Test Portfolio 3", owner=owner_user))
-        db.session.commit()
+        create_portfolio("Test Portfolio", admin_user)
+        create_portfolio("Test Portfolio2", admin_user)
+        create_portfolio("Test Portfolio 3", owner_user)
 
         results: List[Portfolio] = get_all_portfolios_for_user(owner_user)
-        self.assertEqual(1, len(results))
+        self.assertEqual(1, len(results), "Owner user should see only their portfolios")
 
     def test_get_portfolio_by_id_returns_correct_portfolio(self) -> None:
-        """Tests that the get_portfolio_by_id service returns the correct porfolio"""
+        """Tests that the get_portfolio_by_id service returns the correct portfolio."""
         create_owner_user()
         owner_user = db.session.query(User).filter_by(email="user@testing.com").scalar()
 
-        db.session.add(Portfolio(name="Portfolio One", owner=owner_user))
-        db.session.add(Portfolio(name="Portfolio Two", owner=owner_user))
-        db.session.commit()
+        create_portfolio("Portfolio One", owner_user)
+        create_portfolio("Portfolio Two", owner_user)
 
         portfolio_1 = (
             db.session.query(Portfolio.id).filter_by(name="Portfolio One").scalar()
         )
+        self.assertIsNotNone(portfolio_1, "Portfolio ID should not be None")
 
         result: Portfolio = get_portfolio_by_id(owner_user, portfolio_id=portfolio_1)
-        self.assertEqual("Portfolio One", result.name)
+        self.assertEqual("Portfolio One", result.name, "Portfolio name mismatch")
+        self.assertEqual(owner_user.id, result.owner.id, "Owner ID mismatch")
 
     def test_get_portfolio_by_id_handles_incorrect_user(self) -> None:
-        """Tests that the get_portfolio_by_id service returns the correct porfolio"""
+        """Tests that the get_portfolio_by_id service raises NotFound for incorrect user."""
         create_owner_user()
-        create_owner_user_2()
+        create_user(email="user2@testing.com", username="user2@testing.com")
         owner_user = db.session.query(User).filter_by(email="user@testing.com").scalar()
         owner_user_2 = db.session.query(User).filter_by(email="user2@testing.com").scalar()
-        # admin_user = db.session.query(User).filter_by(email="admin@user.com").scalar()
 
-        db.session.add(Portfolio(name="Portfolio One", owner=owner_user))
-        db.session.add(Portfolio(name="Portfolio Two", owner=owner_user))
-        db.session.commit()
+        create_portfolio("Portfolio One", owner_user)
+        create_portfolio("Portfolio Two", owner_user)
 
         portfolio_1 = (
             db.session.query(Portfolio.id).filter_by(name="Portfolio One").scalar()
         )
+        self.assertIsNotNone(portfolio_1, "Portfolio ID should not be None")
 
-        self.assertRaises(NotFound, get_portfolio_by_id, owner_user_2, portfolio_1)
+        self.assertRaises(
+            NotFound,
+            get_portfolio_by_id,
+            owner_user_2,
+            portfolio_1,
+        )
