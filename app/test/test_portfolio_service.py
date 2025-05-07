@@ -30,6 +30,19 @@ def create_owner_user() -> None:
     db.session.add(user)
     db.session.commit()
 
+def create_owner_user_2() -> None:
+    """Creates a non-admin user and returns the auth token"""
+    datetime_now = datetime.now(timezone.utc)
+    user = User(
+        email="user2@testing.com",
+        username="user2@testing.com",
+        registered_on=datetime_now, 
+        admin=False,
+        public_id=str(uuid.uuid4()))
+    user.password = "test"
+    db.session.add(user)
+    db.session.commit()
+
 
 class TestPortfolioServiceBlueprint(BaseTestCase):
     """Test class for Portfolio services"""
@@ -81,14 +94,16 @@ class TestPortfolioServiceBlueprint(BaseTestCase):
             db.session.query(Portfolio.id).filter_by(name="Portfolio One").scalar()
         )
 
-        result: Portfolio = get_portfolio_by_id(owner_user.id, portfolio_id=portfolio_1)
+        result: Portfolio = get_portfolio_by_id(owner_user, portfolio_id=portfolio_1)
         self.assertEqual("Portfolio One", result.name)
 
     def test_get_portfolio_by_id_handles_incorrect_user(self) -> None:
         """Tests that the get_portfolio_by_id service returns the correct porfolio"""
         create_owner_user()
+        create_owner_user_2()
         owner_user = db.session.query(User).filter_by(email="user@testing.com").scalar()
-        admin_user = db.session.query(User).filter_by(email="admin@user.com").scalar()
+        owner_user_2 = db.session.query(User).filter_by(email="user2@testing.com").scalar()
+        # admin_user = db.session.query(User).filter_by(email="admin@user.com").scalar()
 
         db.session.add(Portfolio(name="Portfolio One", owner=owner_user))
         db.session.add(Portfolio(name="Portfolio Two", owner=owner_user))
@@ -98,4 +113,4 @@ class TestPortfolioServiceBlueprint(BaseTestCase):
             db.session.query(Portfolio.id).filter_by(name="Portfolio One").scalar()
         )
 
-        self.assertRaises(NotFound, get_portfolio_by_id, admin_user.id, portfolio_1)
+        self.assertRaises(NotFound, get_portfolio_by_id, owner_user_2, portfolio_1)
