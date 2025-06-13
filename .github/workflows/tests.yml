@@ -20,6 +20,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2  
       - uses: actions/setup-python@v2  
-      - run: pip install -r requirements.txt  # install requirements to enable GitHub run tests
-      - run: export FLASK_APP=manage.py && flask test
-      - run:  flask test # run tests
+      - run: pip install -r requirements.txt
+      - name: Run unit tests
+        run: flask test
+        env:
+          FLASK_APP: manage.py
