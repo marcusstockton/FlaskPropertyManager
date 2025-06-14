@@ -136,7 +136,10 @@ def generate_token(user):
 
 def reset_user_password(auth_token: str, new_password: str) -> User | None:
     """Helper method for updating the users password"""
-    user_id = User.decode_auth_token(auth_token)
+    resp = User.decode_auth_token(auth_token)
+    user_id = resp.get("sub") if isinstance(resp, dict) else resp
+    if not user_id:
+        raise BadRequest("Invalid auth token provided.")
     user = User.query.filter_by(id=user_id).first()
     try:
         if user:

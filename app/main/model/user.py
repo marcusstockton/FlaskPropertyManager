@@ -4,6 +4,7 @@ from dataclasses import dataclass
 import re
 from datetime import date, timedelta, datetime, timezone
 from typing import Optional
+from flask import current_app
 import jwt
 from sqlalchemy import Boolean, DateTime, String
 from sqlalchemy.orm import relationship, Mapped, mapped_column
@@ -68,22 +69,26 @@ class User(BaseClass):
         :return: string
         """
         try:
-            username = (
-                db.session.query(User.username).filter(User.id == user_id).scalar()
-            )
-
+            roles = [role.name for role in self.roles]
             payload = {
                 "exp": datetime.now(timezone.utc) + timedelta(minutes=expires_mins),
                 "iat": datetime.now(timezone.utc),
                 "sub": str(user_id),
-                "username": username,
+                "username": self.username,
+                "roles": roles,
             }
-            return jwt.encode(payload, key, algorithm="HS256")
+            token = jwt.encode(payload, key, algorithm="HS256")
+            # PyJWT >= 2.0 returns a string, <2.0 returns bytes
+            if isinstance(token, bytes):
+                token = token.decode("utf-8")
+            return token
         except Exception as e:
-            raise Exception from e
+            current_app.logger.error(f"Token generation failed: {e}")
+            raise RuntimeError(f"Token generation failed: {e}")
+        
 
     @staticmethod
-    def decode_auth_token(auth_token):
+    def decode_auth_token(auth_token) -> dict | str:
         """
         Decodes the auth token
         :param auth_token:
@@ -94,17 +99,15 @@ class User(BaseClass):
                 auth_token = auth_token.replace("Bearer ", "")
 
             payload = jwt.decode(auth_token, key, algorithms=["HS256"])
-            is_blacklisted_token = BlacklistToken.check_blacklist(auth_token)
-            if is_blacklisted_token:
+            if BlacklistToken.check_blacklist(auth_token):
                 return "Token blacklisted. Please log in again."
-            else:
-                return int(payload["sub"])
+            return payload
         except jwt.ExpiredSignatureError:
             return "Signature expired. Please log in again."
-        except jwt.InvalidTokenError as e:
+        except jwt.InvalidTokenError:
             return "Invalid token. Please log in again."
         except Exception as e:
-            return repr(e)
+            return f"Token decode error: {e}"
 
 
 @dataclass

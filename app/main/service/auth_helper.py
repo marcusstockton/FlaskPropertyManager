@@ -35,7 +35,7 @@ class Auth:
         """Logs out the user and blacklists the token"""
         if data:
             resp = User.decode_auth_token(data)
-            if not isinstance(resp, str):
+            if isinstance(resp, dict):
                 # mark the token as blacklisted
                 return save_token(token=data)
             else:
@@ -54,9 +54,10 @@ class Auth:
             )
             resp = User.decode_auth_token(auth_token)
             # int means a username, a string means an error
-            if isinstance(resp, int):
-                app.logger.info(f"Auth token {auth_token} decoded finding user {resp}")
-                user: User | None = User.query.filter_by(id=resp).first()
+            if isinstance(resp, dict):
+                user_id = resp.get("sub")
+                app.logger.info(f"Auth token {auth_token} decoded finding user {user_id}")
+                user: User | None = User.query.filter_by(id=user_id).first()
                 if user is None:
                     raise NotFound(user)
                 app.logger.info("User found...")
@@ -68,6 +69,7 @@ class Auth:
                         "username": user.username,
                         "admin": user.admin,
                         "registered_on": str(user.registered_on),
+                        "roles": resp.get("roles", []),  # Optionally include roles
                     },
                 }
                 return response_object, HTTPStatus.OK
@@ -82,7 +84,8 @@ class Auth:
         auth_token = request.headers.get("Authorization")
         if auth_token:
             resp = User.decode_auth_token(auth_token)
-            if isinstance(resp, int):
-                user: User | None = User.query.filter_by(id=resp).first()
+            if isinstance(resp, dict):
+                user_id = resp.get("sub")
+                user: User | None = User.query.filter_by(id=user_id).first()
                 if user:
                     return user

@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime
 from faker import Faker
 from flask import current_app
-from app.main.model import user, portfolio, property, address, tenant
+from app.main.model import user, portfolio, property as property_model, address, tenant
 from app.main.model.property_image import PropertyImages
 
 
@@ -175,12 +175,6 @@ def seed_data(db) -> None:
         .filter(user.Role.name == "Owner")
         .all()
     ]
-    # user_ids: list[int] = [
-    #     value
-    #     for value, in db.session.query(user.User.id)
-    #     .filter(user.User.roles.any(user.Role.name == "Owner"))
-    #     .all()
-    # ]
 
     portfolio_list = []
     for _ in range(8):
@@ -202,7 +196,7 @@ def seed_data(db) -> None:
                 else None
             )
             x.properties.append(
-                property.Property(
+                property_model.Property(
                     purchase_price=random.randrange(95000, 200000, 1075),
                     purchase_date=datetime.combine(purchase_date, datetime.min.time()),
                     sold_date=(

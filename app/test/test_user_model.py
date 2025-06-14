@@ -38,7 +38,11 @@ class TestUserModel(BaseTestCase):
         db.session.commit()
         auth_token = user.encode_auth_token(user.id)
         self.assertTrue(isinstance(auth_token, str))
-        self.assertTrue(User.decode_auth_token(auth_token) == user.id)
+
+        payload = User.decode_auth_token(auth_token)
+        self.assertIsInstance(payload, dict)
+        if isinstance(payload, dict):
+            self.assertEqual(str(user.id), payload.get("sub"))
 
 
 # if __name__ == "__main__":
