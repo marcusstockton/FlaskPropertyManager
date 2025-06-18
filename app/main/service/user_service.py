@@ -1,5 +1,6 @@
 """User Service for interacting with users"""
 
+import re
 import uuid
 from datetime import datetime, timezone
 from http import HTTPStatus
@@ -19,6 +20,12 @@ def save_new_user(data):
     user: User | None = User.query.filter_by(email=data["email"]).first()
     if user:
         raise BadRequest("User already exists. Please Log in.")
+    
+    is_valid, errors = validate_password(data["password"])
+    if not is_valid:
+        raise BadRequest(
+            description=" ".join(errors)
+        )
 
     owner_role: Role | None = Role.query.filter_by(
         name="Owner"
@@ -155,3 +162,22 @@ def save_changes(data) -> None:
     """Saves changes"""
     db.session.add(data)
     db.session.commit()
+
+
+def validate_password(password)-> tuple[bool, list[str]]:
+    """
+    Validates the password integrity according to policy.
+    Returns (is_valid, list_of_errors)
+    """
+    errors = []
+    if len(password) < 8:
+        errors.append("Password must be at least 8 characters long.")
+    if re.search(r"[0-9]", password) is None:
+        errors.append("Password must contain at least one number.")
+    if re.search(r"[A-Z]", password) is None:
+        errors.append("Password must contain at least one uppercase letter.")
+    if re.search(r"[a-z]", password) is None:
+        errors.append("Password must contain at least one lowercase letter.")
+    if re.search(r"[!@#$%^&*(),.?\":{}|<>]", password) is None:
+        errors.append("Password must contain at least one special character.")
+    return (len(errors) == 0, errors)
