@@ -8,7 +8,6 @@ from http import HTTPStatus
 from flask import current_app
 from sqlalchemy import update
 from sqlalchemy import func
-from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import BadRequest, InternalServerError, NotFound
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from app.main import db
@@ -20,7 +19,7 @@ def save_new_user(data):
     user: User | None = User.query.filter_by(email=data["email"]).first()
     if user:
         raise BadRequest("User already exists. Please Log in.")
-    
+
     is_valid, errors = validate_password(data["password"])
     if not is_valid:
         raise BadRequest(

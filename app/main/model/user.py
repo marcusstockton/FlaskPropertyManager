@@ -4,12 +4,11 @@ from dataclasses import dataclass
 from datetime import date, timedelta, datetime, timezone
 from typing import Optional
 from flask import current_app
+from sqlalchemy_utils import EmailType
 import jwt
 from sqlalchemy import Boolean, DateTime, String
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from app.main.model.base import BaseClass
-from sqlalchemy_utils import EmailType
-
 from app.main.model.blacklist import BlacklistToken
 from .. import db, flask_bcrypt
 from ..config import key
@@ -51,7 +50,6 @@ class User(BaseClass):
         """Checks user password"""
         return flask_bcrypt.check_password_hash(self.password_hash, password)
 
-    
     def encode_auth_token(self, user_id, expires_mins=1440) -> str:
         """
         Generates the Auth Token
@@ -73,8 +71,7 @@ class User(BaseClass):
             return token
         except Exception as e:
             current_app.logger.error(f"Token generation failed: {e}")
-            raise RuntimeError(f"Token generation failed: {e}")
-        
+            raise RuntimeError(f"Token generation failed: {e}") from e
 
     @staticmethod
     def decode_auth_token(auth_token) -> dict | str:

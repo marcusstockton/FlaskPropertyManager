@@ -1,3 +1,4 @@
+"""Test User Model"""
 from datetime import datetime, timezone
 import uuid
 from app.main import db
@@ -6,13 +7,14 @@ from app.test.base import BaseTestCase
 
 
 class TestUserModel(BaseTestCase):
+    """Tests for the User model"""
 
-    datetime_now = datetime.now(timezone.utc)
+    datetime_now: datetime = datetime.now(timezone.utc)
 
     def test_encode_auth_token(self) -> None:
         """Tests encode auth token works"""
         user = User(
-            email="testFoo@FooFighters.com", 
+            email="testFoo@FooFighters.com",
             username="testFoo@FooFighters.com",
             registered_on=self.datetime_now,
             public_id=str(uuid.uuid4()))
