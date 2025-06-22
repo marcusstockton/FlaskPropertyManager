@@ -1,7 +1,6 @@
 """User Entity"""
 
 from dataclasses import dataclass
-import re
 from datetime import date, timedelta, datetime, timezone
 from typing import Optional
 from flask import current_app
@@ -52,17 +51,7 @@ class User(BaseClass):
         """Checks user password"""
         return flask_bcrypt.check_password_hash(self.password_hash, password)
 
-    def validate_password(self, password):
-        """Validates the password integrety"""
-        if len(password) < 8:
-            print("Make sure your password is at lest 8 letters")
-        elif re.search("[0-9]", password) is None:
-            print("Make sure your password has a number in it")
-        elif re.search("[A-Z]", password) is None:
-            print("Make sure your password has a capital letter in it")
-        else:
-            print("Your password seems fine")
-
+    
     def encode_auth_token(self, user_id, expires_mins=1440) -> str:
         """
         Generates the Auth Token
