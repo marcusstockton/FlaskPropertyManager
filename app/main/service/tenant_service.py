@@ -5,7 +5,6 @@ from http import HTTPStatus
 from sqlite3 import IntegrityError
 from typing import List
 
-from bleach import clean
 from sqlalchemy import Update, update
 from werkzeug.exceptions import NotFound, BadRequest
 from werkzeug.utils import secure_filename
@@ -107,17 +106,17 @@ def save_new_tenant(portfolio_id, property_id, data):
     title: TitleEnum = TitleEnum[data["title"]]
     new_tenant = Tenant(
         title=title,
-        first_name=clean(data.get("first_name")),
-        email_address=clean(data.get("email_address")),
-        last_name=clean(data.get("last_name")),
-        phone_number=clean(data.get("phone_number")),
+        first_name=data.get("first_name"),
+        email_address=data.get("email_address"),
+        last_name=data.get("last_name"),
+        phone_number=data.get("phone_number"),
         date_of_birth=dt.strptime(data["date_of_birth"], "%Y-%m-%d"),
-        job_title=clean(data.get("job_title")),
+        job_title=data.get("job_title"),
         tenancy_start_date=dt.strptime(data["tenancy_start_date"], "%Y-%m-%d"),
         tenancy_end_date=data.get("tenancy_end_date"),
     )
     if "note" in data:
-        new_note = TenantNote(note=clean(data["note"]))
+        new_note = TenantNote(note=data["note"])
         new_tenant.notes.append(new_note)
 
     property.tenants.append(new_tenant)

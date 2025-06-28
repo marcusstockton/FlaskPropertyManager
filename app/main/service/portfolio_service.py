@@ -13,7 +13,6 @@ from sqlalchemy.exc import (
 )
 from sqlalchemy.orm import lazyload
 from werkzeug.exceptions import NotFound, BadRequest, InternalServerError
-from bleach import clean
 
 from app.main import db
 from app.main.model.portfolio import Portfolio
@@ -63,7 +62,7 @@ def get_portfolio_by_id(user: User, portfolio_id: int) -> Portfolio:
 
 def save_new_portfolio(data: Dict[str, str], user_id: int) -> Portfolio:
     """Creates a new Portfolio"""
-    sanitised_name = clean(data["name"])
+    sanitised_name = data["name"]
     current_app.logger.info(f"Adding portfolio {sanitised_name}")
     portfolio_exists = db.session.query(exists().where(Portfolio.name == sanitised_name).where(Portfolio.owner_id == user_id)).scalar()
     if not portfolio_exists:
@@ -83,7 +82,7 @@ def update_portfolio(portfolio_id: int, data: Dict[str, Union[str, int]]) -> Por
     if not portfolio_query:
         raise NotFound("Portfolio not found.")
     try:
-        sanitised_name = clean(str(data.get("name", "")))
+        sanitised_name = str(data.get("name", ""))
         data["name"] = sanitised_name
         stmt = update(Portfolio).where(Portfolio.id == portfolio_id).values(data)
         db.session.execute(stmt)
