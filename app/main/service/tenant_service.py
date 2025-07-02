@@ -5,6 +5,7 @@ from http import HTTPStatus
 from sqlite3 import IntegrityError
 from typing import List
 
+from marshmallow import ValidationError
 from sqlalchemy import Update, update
 from werkzeug.exceptions import NotFound, BadRequest
 from werkzeug.utils import secure_filename
@@ -19,6 +20,7 @@ from app.main.model.tenant import (
     TenantProfile,
     TitleEnum,
 )
+from app.main.schemas.tenant import TenantSchema
 
 
 def get_all_tenants_for_property(portfolio_id, property_id) -> List[Tenant]:
@@ -86,6 +88,13 @@ def delete_tenant(property_id, tenant_id):
 
 def save_new_tenant(portfolio_id, property_id, data):
     """Creates a new tenant against the supplied portfolio and property"""
+    schema = TenantSchema()
+    try:
+        valid_data = schema.load(data)
+    except ValidationError as err:
+        # Return all errors as a single string or as a dict
+        raise BadRequest("; ".join([f"{k}: {', '.join(v)}" for k, v in err.messages.items()]))
+
     property: Property | None = Property.query.filter_by(id=property_id).first()
     if property is None:
         raise NotFound()
@@ -96,27 +105,27 @@ def save_new_tenant(portfolio_id, property_id, data):
     # check if tenant already exists?
     existing_tenant = Tenant.query.filter(
         Tenant.property_id == property_id,
-        Tenant.first_name == data["first_name"],
-        Tenant.last_name == data["last_name"],
-        Tenant.date_of_birth == data["date_of_birth"],
+        Tenant.first_name == valid_data.get("first_name"),
+        Tenant.last_name == valid_data.get("last_name"),
+        Tenant.date_of_birth == valid_data.get("date_of_birth"),
     ).scalar()
     if existing_tenant is not None:
         raise BadRequest("Tenant already exists at this property")
 
-    title: TitleEnum = TitleEnum[data["title"]]
+    title: TitleEnum = TitleEnum[valid_data["title"]]
     new_tenant = Tenant(
         title=title,
-        first_name=data.get("first_name"),
-        email_address=data.get("email_address"),
-        last_name=data.get("last_name"),
-        phone_number=data.get("phone_number"),
-        date_of_birth=dt.strptime(data["date_of_birth"], "%Y-%m-%d"),
-        job_title=data.get("job_title"),
-        tenancy_start_date=dt.strptime(data["tenancy_start_date"], "%Y-%m-%d"),
-        tenancy_end_date=data.get("tenancy_end_date"),
+        first_name=valid_data["first_name"],
+        email_address=valid_data["email_address"],
+        last_name=valid_data["last_name"],
+        phone_number=valid_data["phone_number"],
+        date_of_birth=valid_data["date_of_birth"],
+        job_title=valid_data.get("job_title"),  # optional
+        tenancy_start_date=valid_data["tenancy_start_date"],
+        tenancy_end_date=valid_data.get("tenancy_end_date"),  # optional
     )
-    if "note" in data:
-        new_note = TenantNote(note=data["note"])
+    if "note" in valid_data and valid_data.get("note"):
+        new_note = TenantNote(note=valid_data["note"])
         new_tenant.notes.append(new_note)
 
     property.tenants.append(new_tenant)
