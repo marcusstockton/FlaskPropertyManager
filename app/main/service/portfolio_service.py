@@ -13,21 +13,44 @@ from sqlalchemy.exc import (
 )
 from sqlalchemy.orm import lazyload
 from werkzeug.exceptions import NotFound, BadRequest, InternalServerError
-
-from app.main import db
+import json
+from app.main import db, redis_client
 from app.main.model.portfolio import Portfolio
 from app.main.model.user import User
+from app.main.schemas.portfolio import PortfolioSchema
 
 
 def get_all_portfolios_for_user(user: User) -> List[Portfolio]:
     """Gets all Portfolios for the logged in user"""
+
+    cache_key = f"portfolios_user_{'admin' if user.admin else user.id}"
+    cached = redis_client.get(cache_key)
+
+    if cached:
+        current_app.logger.info("Portfolio found in cache with key: %s", cache_key)
+        # Deserialize JSON string to Python objects
+        portfolio_dicts = json.loads(cached)
+        # Convert dicts back to Portfolio objects if needed
+        # If you have a Portfolio schema, use it here
+        # Otherwise, return the dicts
+        return portfolio_dicts
+
+    current_app.logger.info("Portfolio not found in cache. Calling database.")
     if user.admin:
-        return Portfolio.query.all()
-    return (
-        Portfolio.query.filter_by(owner_id=user.id)
+        portfolios = Portfolio.query.all()
+    else:
+        portfolios = (Portfolio.query.filter_by(owner_id=user.id)
         .options(lazyload(Portfolio.owner), lazyload(Portfolio.properties))
-        .all()
-    )
+        .all())
+    # Serialize portfolios to JSON (use a schema if available)
+    schema = PortfolioSchema(many=True)
+    portfolios_json = schema.dumps(portfolios)
+
+    # Store in Redis (set an expiry if desired, e.g., 300 seconds)
+    redis_client.setex(cache_key, 300, portfolios_json)
+
+    return portfolios
+
 
 
 def get_portfolio_by_id(user: User, portfolio_id: int) -> Portfolio:

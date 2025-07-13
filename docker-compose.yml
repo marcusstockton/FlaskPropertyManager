@@ -24,6 +24,8 @@ services:
       - "5433:5433"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    networks:
+      - docker-network
 
 
   flask_app:
@@ -44,12 +46,35 @@ services:
     environment:
       - PROPERTYMANAGER_ENV=dev # prod, dev, test
       - DATABASE_URL=postgresql://postgres:postgres@flask_db:5433/postgres
+    networks:
+    - docker-network
     mem_limit: 512m
     mem_reservation: 128M
     memswap_limit: 1g
     cpus: "0.5"
     cpuset: "1"
 
+
+  redis_cache:
+    image: redis:latest
+    container_name: redis_cache
+    ports:
+      - "6379:6379"
+    networks:
+      - docker-network
+    mem_limit: 128m
+    mem_reservation: 128m
+    memswap_limit: 128m
+    environment:
+    - REDIS_HOST=redis_cache
+    - REDIS_PORT=6379
+    cpus: "0.5"
+    cpuset: "1"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
 
   smtp4dev:
     image: rnwood/smtp4dev:v3
@@ -73,6 +98,9 @@ services:
     cpuset: "1"
 
 
+networks:
+  docker-network:
+    driver: bridge
 
 volumes:
   pgdata: {}

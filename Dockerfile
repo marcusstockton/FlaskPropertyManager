@@ -13,6 +13,14 @@ COPY ./requirements.txt /app/requirements.txt
 
 RUN pip install --upgrade -r requirements.txt --no-cache-dir
 
+# Create a non-root user and group
+RUN addgroup -g 10001 appgroup && \
+    adduser -D -u 10000 -G appgroup appuser && \
+    chown -R appuser:appgroup /app
+
+# Switch to the non-root user
+USER appuser
+
 ######################
 ## Apply Migrations ##
 ######################

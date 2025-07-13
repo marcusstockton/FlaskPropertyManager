@@ -7,6 +7,8 @@ from flask_mail import Mail
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
+import redis
+import os
 
 from .config import config_by_name
 
@@ -22,12 +24,19 @@ db = SQLAlchemy(metadata=MetaData(naming_convention=naming_convention))
 cache = Cache(config={"CACHE_TYPE": "SimpleCache"})
 flask_bcrypt = Bcrypt()
 mail = Mail()
+redis_client = redis.Redis(
+        host=os.getenv("REDIS_HOST", "redis_cache"),
+        port=int(os.getenv("REDIS_PORT", 6379)),
+        db=0,
+        decode_responses=True
+    )
 
 
 def create_app(config_name: str) -> Flask:
     """Creates the application"""
     app = Flask(__name__)
     CORS(app)
+    app.redis_client = redis_client
     app.logger.setLevel(logging.DEBUG)
     app.logger.debug("Calling create_app(%s)", config_name)
 

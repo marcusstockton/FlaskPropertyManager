@@ -22,7 +22,7 @@ def save_token(token):
         }
         app.logger.info(f"Token {blacklist_token} added to blacklist")
         return response_object, HTTPStatus.OK
-    except Exception as err:
+    except db.exc.SQLAlchemyError as err:
         app.logger.error(f"Unable to add Token {blacklist_token}. {err}")
         response_object = {"status": "fail", "message": str(err)}
         return response_object, HTTPStatus.OK
