@@ -27,15 +27,12 @@ def run() -> None:
 @app.cli.command()
 def test() -> int:
     """Runs the unit tests."""
+    import sys
     tests: unittest.TestSuite = unittest.TestLoader().discover(
         "app/test", pattern="test*.py"
     )
-    result = unittest.TextTestRunner(verbosity=0).run(
-        tests
-    )  # 0 (quiet), 1 (default), 2 (verbose)
-    if result.wasSuccessful():
-        return 0
-    return 1
+    result = unittest.TextTestRunner(verbosity=0).run(tests)
+    sys.exit(not result.wasSuccessful())
 
 
 @app.cli.command()
