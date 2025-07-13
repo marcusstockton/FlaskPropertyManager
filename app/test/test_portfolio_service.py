@@ -12,7 +12,7 @@ from app.main.service.portfolio_service import (
 )
 from app.test.base import BaseTestCase
 from werkzeug.exceptions import NotFound
-
+from unittest.mock import patch, MagicMock
 
 from manage import app
 
@@ -45,6 +45,36 @@ def create_portfolio(name: str, owner: User) -> None:
 
 class TestPortfolioServiceBlueprint(BaseTestCase):
     """Test class for Portfolio services"""
+
+    def setUp(self):
+        # Patch redis_client in the portfolio_service module
+        patcher = patch('app.main.service.portfolio_service.redis_client', autospec=True)
+        self.mock_redis = patcher.start()
+        self.addCleanup(patcher.stop)
+        # Optionally, set up mock return values
+        self.mock_redis.get.return_value = None
+        self.mock_redis.setex.return_value = True
+        
+        # Create all tables before each test
+        db.create_all()
+
+        # Seed an admin user for tests
+        from datetime import datetime, timezone
+        import uuid
+        admin_user = User(
+            email="admin@user.com",
+            username="admin@user.com",
+            registered_on=datetime.now(timezone.utc),
+            admin=True,
+            public_id=str(uuid.uuid4()),
+        )
+        admin_user.password = "test"
+        db.session.add(admin_user)
+        db.session.commit()
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
 
     def test_get_all_portfolios_for_user_returns_all_portfolios_for_admin_user(
         self,
