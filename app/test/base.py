@@ -4,9 +4,10 @@ from flask_testing import TestCase
 from sqlalchemy.exc import IntegrityError
 
 from app.main import create_app, db
+from app.main.model.blacklist import BlacklistToken
 # Import all models that need tables before calling db.create_all().
 # This will ensure all tables, including blacklist_tokens, are created for your tests.
-from app.main.model import (user, portfolio, property as property_model, 
+from app.main.model import (user, portfolio, property as property_model,
                             address, tenant, blacklist)
 from manage import app
 
@@ -66,4 +67,5 @@ class BaseTestCase(TestCase):
             db.session.commit()
         except IntegrityError as e:
             db.session.rollback()
-            app.logger.error("Failed seeding test database: %s", e, exc_info=True)
+            app.logger.error(
+                "Failed seeding test database: %s", e, exc_info=True)
