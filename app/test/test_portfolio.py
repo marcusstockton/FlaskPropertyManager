@@ -2,9 +2,9 @@ from datetime import datetime, timezone
 import json
 from unittest.mock import patch
 import uuid
-from app.main.schemas.portfolio import PortfolioSchema
 from werkzeug.exceptions import NotFound
 from werkzeug.test import TestResponse
+from app.main.schemas.portfolio import PortfolioSchema
 
 from app.main import db
 from app.main.model.portfolio import Portfolio

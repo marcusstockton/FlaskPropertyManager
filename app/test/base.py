@@ -62,4 +62,5 @@ class BaseTestCase(TestCase):
         try:
             db.session.commit()
         except IntegrityError as e:
-            print(e)
+            db.session.rollback()
+            app.logger.error("Failed seeding test database: %s", e, exc_info=True)
