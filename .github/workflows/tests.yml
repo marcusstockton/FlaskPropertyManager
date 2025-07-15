@@ -34,4 +34,6 @@ jobs:
           cache: 'pip' # caching pip dependencies
       - run: pip install -r requirements.txt
       - name: Run unit tests
+        env:
+          PROPERTYMANAGER_ENV: test
         run: pytest --maxfail=1 --disable-warnings
