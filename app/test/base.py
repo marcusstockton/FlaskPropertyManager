@@ -4,11 +4,16 @@ from flask_testing import TestCase
 from sqlalchemy.exc import IntegrityError
 
 from app.main import create_app, db
-from app.main.model.blacklist import BlacklistToken
+
 # Import all models that need tables before calling db.create_all().
 # This will ensure all tables, including blacklist_tokens, are created for your tests.
-from app.main.model import (user, portfolio, property as property_model,
-                            address, tenant, blacklist)
+from app.main.model.user import User, Role
+from app.main.model.portfolio import Portfolio
+from app.main.model.property import Property
+from app.main.model.address import Address
+from app.main.model.tenant import Tenant
+from app.main.model.blacklist import BlacklistToken
+
 from manage import app
 
 
