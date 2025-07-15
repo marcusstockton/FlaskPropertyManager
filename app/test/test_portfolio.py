@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 import json
 from unittest.mock import patch
 import uuid
+from app.main.schemas.portfolio import PortfolioSchema
 from werkzeug.exceptions import NotFound
 from werkzeug.test import TestResponse
 
@@ -85,10 +86,11 @@ class TestPortfolioBlueprint(BaseTestCase):
         }
 
         # Filter and select the first portfolio with id == 1
-        mock_portfolios.return_value = next(
-            (portfolio for portfolio in mock_get_all_portfolios_for_user() if portfolio.id == 1),
+        portfolio: Portfolio | None = next(
+            (p for p in mock_get_all_portfolios_for_user() if p.id == 1),
             None
         )
+        mock_portfolios.return_value = PortfolioSchema().dump(portfolio)
 
         with app.test_client() as client:
             response: TestResponse = client.get("/portfolio/1", headers=headers)
