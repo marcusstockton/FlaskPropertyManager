@@ -13,16 +13,13 @@ from app.test.base import BaseTestCase
 from app.test.helpers import mock_get_all_portfolios_for_user, mock_portfolio_by_id
 
 
-from manage import app
-
-
 def create_admin_user() -> str:
     """Creates an admin user and returns the auth token"""
     datetime_now: datetime = datetime.now(timezone.utc)
     user = User(
         email="admin@testing.com",
-        username="admin@testing.com", 
-        registered_on=datetime_now, 
+        username="admin@testing.com",
+        registered_on=datetime_now,
         public_id=str(uuid.uuid4()),
         admin=True)
     user.password = "test"
@@ -38,9 +35,9 @@ def create_owner_user() -> str:
     """Creates a non-admin user and returns the auth token"""
     datetime_now: datetime = datetime.now(timezone.utc)
     user = User(
-        email="user@testing.com", 
+        email="user@testing.com",
         username="user@testing.com",
-        registered_on=datetime_now, 
+        registered_on=datetime_now,
         admin=False,
         public_id=str(uuid.uuid4()))
     user.password = "test"
@@ -69,7 +66,7 @@ class TestPortfolioBlueprint(BaseTestCase):
             portfolio for portfolio in mock_get_all_portfolios_for_user()
         ]
 
-        with app.test_client() as client:
+        with self.app.test_client() as client:
             response: TestResponse = client.get("/portfolio/", headers=headers)
             self.assert200(response)
             data = json.loads(response.get_data(as_text=True))
@@ -90,17 +87,19 @@ class TestPortfolioBlueprint(BaseTestCase):
             (p for p in mock_get_all_portfolios_for_user() if p.id == 1),
             None
         )
-        app.logger.info(f"Filtered portfolio object: {portfolio}")
-        app.logger.info(f"Serialized portfolio: {PortfolioSchema().dump(portfolio)}")
-        
+        self.app.logger.info(f"Filtered portfolio object: {portfolio}")
+        self.app.logger.info(
+            f"Serialized portfolio: {PortfolioSchema().dump(portfolio)}")
+
         assert portfolio is not None, "No portfolio with id == 1 found in mock data"
-        
+
         mock_portfolios.return_value = PortfolioSchema().dump(portfolio)
 
-        with app.test_client() as client:
-            response: TestResponse = client.get("/portfolio/1", headers=headers)
+        with self.app.test_client() as client:
+            response: TestResponse = client.get(
+                "/portfolio/1", headers=headers)
             data = response.get_json()
-            app.logger.info(f"Response data: {data}")
+            self.app.logger.info(f"Response data: {data}")
             self.assertEqual("Test Portfolio One", data.get("name"))
             self.assertEqual(1, data.get("id"))
 
@@ -116,8 +115,9 @@ class TestPortfolioBlueprint(BaseTestCase):
             "app.main.controller.portfolio_controller.get_portfolio_by_id"
         ) as mock_get_portfolio_by_id:
             mock_get_portfolio_by_id.side_effect = NotFound()
-            with app.test_client() as client:
-                response: TestResponse = client.get("/portfolio/2", headers=headers)
+            with self.app.test_client() as client:
+                response: TestResponse = client.get(
+                    "/portfolio/2", headers=headers)
                 self.assert404(response)
 
     def test_update_portfolio_works_with_correct_data_and_user(self) -> None:
@@ -134,7 +134,7 @@ class TestPortfolioBlueprint(BaseTestCase):
             "app.main.controller.portfolio_controller.update_portfolio"
         ) as update_patch:
             update_patch.return_value = Portfolio(name=dict_data["name"])
-            with app.test_client() as client:
+            with self.app.test_client() as client:
                 response: TestResponse = client.put(
                     "/portfolio/1",
                     data=json.dumps(dict_data),
@@ -158,7 +158,7 @@ class TestPortfolioBlueprint(BaseTestCase):
         ) as update_patch:
             update_patch.side_effect = NotFound()
             dict_data: dict[str, str] = {"id": "2", "name": "Updated Test 1"}
-            with app.test_client() as client:
+            with self.app.test_client() as client:
                 response: TestResponse = client.put(
                     "/portfolio/2",
                     data=json.dumps(dict_data),
@@ -182,8 +182,9 @@ class TestPortfolioBlueprint(BaseTestCase):
             "app.main.controller.portfolio_controller.get_portfolio_by_id"
         ) as mock_get_portfolio_by_id:
             mock_get_portfolio_by_id.return_value = mock_portfolio_by_id()
-            with app.test_client() as client:
-                response: TestResponse = client.get("/portfolio/1", headers=headers)
+            with self.app.test_client() as client:
+                response: TestResponse = client.get(
+                    "/portfolio/1", headers=headers)
                 self.assert200(response)
                 data = json.loads(response.get_data(as_text=True))
 
@@ -206,7 +207,7 @@ class TestPortfolioBlueprint(BaseTestCase):
                 name="&lt;script&gt;alert();&lt;/script&gt;"
             )
             # Do the test:
-            with app.test_client() as client:
+            with self.app.test_client() as client:
                 response: TestResponse = client.post(
                     "/portfolio/",
                     data=json.dumps(new_portfolio),
@@ -235,7 +236,7 @@ class TestPortfolioBlueprint(BaseTestCase):
                 name="Testing Portfolio Name"
             )
             # Do the test:
-            with app.test_client() as client:
+            with self.app.test_client() as client:
                 response: TestResponse = client.post(
                     "/portfolio/",
                     data=json.dumps(new_portfolio),
