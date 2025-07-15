@@ -90,8 +90,6 @@ class TestPortfolioBlueprint(BaseTestCase):
             (p for p in mock_get_all_portfolios_for_user() if p.id == 1),
             None
         )
-        print("Filtered portfolio object:", portfolio)
-        print("Serialized portfolio:", PortfolioSchema().dump(portfolio))
         app.logger.info(f"Filtered portfolio object: {portfolio}")
         app.logger.info(f"Serialized portfolio: {PortfolioSchema().dump(portfolio)}")
         
@@ -102,6 +100,7 @@ class TestPortfolioBlueprint(BaseTestCase):
         with app.test_client() as client:
             response: TestResponse = client.get("/portfolio/1", headers=headers)
             data = response.get_json()
+            app.logger.info(f"Response data: {data}")
             self.assertEqual("Test Portfolio One", data.get("name"))
             self.assertEqual(1, data.get("id"))
 
