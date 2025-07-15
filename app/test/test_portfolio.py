@@ -84,15 +84,17 @@ class TestPortfolioBlueprint(BaseTestCase):
             "Authorization": access_token,
         }
 
-        mock_portfolios.return_value = [
-            portfolio for portfolio in mock_get_all_portfolios_for_user()
-        ]
+        # Filter and select the first portfolio with id == 1
+        mock_portfolios.return_value = next(
+            (portfolio for portfolio in mock_get_all_portfolios_for_user() if portfolio.id == 1),
+            None
+        )
 
         with app.test_client() as client:
             response: TestResponse = client.get("/portfolio/1", headers=headers)
             data = response.get_json()
-            self.assertEqual("Test Portfolio One", data[0].get("name"))
-            self.assertEqual(1, data[0].get("id"))
+            self.assertEqual("Test Portfolio One", data.get("name"))
+            self.assertEqual(1, data.get("id"))
 
     def test_portfolio_is_not_returned_for_non_owner_user_id(self) -> None:
         """Unit test to test that users cannot access other user records"""
