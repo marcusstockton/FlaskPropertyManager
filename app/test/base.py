@@ -15,6 +15,7 @@ from app.main.model.blacklist import BlacklistToken
 
 from app.main import create_app, db
 from app.main.model import user
+from app import blueprint
 
 
 class BaseTestCase(TestCase):
@@ -24,9 +25,8 @@ class BaseTestCase(TestCase):
         return create_app("test")
 
     def setUp(self):
-        # if "_test.db" not in str(db.engine.url):
-        #     raise ValueError("Not using test database!")
-        # print("Engine URL: %s", db.engine.url)
+        self.app.register_blueprint(blueprint)
+
         self.app.logger.info("Setting up %s", db.engine.url)
         with self.app.app_context():
            # Initialize Flask-Migrate
