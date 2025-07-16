@@ -34,9 +34,12 @@ class TestPropertyBlueprint(BaseTestCase):
         with patch(
             "app.main.controller.property_controller.get_all_properties_for_portfolio"
         ) as mock_get_portfolio_by_id:
-            mock_get_portfolio_by_id.return_value = property.Property.query.filter_by(portfolio_id=1).all()
-            with app.test_client() as client:
+            properties = property.Property.query.filter_by(portfolio_id=1).all()
+            
+            self.app.logger.info(f"Filtered properties object: {properties}")
 
+            mock_get_portfolio_by_id.return_value = properties
+            with app.test_client() as client:
                 response = client.get("/portfolio/1/property/", headers=headers)
                 print(response)
                 self.assert200(response)

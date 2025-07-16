@@ -87,9 +87,6 @@ class TestPortfolioBlueprint(BaseTestCase):
             (p for p in mock_get_all_portfolios_for_user() if p.id == 1),
             None
         )
-        self.app.logger.info(f"Filtered portfolio object: {portfolio}")
-        self.app.logger.info(
-            f"Serialized portfolio: {PortfolioSchema().dump(portfolio)}")
 
         assert portfolio is not None, "No portfolio with id == 1 found in mock data"
 
