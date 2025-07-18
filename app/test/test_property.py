@@ -7,7 +7,6 @@ from app.main.model import address, property
 from app.main.model.portfolio import Portfolio
 from app.main.model.user import User
 from app.test.base import BaseTestCase
-from manage import app
 
 
 def create_owner_user() -> str:
@@ -39,20 +38,14 @@ class TestPropertyBlueprint(BaseTestCase):
             self.app.logger.info(f"Filtered properties object: {properties}")
 
             mock_get_portfolio_by_id.return_value = properties
-            with app.test_client() as client:
+            with self.app.test_client() as client:
                 response = client.get("/portfolio/1/property/", headers=headers)
                 print(response)
                 self.assert200(response)
                 data = json.loads(response.get_data(as_text=True))
                 self.assertEqual(2, len(data))
 
-                # response = client.get("/portfolio/2/property/", headers=headers)
-                # print(response)
-                # self.assert404(response)
-                # data = json.loads(response.get_data(as_text=True))
-                # self.assertEqual(0, len(data))
 
-    #
     @staticmethod
     def create_data():
         """Creates some test data for these tests"""
