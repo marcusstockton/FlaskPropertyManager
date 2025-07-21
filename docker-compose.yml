@@ -25,7 +25,7 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
-      - back-end
+      - db
 
 
   flask_app:
@@ -47,8 +47,9 @@ services:
       - PROPERTYMANAGER_ENV=dev # prod, dev, test
       - DATABASE_URL=postgresql://postgres:postgres@flask_db:5433/postgres
     networks:
-    - front-end
-    - back-end
+    - api
+    - db
+    - redis
     mem_limit: 512m
     mem_reservation: 128M
     memswap_limit: 1g
@@ -62,7 +63,7 @@ services:
     ports:
       - "6379:6379"
     networks:
-      - front-end
+      - redis
     mem_limit: 128m
     mem_reservation: 128m
     memswap_limit: 128m
@@ -93,7 +94,7 @@ services:
     - ServerOptions__Urls=http://*:80
     - ServerOptions__HostName=smtp4dev
     networks:
-    - back-end
+    - api
     mem_limit: 512m
     mem_reservation: 128M
     memswap_limit: 1g
@@ -102,9 +103,11 @@ services:
 
 
 networks:
-  front-end:
+  api:
     driver: bridge
-  back-end:
+  db:
+    driver: bridge
+  redis:
     driver: bridge
 
 volumes:
