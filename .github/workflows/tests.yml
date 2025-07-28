@@ -19,7 +19,7 @@ jobs:
         with:
           python-version: '3.13'
           cache: 'pip' # caching pip dependencies
-      - run: 🛠️ pip install -r requirements.txt
+      - run: pip install -r requirements.txt
       - name: ⚙️ Check app imports
         run: python -c "import manage"
 
@@ -32,7 +32,7 @@ jobs:
         with:
           python-version: '3.13'
           cache: 'pip' # caching pip dependencies
-      - run: 🛠️ pip install -r requirements.txt
+      - run: pip install -r requirements.txt
       - name: ✅ Run unit tests
         env:
           PROPERTYMANAGER_ENV: test
