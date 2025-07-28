@@ -55,7 +55,7 @@ class PortfolioList(Resource):
         if user is None:
             raise NotFound(user)
         app.logger.info(f"Creating a new portfolio for {user.username}")
-        return save_new_portfolio(data=data, user_id=user.id)
+        return save_new_portfolio(data=data, user=user)
 
 
 @api.route("/<int:portfolio_id>")
@@ -83,7 +83,10 @@ class PortfolioItem(Resource):
     def put(self, portfolio_id) -> Portfolio:
         """Edits a portfolio"""
         data: ParseResult = _portfolio_update_parser.parse_args()
-        return update_portfolio(portfolio_id, data)
+        user: User | None = Auth.get_logged_in_user_object(request)
+        if user is None:
+            raise NotFound(user)
+        return update_portfolio(portfolio_id, data, user)
 
     @token_required
     @api.response(204, "Portfolio and related data deleted.")
