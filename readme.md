@@ -73,3 +73,7 @@ Should get a blue bar along the bottom in vs code - should be good to go!\
 
 Add deposit scheme for tenants - scheme, amount
 When in rent paid, keep track of payments
+
+### CORS testing
+
+curl -i -X OPTIONS http://localhost:5000/portfolio/ -H "Origin: http://localhost:3000" -H "Access-Control-Request-Method: GET"

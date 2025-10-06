@@ -25,11 +25,11 @@ cache = Cache(config={"CACHE_TYPE": "SimpleCache"})
 flask_bcrypt = Bcrypt()
 mail = Mail()
 redis_client = redis.Redis(
-        host=os.getenv("REDIS_HOST", "redis_cache"),
-        port=int(os.getenv("REDIS_PORT", 6379)),
-        db=0,
-        decode_responses=True
-    )
+    host=os.getenv("REDIS_HOST", "redis_cache"),
+    port=int(os.getenv("REDIS_PORT", 6379)),
+    db=0,
+    decode_responses=True
+)
 
 
 def create_app(config_name: str) -> Flask:
