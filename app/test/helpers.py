@@ -44,7 +44,8 @@ def mock_logged_in_user():
 def register(self, email, username, password):
     return self.client.post(
         "/user/",
-        data=json.dumps(dict(email=email, username=username, password=password)),
+        data=json.dumps(
+            dict(email=email, username=username, password=password)),
         content_type="application/json",
     )
 

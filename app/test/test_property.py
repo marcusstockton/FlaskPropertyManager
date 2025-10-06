@@ -11,7 +11,8 @@ from app.test.base import BaseTestCase
 
 def create_owner_user() -> str:
     """Creates a non-admin user and returns the auth token"""
-    user: User = db.session.query(User).filter_by(username="test@test.com").one()
+    user: User = db.session.query(User).filter_by(
+        username="test@test.com").one()
     auth_token: str = user.encode_auth_token(user.id)
     if isinstance(auth_token, str):
         return auth_token
@@ -33,18 +34,19 @@ class TestPropertyBlueprint(BaseTestCase):
         with patch(
             "app.main.controller.property_controller.get_all_properties_for_portfolio"
         ) as mock_get_portfolio_by_id:
-            properties = property.Property.query.filter_by(portfolio_id=1).all()
-            
+            properties = property.Property.query.filter_by(
+                portfolio_id=1).all()
+
             self.app.logger.info(f"Filtered properties object: {properties}")
 
             mock_get_portfolio_by_id.return_value = properties
             with self.app.test_client() as client:
-                response = client.get("/portfolio/1/property/", headers=headers)
+                response = client.get(
+                    "/portfolio/1/property/", headers=headers)
                 print(response)
                 self.assert200(response)
                 data = json.loads(response.get_data(as_text=True))
                 self.assertEqual(2, len(data))
-
 
     @staticmethod
     def create_data():

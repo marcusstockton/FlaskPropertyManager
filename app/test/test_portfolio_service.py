@@ -34,7 +34,8 @@ def create_user(email: str, username: str, admin: bool = False, password: str = 
 
 def create_owner_user() -> None:
     """Creates a non-admin user with predefined details."""
-    create_user(email="user@testing.com", username="user@testing.com", admin=False, password="test")
+    create_user(email="user@testing.com",
+                username="user@testing.com", admin=False, password="test")
 
 
 def create_portfolio(name: str, owner: User) -> None:
@@ -48,13 +49,14 @@ class TestPortfolioServiceBlueprint(BaseTestCase):
 
     def setUp(self):
         # Patch redis_client in the portfolio_service module
-        patcher = patch('app.main.service.portfolio_service.redis_client', autospec=True)
+        patcher = patch(
+            'app.main.service.portfolio_service.redis_client', autospec=True)
         self.mock_redis = patcher.start()
         self.addCleanup(patcher.stop)
         # Optionally, set up mock return values
         self.mock_redis.get.return_value = None
         self.mock_redis.setex.return_value = True
-        
+
         # Create all tables before each test
         db.create_all()
 
@@ -81,62 +83,74 @@ class TestPortfolioServiceBlueprint(BaseTestCase):
     ) -> None:
         """Tests that the admin user can see all portfolios"""
 
-        admin_user = db.session.query(User).filter_by(email="admin@user.com").scalar()
+        admin_user = db.session.query(User).filter_by(
+            email="admin@user.com").scalar()
         create_owner_user()
 
-        owner_user = db.session.query(User).filter_by(email="user@testing.com").scalar()
+        owner_user = db.session.query(User).filter_by(
+            email="user@testing.com").scalar()
         create_portfolio("Test Portfolio", admin_user)
         create_portfolio("Test Portfolio2", admin_user)
         create_portfolio("Test Portfolio 3", owner_user)
 
         results = get_all_portfolios_for_user(admin_user)
-        self.assertEqual(3, len(results), "Admin user should see all portfolios")
+        self.assertEqual(
+            3, len(results), "Admin user should see all portfolios")
 
     def test_get_all_portfolios_for_user_returns_portfolios_for_owner_user(
         self,
     ) -> None:
         """Tests that the portfolio service correctly returns data for the owner user"""
 
-        admin_user = db.session.query(User).filter_by(email="admin@user.com").scalar()
+        admin_user = db.session.query(User).filter_by(
+            email="admin@user.com").scalar()
         create_owner_user()
 
-        owner_user = db.session.query(User).filter_by(email="user@testing.com").scalar()
+        owner_user = db.session.query(User).filter_by(
+            email="user@testing.com").scalar()
         create_portfolio("Test Portfolio", admin_user)
         create_portfolio("Test Portfolio2", admin_user)
         create_portfolio("Test Portfolio 3", owner_user)
 
         results: List[Portfolio] = get_all_portfolios_for_user(owner_user)
-        self.assertEqual(1, len(results), "Owner user should see only their portfolios")
+        self.assertEqual(
+            1, len(results), "Owner user should see only their portfolios")
 
     def test_get_portfolio_by_id_returns_correct_portfolio(self) -> None:
         """Tests that the get_portfolio_by_id service returns the correct portfolio."""
         create_owner_user()
-        owner_user = db.session.query(User).filter_by(email="user@testing.com").scalar()
+        owner_user = db.session.query(User).filter_by(
+            email="user@testing.com").scalar()
 
         create_portfolio("Portfolio One", owner_user)
         create_portfolio("Portfolio Two", owner_user)
 
         portfolio_1 = (
-            db.session.query(Portfolio.id).filter_by(name="Portfolio One").scalar()
+            db.session.query(Portfolio.id).filter_by(
+                name="Portfolio One").scalar()
         )
         self.assertIsNotNone(portfolio_1, "Portfolio ID should not be None")
 
-        result: Portfolio = get_portfolio_by_id(owner_user, portfolio_id=portfolio_1)
-        self.assertEqual("Portfolio One", result.name, "Portfolio name mismatch")
+        result = get_portfolio_by_id(owner_user, portfolio_id=portfolio_1)
+        self.assertEqual("Portfolio One", result.name,
+                         "Portfolio name mismatch")
         self.assertEqual(owner_user.id, result.owner.id, "Owner ID mismatch")
 
     def test_get_portfolio_by_id_handles_incorrect_user(self) -> None:
         """Tests that the get_portfolio_by_id service raises NotFound for incorrect user."""
         create_owner_user()
         create_user(email="user2@testing.com", username="user2@testing.com")
-        owner_user = db.session.query(User).filter_by(email="user@testing.com").scalar()
-        owner_user_2 = db.session.query(User).filter_by(email="user2@testing.com").scalar()
+        owner_user = db.session.query(User).filter_by(
+            email="user@testing.com").scalar()
+        owner_user_2 = db.session.query(User).filter_by(
+            email="user2@testing.com").scalar()
 
         create_portfolio("Portfolio One", owner_user)
         create_portfolio("Portfolio Two", owner_user)
 
         portfolio_1 = (
-            db.session.query(Portfolio.id).filter_by(name="Portfolio One").scalar()
+            db.session.query(Portfolio.id).filter_by(
+                name="Portfolio One").scalar()
         )
         self.assertIsNotNone(portfolio_1, "Portfolio ID should not be None")
 
