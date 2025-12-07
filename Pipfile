@@ -22,7 +22,7 @@ marshmallow = "==3.21.3"
 requests = "==2.32.4"
 sqlalchemy-utils = "==0.41.2"
 sqlalchemy = "==2.0.30"
-werkzeug = "==3.0.6"
+werkzeug = "==3.1.4"
 gunicorn = "==23.0.0"
 
 [dev-packages]
