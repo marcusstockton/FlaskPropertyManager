@@ -2,78 +2,192 @@
 
 This was just an idea for managing properties for landlords etc.
 
+## Development setup
+
+This project runs using Docker Compose.
+
+### Prerequisites
+
+1. Docker Desktop
+2. VS Code (recommended)
+3. Python tooling is not required locally when running through Docker.
+
 ## Scaffolded out in line with
 
 https://www.freecodecamp.org/news/structuring-a-flask-restplus-web-service-for-production-builds-c2ec676de563/
 
-### Help
+### Start the application
 
-    flask --app manage.py --help
+Build and start all services:
+```docker compose up -d --build```
+#### This will:
+
+1. Start PostgreSQL
+2. Wait for PostgreSQL to become healthy
+3. Run database migrations
+4. Start the Flask application
+5. Start Redis
+6. Start smtp4dev
+
+The application is available at: ```http://localhost:5000```
+
+## View logs
+
+All services:
+
+```docker compose logs -f```
+
+Flask application only:
+
+```docker compose logs -f flask_app```
+
+PostgreSQL only:
+
+```docker compose logs -f flask_db```
+
+## Docker commands
+
+### Start
+
+Start the existing containers: ```docker compose up -d```
+
+Build and start: ```docker compose up -d --build```
+
+Stop the application: ```docker compose down```
+
+Restart: ```docker compose restart```
+
+### Rebuild
+
+Rebuild everything: ```docker compose build```
+
+Rebuild only the Flask application: ```docker compose build flask_app```
+
+Usually, however, you can simply use: ```docker compose up -d --build``` which rebuilds what is necessary and starts the services.
+
+
+## Accessing the Flask container
+
+Open a shell inside the running Flask container: ```docker compose exec flask_app sh```
+
+The image uses Alpine Linux, so sh is available rather than bash.
+
+Alternatively, execute a command directly: ```docker compose exec flask_app flask --help```
+
+## Database
+
+PostgreSQL is available to the application at: ```flask_db:5432```
+From the host machine it is exposed at: ```localhost:5433```
 
 ### Migrations
 
-    flask --app manage.py db init
-    flask --app manage.py db migrate -m "<Migration Message>"
-    flask --app manage.py db upgrade
+Create a migration: ```docker compose exec flask_app flask db migrate -m "Migration message"```
 
-### Testing
+Apply migrations: ```docker compose exec flask_app flask db upgrade```
 
-    sudo python manage.py test || flask test
+Check the current migration: ```docker compose exec flask_app flask db current```
 
-### Running
+View migration history: ```docker compose exec flask_app flask db history```
 
-    sudo python manage.py run || flask run
+Database migrations are automatically applied when the Flask container starts.
 
-### Seeding
+#### Initialising migrations
 
-    sudo python manage.py seed
-    flask --app manage.py seed
+Only required if setting up the project from scratch without an existing migrations directory: ```docker compose exec flask_app flask db init```
 
-### Shell
+## Seed data
 
-    flask shell
+Seed the development database: ```docker compose exec flask_app flask seed```
 
-### Example insert of property against Portfolio in shell
+This can be run whenever the database needs to be populated with development data.
 
+## Testing
+
+Run the test suite: ```docker compose exec flask_app flask test```
+
+## Flask shell
+
+Open a Flask shell: ```docker compose exec flask_app flask shell```
+
+For example:
+
+```
     from app.main.model.portfolio import Portfolio
-    port = Portfolio.query.first()
-    new_property = Property(portfolio_id=1, purchase_price=234561, purchase_date= datetime.datetime(2020,3,12))
-    port.properties.append(new_property)
+    from app.main.model.property import Property
+    from app.main import db
+
+    portfolio = Portfolio.query.first()
+
+    new_property = Property(
+        portfolio_id=1,
+        purchase_price=234561,
+        purchase_date=datetime.datetime(2020, 3, 12)
+    )
+
+    portfolio.properties.append(new_property)
     db.session.commit()
+```
 
-#### Usernames
+## Development users
 
-<test@test.com> | <marcus_stockton@hotmail.co.uk>\
-test
+| Username | Password |
+|--------  | -------- |
+| test@test.com | test |
+| marcus_stockton@hotmail.co.uk | test |
 
-## Idea's
+These credentials are for local development only.
 
-* Add caching to auto-completes (AddressSearchList)
-* Remove Flask-Caching and add in redis caching
 
-### Docker Commands
+## Debugging with VS Code
 
-``docker build -t flaskpropertymanager .``\
-``docker run -it -p 5000:5000 flaskpropertymanager``\
-``docker exec -it <container name> bash`` # to load up the docker image to navigate in linux\
-``docker compose build`` # builds all images\
-``docker compose build flask_app`` # Builds specific image\
-``docker compose up -d`` # runs all images in detached mode\
-``docker compose up -d --build``
-``docker compose up -d flask_app`` # runs one particular image in detached mode
+Make sure Docker Desktop is running.
 
-### Debugging against a docker container
+Start the application with: ```docker compose up -d --build```
 
-Firstly, make sure docker desktop is running.\
-Then you'll want to build the latest images (assuming something has changed since last time) and run them up\
-Then, once both images are up and running, you can just hit the debug in vs code choosing the Python Debugger: Remote Attach option.\
-Should get a blue bar along the bottom in vs code - should be good to go!\
+Once the containers are running, use the VS Code Python Debugger: Remote Attach configuration.
 
-### Ideas
+The Flask container must expose the debugger port when using the debugger configuration.
 
-Add deposit scheme for tenants - scheme, amount
-When in rent paid, keep track of payments
+## Useful Docker commands
 
-### CORS testing
+See running services: ```docker compose ps```
 
-curl -i -X OPTIONS http://localhost:5000/portfolio/ -H "Origin: http://localhost:3000" -H "Access-Control-Request-Method: GET"
+Follow application logs: ```docker compose logs -f flask_app```
+
+Restart Flask: ```docker compose restart flask_app```
+
+Open a shell in Flask: ```docker compose exec flask_app sh```
+
+Open PostgreSQL: ```docker compose exec flask_db psql -U postgres -d postgres```
+
+Stop everything: ```docker compose down```
+
+Stop everything and remove the database volume:
+> **Warning** this deletes the development database. ```docker compose down -v```
+
+This is particularly useful when you want to simulate a completely fresh installation:
+
+```docker compose down -v```
+
+```docker compose up -d --build```
+
+```docker compose exec flask_app flask seed```
+
+## CORS testing
+
+Test a CORS preflight request:
+
+```curl -i -X OPTIONS http://localhost:5000/portfolio/ -H "Origin: http://localhost:3000" -H "Access-Control-Request-Method: GET"```
+
+## Project ideas
+
+- Add caching to autocomplete endpoints (AddressSearchList)
+- Replace Flask-Caching with Redis caching
+- Add tenant deposit scheme tracking:
+    - Scheme
+    - Deposit amount
+    - Reference
+    - Start/end dates
+    - Track rent payments
+    - Add rent payment history against tenants
+    - Add deposit scheme information to tenant records

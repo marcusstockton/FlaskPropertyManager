@@ -17,11 +17,11 @@ with app.app_context():
     ma = Marshmallow(app)
 
 
-@app.cli.command()
-def run() -> None:
-    """Command to run the app."""
-    app.logger.info("run called")
-    app.run(debug=True)
+# @app.cli.command()
+# def run() -> None:
+#     """Command to run the app."""
+#     app.logger.info("run called")
+#     app.run(debug=True)
 
 
 @app.cli.command()
@@ -41,6 +41,6 @@ def seed() -> None:
     seed_data(db)
 
 
-if __name__ == "__main__":
-    app.logger.info("__main__ called")
-    app.run(debug=True)
+# if __name__ == "__main__":
+#     app.logger.info("__main__ called")
+#     app.run(debug=True)

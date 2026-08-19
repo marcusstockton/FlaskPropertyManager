@@ -3,3 +3,6 @@ __pycache__/
 venv/
 app/main/flask_PropertyManager_main.db
 app/main/flask_PropertyManager_test.db
+.pytest_cache
+.vscode
+.idea

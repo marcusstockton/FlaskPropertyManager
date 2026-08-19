@@ -21,12 +21,6 @@ RUN addgroup -g 10001 appgroup && \
 # Switch to the non-root user
 USER appuser
 
-######################
-## Apply Migrations ##
-######################
-FROM base AS migrations
-RUN python manage.py db upgrade
-
 ##############
 ## Debugger ##
 ##############
@@ -37,5 +31,4 @@ RUN python manage.py db upgrade
 #############
 ## Primary ##
 #############
-FROM base AS primary
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "manage:app"]
+ENTRYPOINT ["./entrypoint.sh"]

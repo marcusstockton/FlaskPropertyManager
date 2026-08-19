@@ -1,17 +1,15 @@
 services:
 
   flask_db:
-    image: postgres
+    image: postgres:18
     container_name: flask_db
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
-      - PGUSER=postgres
-      - PGPORT=5433
     shm_size: 128mb
     healthcheck:
-      test: ["CMD", "pg_isready", "-q", "-d", "postgres", "-U", "postgres"]
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -p 5432 -U postgres -d postgres"]
       interval: 5s
       timeout: 5s
       retries: 5 
@@ -21,7 +19,7 @@ services:
     cpus: "0.5"
     cpuset: "1"
     ports:
-      - "5433:5433"
+      - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql
     networks:
@@ -33,8 +31,8 @@ services:
     build: 
       context: .
       dockerfile: Dockerfile
-      #target: debugger # only for dev
-      target: primary # for prod
+      # target: debugger # only for dev
+      # target: primary # for prod
     ports:
        - 5000:5000
        #- 5678:5678 # only for dev
@@ -45,7 +43,7 @@ services:
         condition: service_healthy
     environment:
       - PROPERTYMANAGER_ENV=dev # prod, dev, test
-      - DATABASE_URL=postgresql://postgres:postgres@flask_db:5433/postgres
+      - DATABASE_URL=postgresql://postgres:postgres@flask_db:5432/postgres
     networks:
     - api
     - db
