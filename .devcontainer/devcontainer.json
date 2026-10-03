@@ -1,0 +1,7 @@
+{
+    "name": "Flask Property Manager",
+    "dockerComposeFile": "../docker-compose.yml",
+    "service": "flask_app",
+    "workspaceFolder": "/app",
+    "shutdownAction": "stopCompose"
+}
